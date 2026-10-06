@@ -850,6 +850,12 @@ body.held{overflow:hidden}
           </div>
         </div>
 
+        <div class="field" id="familyField">
+          <label for="r-family">What shall we call your family?</label>
+          <p class="hint">However you like it — The Sharmas, Team Gupta, the Bensalem Bhangra Crew. Leave blank if it's just you, coming or not.</p>
+          <input id="r-family" type="text" placeholder="Your family name (optional)">
+        </div>
+
         <!-- everything below appears only for a yes -->
         <div id="comingBlock" hidden style="display:grid;gap:var(--s-5)">
 
@@ -861,12 +867,6 @@ body.held{overflow:hidden}
               <button class="stepper" type="button" id="cPlus" aria-label="One more">+</button>
             </div>
             <p class="hint">Everyone, big and small.</p>
-          </div>
-
-          <div class="field" id="familyField" hidden>
-            <label for="r-family">What shall we call your family?</label>
-            <p class="hint">However you like it on the night. The Sharmas, Team Gupta, the Bensalem Bhangra Crew. Have fun with it.</p>
-            <input id="r-family" type="text" placeholder="Your family name">
           </div>
 
           <div id="people" style="display:grid;gap:var(--s-4)"></div>
@@ -1420,7 +1420,7 @@ function attachMark(){
 
 function initRsvp(){
   const yes=$('#att-yes'), no=$('#att-no'), coming=$('#comingBlock'), sorry=$('#sorryBlock');
-  const count=$('#r-count'), people=$('#people'), famField=$('#familyField');
+  const count=$('#r-count'), people=$('#people');
   if(!yes) return;
 
   function personBlock(i){
@@ -1441,7 +1441,6 @@ function initRsvp(){
   function paintPeople(){
     const n=Math.max(1,Math.min(12,+count.value||1));
     count.value=n;
-    famField.hidden = n<2;
     const have=people.children.length;
     if(n>have) for(let i=have;i<n;i++) people.insertAdjacentHTML('beforeend',personBlock(i));
     else while(people.children.length>n) people.lastElementChild.remove();
