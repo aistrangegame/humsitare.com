@@ -1,0 +1,25 @@
+Sounds for humsitare.com — what each is, and where it came from.
+
+Put this whole folder beside index.html, named "sound".
+
+RECORDED
+  bell.mp3     A ghanta (Hindu ritual bell) struck with a leather mallet.
+               "274316 the-very-real-horst ghanta-leather-mallet-2015-05-16.wav"
+               by the_very_Real_Horst, Wikimedia Commons — CC0 (public domain dedication).
+               One strike, trimmed and faded. Rings at about 1014 Hz.
+  boom-1.mp3   Fireworks bursting in the distance.
+  boom-2.mp3   "Fireworks in distance 3.ogg" by ezwa, Wikimedia Commons — public domain.
+  pop-1.mp3    Trimmed into single bursts and crackles, and brought up in level.
+  pop-2.mp3
+  pop-3.mp3
+
+MADE FOR THIS PAGE
+  tanpura.mp3  A tanpura drone, Pa–Sa–Sa–low Sa, plucked strings with the jawari buzz
+               of the bridge. Tuned so Sa sits exactly three octaves below the bell.
+               An 8.8-second loop. No freely licensed pure tanpura recording exists on
+               Commons, so this one was synthesised.
+  swell.mp3    The swell when the page lights: Sa, Pa and high Sa opening slowly.
+  hum.mp3      The low breathing hum under the dark lamp. A loop.
+  launch.mp3   A rocket leaving the ground: a soft rising whoosh.
+
+Neither licence requires credit. This file is kept so the sources are never lost.

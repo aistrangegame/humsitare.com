@@ -488,6 +488,57 @@ body.held{overflow:hidden}
  text-transform:uppercase;color:var(--sig)}
 .person-note{font-size:var(--fs-sm);color:var(--fg-muted)}
 
+
+/* ================= stories, the way every phone already does them ================= */
+.story{position:fixed;inset:0;z-index:70;background:#07060B;display:none;grid-template-rows:auto 1fr auto;gap:var(--s-2);
+ padding:calc(var(--s-3) + env(safe-area-inset-top)) var(--s-2) calc(var(--s-3) + env(safe-area-inset-bottom));
+ color:#F4EFE4;-webkit-user-select:none;user-select:none}
+.story.up{display:grid}
+@media(min-width:720px){.story{padding-inline:max(var(--s-4),calc(50vw - 230px))}}
+.story-top{display:grid;gap:var(--s-2);padding:0 var(--s-1)}
+.story-bars{display:flex;gap:4px}
+.story-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden}
+.story-bars i b{display:block;height:100%;background:#fff;transform:scaleX(0);transform-origin:left;will-change:transform}
+.story-bars i.done b{transform:scaleX(1)}
+.story-head{display:flex;align-items:center;gap:var(--s-2);min-height:44px}
+.story-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:0 0 auto;box-shadow:0 0 0 2px #07060B,0 0 0 3.5px var(--gold)}
+.story-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.story-title{font-family:var(--font-display);font-size:var(--fs-ui);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.story-count{font-family:var(--font-mono);font-size:var(--fs-mono-floor);letter-spacing:var(--ls-mono);color:rgba(244,239,228,.62)}
+.story-ctls{margin-left:auto;display:flex;align-items:center}
+.story-ctl{width:44px;height:44px;display:grid;place-items:center;background:none;border:0;color:#F4EFE4;cursor:pointer;border-radius:50%}
+.story-ctl:hover{background:rgba(255,255,255,.08)}
+.story-ctl:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.story-ctl svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.story-ctl .spk{fill:currentColor;stroke:none}
+#stSound .on{display:none} #stSound[aria-pressed="true"] .on{display:inline} #stSound[aria-pressed="true"] .off{display:none}
+#stPlay .py{display:none;fill:currentColor;stroke:none} #stPlay.paused .py{display:inline} #stPlay.paused .pz{display:none}
+.story-stage{position:relative;min-height:0;border-radius:var(--radius);overflow:hidden;background:#0E0C14;touch-action:none;cursor:pointer;
+ -webkit-touch-callout:none}
+.story-stage img,.story-stage video{-webkit-user-drag:none;user-drag:none;-webkit-touch-callout:none;pointer-events:none}
+.story-media{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:contain;transition:opacity .18s linear}
+.story-media.loading{opacity:0}
+.story-spin{position:absolute;left:50%;top:50%;z-index:2;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+ border:2.5px solid rgba(255,255,255,.22);border-top-color:#fff;animation:storyspin .8s linear infinite;opacity:0;transition:opacity .2s;pointer-events:none}
+.story-stage.waiting .story-spin{opacity:1}
+@keyframes storyspin{to{transform:rotate(360deg)}}
+.story-slot{position:absolute;inset:0;z-index:2;display:grid;place-content:center;gap:var(--s-2);text-align:center;color:rgba(244,239,228,.7)}
+.story-hint{position:absolute;left:50%;bottom:var(--s-5);z-index:3;transform:translateX(-50%);
+ background:rgba(7,6,11,.72);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:999px;
+ padding:0 var(--s-4);min-height:44px;font:600 var(--fs-sm)/1 var(--font-ui);cursor:pointer;
+ animation:storyhint 4.2s ease forwards}
+@keyframes storyhint{0%{opacity:0;transform:translate(-50%,8px)}10%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;visibility:hidden}}
+.story-chev{position:absolute;top:50%;z-index:3;width:44px;height:44px;margin-top:-22px;display:grid;place-items:center;
+ border-radius:50%;border:0;background:rgba(7,6,11,.45);color:#fff;cursor:pointer;opacity:.0;transition:opacity .2s}
+.story-chev svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.story-chev.l{left:var(--s-2)} .story-chev.r{right:var(--s-2)}
+.story-stage:hover .story-chev,.story-chev:focus-visible{opacity:1}
+@media(hover:none){.story-chev{opacity:.0}}
+.story-help{margin:0;text-align:center;font-size:var(--fs-sm);color:rgba(244,239,228,.5);min-height:1.3em;transition:opacity .4s}
+.story-help.gone{opacity:0}
+.story.dragging .story-stage{transition:none}
+.story-stage{transition:transform .25s var(--ease-out),opacity .25s}
+
 /* ---- any photograph, full screen ---- */
 .lightbox{position:fixed;inset:0;z-index:80;background:rgba(5,4,9,.95);display:none;
  grid-template-rows:auto 1fr auto;gap:var(--s-3);
@@ -527,7 +578,6 @@ body.held{overflow:hidden}
 .slot-media:has(img) .ceremony,.slot-circle:has(img) .ceremony,
 .slot-media:has(img) > span:not(.ceremony){display:none}
 .slot-media.awaiting,.slot-circle.awaiting{display:grid}
-.story-media{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;border-radius:var(--radius-sm)}
 /* the frame is 9:16; a photograph that is not fills the rest with a blurred copy of itself,
    the way Instagram and WhatsApp Status do, so nothing is ever cropped and nothing floats in black */
 .story-wash{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
@@ -580,23 +630,10 @@ body.held{overflow:hidden}
 .slot-circle{color:var(--fg-muted);font-size:var(--fs-sm)}
 
 /* the story player */
-.story{position:fixed;inset:0;z-index:70;background:#07060B;display:none;
- padding:calc(var(--s-4) + env(safe-area-inset-top)) var(--s-3) calc(var(--s-4) + env(safe-area-inset-bottom))}
 .story.up{display:grid;grid-template-rows:auto 1fr auto;gap:var(--s-3)}
-.story-bars{display:flex;gap:4px}
-.story-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.26);overflow:hidden;position:relative}
-.story-bars i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
-.story-bars i.done::after{transform:scaleX(1)}
-.story-bars i.run::after{animation:storybar var(--story-ms,5000ms) linear forwards}
 @keyframes storybar{to{transform:scaleX(1)}}
-.story-stage{position:relative;min-height:0;border-radius:var(--radius);overflow:hidden;background:#0E0C14;display:grid;place-items:center}
 .story-stage img,.story-stage video{width:100%;height:100%;object-fit:contain}
 .story-slot{display:grid;gap:var(--s-2);place-items:center;text-align:center;color:var(--fg-muted);padding:var(--s-6)}
-.story-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);color:#F4EFE4}
-.story-title{font-family:var(--font-display);font-size:var(--fs-lg)}
-.story-x{background:none;border:0;color:#F4EFE4;font-size:1.6rem;line-height:1;padding:var(--s-2) var(--s-4);cursor:pointer}
-.story-nav{position:absolute;inset:0;display:grid;grid-template-columns:32% 1fr 32%}
-.story-nav button{background:none;border:0;cursor:pointer}
 
 /* ---- the evening ---- */
 .beats{list-style:none;margin:var(--s-6) 0 0;padding:0;position:relative}
@@ -799,7 +836,35 @@ main.threshold{position:relative;z-index:1}
 .diyarail.whole .d.on{animation:railwhole 1.8s ease-in-out both}
 @media (prefers-reduced-motion:reduce){.diyarail.whole .d.on{animation:none}}
 
-.fw{position:fixed;inset:0;z-index:50;pointer-events:none}
+.fw{position:fixed;inset:0;z-index:62;pointer-events:none}
+/* the sky goes back to night for the show, then dawn returns */
+.fw-veil{position:fixed;inset:0;z-index:61;pointer-events:none;opacity:0;
+ background:radial-gradient(120% 90% at 50% 100%,#1A1230 0%,#0B0818 55%,#05040A 100%);transition:opacity 1.1s var(--ease-out)}
+.fw-veil.on{opacity:1;pointer-events:auto;cursor:pointer}
+.fw-note{position:fixed;left:50%;top:50%;z-index:63;transform:translate(-50%,-50%);width:min(86vw,420px);text-align:center;
+ color:#FFF4DC;pointer-events:none;opacity:0;transition:opacity 1s var(--ease-out)}
+.fw-note.on{opacity:1}
+.fw-note b{display:block;font-family:var(--font-display);font-weight:500;font-size:clamp(1.6rem,7vw,2.3rem);line-height:1.2;
+ text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.fw-note span{display:block;margin-top:var(--s-3);font-size:var(--fs-ui);color:rgba(255,244,220,.78)}
+.fw-note small{display:block;margin-top:var(--s-5);font-family:var(--font-mono);font-size:var(--fs-mono-floor);
+ letter-spacing:var(--ls-mono);text-transform:uppercase;color:rgba(255,244,220,.5)}
+.fw-note .quiet-diya{width:64px;height:auto;margin:0 auto var(--s-4);display:block;overflow:visible}
+
+/* one switch for every sound on the page; the story videos obey it too */
+.snd{position:fixed;top:calc(env(safe-area-inset-top) + 2px);right:calc(env(safe-area-inset-right) + 6px);z-index:25;
+ width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;
+ background:rgba(8,6,16,.55);color:#F4EFE4;transition:background .2s,transform .2s,box-shadow .4s}
+.snd:hover{background:rgba(8,6,16,.75)}
+.snd:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.snd svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.snd .spk{fill:currentColor;stroke:none}
+.snd .on{display:none} .snd[aria-pressed="true"] .on{display:inline} .snd[aria-pressed="true"] .off{display:none}
+.snd.light{background:rgba(247,243,236,.8);color:#1C1712}
+.snd.nudge{animation:sndnudge 1.6s ease-in-out 2}
+@keyframes sndnudge{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 7px rgba(242,193,78,.35)}}
+.diyarail{padding-inline:56px}
+@media(max-width:420px){.diyarail{gap:clamp(6px,3vw,26px)}}
 
 /* ---- this device has already replied ---- */
 .replied{position:fixed;left:50%;bottom:calc(var(--s-4) + env(safe-area-inset-bottom));transform:translate(-50%,16px);
@@ -1363,15 +1428,37 @@ body.has-replied .rsvp-fab{display:none}
 
 
 <!-- the story player -->
-<div class="story" id="story" role="dialog" aria-modal="true" aria-label="Moments from last year">
-  <div class="story-bars" id="storyBars"></div>
+<div class="story" id="story" role="dialog" aria-modal="true" aria-label="Moments from past years">
+  <div class="story-top">
+    <div class="story-bars" id="storyBars" aria-hidden="true"></div>
+    <div class="story-head">
+      <span class="story-avatar"><img id="storyAvatar" alt=""></span>
+      <span class="story-title" id="storyTitle"></span>
+      <span class="story-count" id="storyCount"></span>
+      <span class="story-ctls">
+        <button class="story-ctl" id="stSound" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+        </button>
+        <button class="story-ctl" id="stPlay" type="button" aria-label="Pause">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="pz" d="M8 5v14M16 5v14"/><path class="py" d="M7 5l12 7-12 7z"/></svg>
+        </button>
+        <button class="story-ctl story-x" id="storyX" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </span>
+    </div>
+  </div>
   <div class="story-stage" id="storyStage">
-    <div class="story-nav"><button id="stPrev" aria-label="Previous photograph"></button><button id="stPause" aria-label="Hold"></button><button id="stNext" aria-label="Next photograph"></button></div>
+    <img class="story-wash" id="stWash" alt="" draggable="false">
+    <img class="story-media" id="stImg" alt="" hidden draggable="false">
+    <video class="story-media" id="stVid" playsinline muted preload="auto" hidden></video>
+    <div class="story-spin" id="stSpin" aria-hidden="true"></div>
+    <div class="story-slot" id="stMissing" hidden><span class="ceremony" style="color:var(--gold)" id="stMissT"></span><span>this one has not arrived yet</span></div>
+    <button class="story-hint" id="stHint" type="button" hidden>Tap for sound</button>
+    <button class="story-chev l" id="stPrev" type="button" aria-label="Previous"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="story-chev r" id="stNext" type="button" aria-label="Next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
   </div>
-  <div class="story-foot">
-    <span class="story-title" id="storyTitle"></span>
-    <button class="story-x" id="storyX" aria-label="Close">&times;</button>
-  </div>
+  <p class="story-help" id="storyHelp">Tap to go on · hold to pause · swipe down to close</p>
 </div>
 
 
@@ -1401,6 +1488,11 @@ body.has-replied .rsvp-fab{display:none}
 <div class="diyarail" id="diyarail" aria-hidden="true"></div>
 
 <canvas id="fw" class="fw" aria-hidden="true"></canvas>
+<div class="fw-veil" id="fwVeil" aria-hidden="true"></div>
+<div class="fw-note" id="fwNote" role="status" aria-live="polite"></div>
+<button class="snd" id="sndBtn" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+</button>
 
 <!-- this device has already replied -->
 <div class="replied" id="repliedBar" hidden role="status">
@@ -1999,6 +2091,8 @@ function initHero(){
 
     // 1. the flame catches where the lamp stands — nothing moves yet
     hero.classList.add('kindling');
+    SND.bell();
+    SND.preload(['swell','tanpura','hum']);
 
     // 2. then the lamp carries its light up beside the name: measured, then animated,
     //    so the change of layout is a journey rather than a jump
@@ -2016,6 +2110,7 @@ function initHero(){
         (fx,fy)=>{                    // the detonation is what lights the page
           if(typeof fx==='number' && typeof fy==='number'){ origin=[fx,fy]; stageReveal(); }
           hero.classList.add('daybreak');
+          SND.moment('swell',{gain:0.7});
           inkTitle();
           $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
           setTimeout(()=>{ gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw')); }, 900);
@@ -2286,87 +2381,224 @@ const STORIES=[
 // a slot listed here is a video; everything else is a .jpg
 const VIDEOS = ['stage-2','stage-3','stage-5','couples-2'];   // e.g. 'dancing-2'
 function initStories(){
-  const wrap=$('#story'), bars=$('#storyBars'), stage=$('#storyStage'), title=$('#storyTitle');
-  let g=0,i=0,timer=null,paused=false,last=null;
-  const MS=5000;
+  const wrap=$('#story'), bars=$('#storyBars'), stage=$('#storyStage');
+  const title=$('#storyTitle'), count=$('#storyCount'), avatar=$('#storyAvatar');
+  const img=$('#stImg'), vid=$('#stVid'), wash=$('#stWash'), missing=$('#stMissing');
+  const sound=$('#stSound'), play=$('#stPlay'), hint=$('#stHint'), help=$('#storyHelp');
+  const PHOTO_MS=5000, MISSING_MS=2500;
+  let g=0, i=0, last=null;
+  let ready=false, paused=false, holding=false, elapsed=0, tPrev=0, raf=0, dur=PHOTO_MS, kind='img', token=0;
+  // the page has one switch for sound, and the stories obey it
+  let soundOn=SND.on(), hinted=false;
+  document.addEventListener('sitarey:sound',e=>{ soundOn=!!e.detail; vid.muted=!soundOn; paintSound(); });
 
-  function render(){
+  const srcFor=(key,ext)=> (typeof MEDIA!=='undefined' && MEDIA[key]) ? MEDIA[key] : `images/story-${key}.${ext}`;
+  const isVid=key=>VIDEOS.includes(key);
+
+  /* ---------- the progress bar is driven by the media itself ---------- */
+  function paintBars(p){
     const st=STORIES[g];
-    title.textContent=st.t;
-    bars.innerHTML='';
-    for(let k=0;k<st.n;k++){
-      const b=document.createElement('i');
-      if(k<i) b.classList.add('done');
-      if(k===i) b.classList.add('run');
-      bars.appendChild(b);
+    if(bars.children.length!==st.n){
+      bars.innerHTML='';
+      for(let k=0;k<st.n;k++){ const b=document.createElement('i'); b.appendChild(document.createElement('b')); bars.appendChild(b); }
     }
-    stage.querySelectorAll('.story-slot,.story-media,.story-wash').forEach(e=>e.remove());
-    const key=`${st.slug}-${i+1}`;
-    const el=document.createElement(VIDEOS.includes(key)?'video':'img');
-    el.className='story-media';
-    el.src=`images/story-${key}.${VIDEOS.includes(key)?'mp4':'jpg'}`;
-    if(el.tagName==='VIDEO'){ el.muted=true; el.autoplay=true; el.playsInline=true; el.loop=false; }
-    else { el.alt=st.t; }
-    el.onerror=()=>{
-      el.remove();
-      const slot=document.createElement('div');
-      slot.className='story-slot';
-      slot.innerHTML=`<span class="ceremony" style="color:var(--gold)">${st.t.toUpperCase()}</span><span>photograph ${i+1} of ${st.n}</span><span class="t-whisper" style="font-size:var(--fs-sm)">not dropped in yet</span>`;
-      stage.insertBefore(slot,stage.firstChild);
-    };
-    // a blurred still of the same frame fills whatever the photograph does not
-    const wash=document.createElement('img');
-    wash.className='story-wash'; wash.alt=''; wash.decoding='async';
-    wash.src = VIDEOS.includes(key) ? `images/story-${st.slug}-1.jpg` : el.src;
-    wash.onerror=()=>wash.remove();
-    stage.insertBefore(wash,stage.firstChild);
-    stage.insertBefore(el,stage.firstChild);
-    clearTimeout(timer);
-    if(!paused) timer=setTimeout(next,MS);
+    [...bars.children].forEach((b,k)=>{
+      b.classList.toggle('done',k<i);
+      b.firstChild.style.transform = k<i ? 'scaleX(1)' : k===i ? `scaleX(${Math.max(0,Math.min(1,p))})` : 'scaleX(0)';
+    });
   }
+  function loop(t){
+    raf=requestAnimationFrame(loop);
+    const dt = tPrev ? t-tPrev : 0; tPrev=t;
+    if(!ready || paused || holding) return;
+    if(kind==='vid'){
+      const d=vid.duration;
+      if(isFinite(d) && d>0){ paintBars(vid.currentTime/d); }
+      return;                                   // 'ended' advances a video
+    }
+    elapsed+=dt;
+    paintBars(elapsed/dur);
+    if(elapsed>=dur) next();
+  }
+
+  /* ---------- sound: off until asked, then on for every video after ---------- */
+  function paintSound(){
+    sound.setAttribute('aria-pressed', soundOn?'true':'false');
+    sound.setAttribute('aria-label', soundOn?'Turn sound off':'Turn sound on');
+  }
+  function setSound(on){
+    soundOn=on;
+    SND.set(on);                                   // the same switch as the rest of the page
+    vid.muted=!on;
+    if(on && kind==='vid' && !paused){ const pr=vid.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
+    hint.hidden=true;
+    paintSound();
+  }
+
+  /* ---------- show one item ---------- */
+  function show(){
+    const st=STORIES[g], key=`${st.slug}-${i+1}`, my=++token;
+    title.textContent=st.t;
+    count.textContent=`${i+1} / ${st.n}`;
+    avatar.src=srcFor(`${st.slug}-1`,'jpg');
+    ready=false; elapsed=0; tPrev=0;
+    paintBars(0);
+    missing.hidden=true;
+    stage.classList.add('waiting');
+    wash.src=srcFor(`${st.slug}-1`,'jpg');
+
+    if(isVid(key)){
+      kind='vid';
+      img.hidden=true; img.removeAttribute('src');
+      vid.hidden=false; vid.classList.add('loading');
+      vid.muted=!soundOn;
+      vid.src=srcFor(key,'mp4');
+      vid.currentTime=0;
+      sound.hidden=false; paintSound();
+      if(!soundOn && !hinted){ hinted=true; hint.hidden=false; hint.style.animation='none'; void hint.offsetWidth; hint.style.animation=''; }
+      const go=()=>{ if(my!==token) return;
+        ready=true; stage.classList.remove('waiting'); vid.classList.remove('loading');
+        if(!paused){ const pr=vid.play(); if(pr&&pr.catch) pr.catch(()=>{ vid.muted=true; soundOn=false; paintSound(); vid.play().catch(()=>{}); }); }
+      };
+      if(vid.readyState>=2) go(); else vid.addEventListener('loadeddata',go,{once:true});
+    } else {
+      kind='img'; dur=PHOTO_MS;
+      vid.pause(); vid.hidden=true; vid.removeAttribute('src'); vid.load();
+      sound.hidden=true; hint.hidden=true;
+      img.hidden=false; img.classList.add('loading'); img.alt=st.t;
+      const go=()=>{ if(my!==token) return; ready=true; stage.classList.remove('waiting'); img.classList.remove('loading'); };
+      img.onload=go;
+      img.src=srcFor(key,'jpg');
+      if(img.complete && img.naturalWidth) go();
+    }
+    preloadNext();
+  }
+  function fail(){
+    // a file that is not there yet should not stall the walk
+    const st=STORIES[g];
+    img.hidden=true; vid.hidden=true; stage.classList.remove('waiting');
+    $('#stMissT').textContent=st.t.toUpperCase();
+    missing.hidden=false; kind='img'; dur=MISSING_MS; elapsed=0; ready=true;
+  }
+  img.addEventListener('error',()=>{ if(!img.hidden) fail(); });
+  vid.addEventListener('error',()=>{ if(!vid.hidden && vid.getAttribute('src')) fail(); });
+  vid.addEventListener('ended',()=>{ if(kind==='vid') next(); });
+  vid.addEventListener('waiting',()=>stage.classList.add('waiting'));
+  vid.addEventListener('playing',()=>stage.classList.remove('waiting'));
+
+  function preloadNext(){
+    let ng=g, ni=i+1;
+    if(ni>=STORIES[ng].n){ ng++; ni=0; }
+    if(ng>=STORIES.length) return;
+    const k=`${STORIES[ng].slug}-${ni+1}`;
+    if(isVid(k)){ const l=document.createElement('link'); l.rel='preload'; l.as='video'; l.href=srcFor(k,'mp4'); document.head.appendChild(l); }
+    else { const p=new Image(); p.decoding='async'; p.src=srcFor(k,'jpg'); }
+  }
+
+  /* ---------- moving around ---------- */
+  function next(){
+    if(i<STORIES[g].n-1){ i++; show(); }
+    else if(g<STORIES.length-1){ g++; i=0; markSeen(g); show(); }
+    else close();
+  }
+  function prev(){
+    if(kind==='vid' && vid.currentTime>1.2){ vid.currentTime=0; return; }   // like Instagram: first back restarts
+    if(i>0){ i--; show(); }
+    else if(g>0){ g--; i=0; show(); }
+    else { elapsed=0; if(kind==='vid') vid.currentTime=0; }
+  }
+  function nextGroup(){ if(g<STORIES.length-1){ g++; i=0; markSeen(g); show(); } else close(); }
+  function prevGroup(){ if(g>0){ g--; i=0; show(); } else { i=0; show(); } }
+  function markSeen(k){ const r=$$('.ring')[k]; if(r) r.classList.add('seen'); }
+
+  function setPaused(p){
+    paused=p;
+    play.classList.toggle('paused',p);
+    play.setAttribute('aria-label',p?'Play':'Pause');
+    if(kind==='vid'){ if(p) vid.pause(); else if(ready){ const pr=vid.play(); if(pr&&pr.catch) pr.catch(()=>{}); } }
+  }
+
   function open(ix){
-    g=ix;i=0;paused=false;last=document.activeElement;
-    wrap.classList.add('up');document.body.classList.add('held');
-    markSeen(g);
-    render();
+    g=ix; i=0; last=document.activeElement;
+    wrap.classList.add('up'); document.body.classList.add('held');
+    markSeen(g); setPaused(false); holding=false;
+    help.classList.remove('gone'); setTimeout(()=>help.classList.add('gone'),4200);
+    show();
+    cancelAnimationFrame(raf); raf=requestAnimationFrame(loop);
     $('#storyX').focus({preventScroll:true});
   }
   function close(){
-    clearTimeout(timer);wrap.classList.remove('up');
+    cancelAnimationFrame(raf); raf=0;
+    vid.pause(); vid.removeAttribute('src'); vid.load();
+    stage.style.transform=''; stage.style.opacity='';
+    wrap.classList.remove('up');
     if(!$('#curtain').classList.contains('up')) document.body.classList.remove('held');
     if(last) last.focus({preventScroll:true});
   }
-  function next(){
-    if(i<STORIES[g].n-1){i++;render();}
-    else if(g<STORIES.length-1){g++;i=0;markSeen(g);render();}
-    else close();     // the end of the last year is the end of the walk
-  }
-  function markSeen(k){ const r=$$('.ring')[k]; if(r) r.classList.add('seen'); }
-  function prev(){ if(i>0){i--;render();} else if(g>0){g--;i=0;render();} }
 
-  $$('.ring').forEach((r,ix)=>r.addEventListener('click',()=>open(ix)));
-  $('#stNext').addEventListener('click',next);
-  $('#stPrev').addEventListener('click',prev);
-  $('#stPause').addEventListener('click',()=>{
-    paused=!paused;
-    const bar=bars.querySelector('.run');
-    if(bar) bar.style.animationPlayState=paused?'paused':'running';
-    if(paused) clearTimeout(timer); else timer=setTimeout(next,MS*0.5);
+  /* ---------- touch: tap sides to move, hold to pause, swipe across for the next year, swipe down to close ---------- */
+  let px=0, py=0, pt=0, holdT=0, dragging=false, moved=false;
+  stage.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button')) return;
+    px=e.clientX; py=e.clientY; pt=performance.now(); moved=false; dragging=true;
+    clearTimeout(holdT);
+    holdT=setTimeout(()=>{ holding=true; if(kind==='vid') vid.pause(); wrap.classList.add('holding'); },220);
+    try{ stage.setPointerCapture(e.pointerId); }catch(_){}
   });
+  stage.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    const dx=e.clientX-px, dy=e.clientY-py;
+    if(Math.abs(dx)>10||Math.abs(dy)>10){ moved=true; clearTimeout(holdT); }
+    if(dy>0 && Math.abs(dy)>Math.abs(dx)){       // the frame follows the finger down
+      wrap.classList.add('dragging');
+      stage.style.transform=`translateY(${dy*0.6}px) scale(${1-Math.min(dy,400)/2200})`;
+      stage.style.opacity=String(1-Math.min(dy,400)/900);
+    }
+  });
+  const end=e=>{
+    if(!dragging) return; dragging=false;
+    clearTimeout(holdT);
+    wrap.classList.remove('dragging');
+    const dx=e.clientX-px, dy=e.clientY-py, dt=performance.now()-pt;
+    const wasHold=holding;
+    if(holding){ holding=false; wrap.classList.remove('holding'); if(kind==='vid' && !paused && ready){ const pr=vid.play(); if(pr&&pr.catch) pr.catch(()=>{}); } }
+    if(dy>110 && Math.abs(dy)>Math.abs(dx)){ close(); return; }
+    stage.style.transform=''; stage.style.opacity='';
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? nextGroup() : prevGroup(); return; }
+    if(wasHold || moved || dt>500) return;
+    const r=stage.getBoundingClientRect();
+    (e.clientX - r.left) < r.width*0.3 ? prev() : next();
+  };
+  stage.addEventListener('pointerup',end);
+  stage.addEventListener('dragstart',e=>e.preventDefault());
+  stage.addEventListener('contextmenu',e=>e.preventDefault());
+  stage.addEventListener('pointercancel',e=>{ dragging=false; clearTimeout(holdT); holding=false; wrap.classList.remove('holding','dragging');
+    stage.style.transform=''; stage.style.opacity=''; });
+
+  /* ---------- buttons and keys ---------- */
+  $$('.ring').forEach((r,ix)=>r.addEventListener('click',()=>open(ix)));
+  $('#stNext').addEventListener('click',e=>{ e.stopPropagation(); next(); });
+  $('#stPrev').addEventListener('click',e=>{ e.stopPropagation(); prev(); });
+  play.addEventListener('click',()=>setPaused(!paused));
+  sound.addEventListener('click',()=>setSound(!soundOn));
+  hint.addEventListener('click',e=>{ e.stopPropagation(); setSound(true); });
   $('#storyX').addEventListener('click',close);
   document.addEventListener('keydown',e=>{
     if(!wrap.classList.contains('up')) return;
     if(e.key==='Escape') close();
-    if(e.key==='ArrowRight') next();
-    if(e.key==='ArrowLeft') prev();
+    else if(e.key==='ArrowRight') next();
+    else if(e.key==='ArrowLeft') prev();
+    else if(e.key==='ArrowDown') nextGroup();
+    else if(e.key==='ArrowUp') prevGroup();
+    else if(e.key===' '||e.key==='k'){ e.preventDefault(); setPaused(!paused); }
+    else if(e.key==='m'||e.key==='M'){ if(kind==='vid') setSound(!soundOn); }
   });
-  let x0=null;
-  wrap.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
-  wrap.addEventListener('touchend',e=>{
-    if(x0===null) return;
-    const dx=e.changedTouches[0].clientX-x0; x0=null;
-    if(Math.abs(dx)>60){ dx<0?next():prev(); }
-  },{passive:true});
+  // leaving the tab or locking the phone pauses, the way every player does
+  document.addEventListener('visibilitychange',()=>{
+    if(!wrap.classList.contains('up')) return;
+    if(document.hidden){ if(kind==='vid') vid.pause(); tPrev=0; }
+    else if(!paused && kind==='vid' && ready){ const pr=vid.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
+  });
 }
 
 /* --- gallery dots --- */
@@ -3082,26 +3314,263 @@ function initLightbox(){
   },{passive:false});
 }
 
-/* --- fireworks, once, earned by replying --- */
-function celebrate(){
-  if(reduceMotion) return;
-  const c=document.getElementById('fw'); if(!c) return;
-  const ctx=c.getContext('2d'), dpr=Math.min(devicePixelRatio||1,2);
-  c.width=innerWidth*dpr; c.height=innerHeight*dpr; ctx.scale(dpr,dpr);
-  const colors=['#F2A71B','#FFD98A','#C0392B','#FFF6DE','#C99A3B'], sparks=[];
-  [[.25,.3],[.72,.22],[.5,.4],[.35,.18]].forEach(([x,y],bi)=>setTimeout(()=>{
-    const cx=innerWidth*x, cy=innerHeight*y;
-    for(let i=0;i<52;i++){const a=(Math.PI*2*i)/52, sp=1.5+Math.random()*2.6;
-      sparks.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,c:colors[(i+bi)%colors.length]});}
-  },bi*380));
-  let frames=0;
-  (function tick(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    sparks.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.035;p.vx*=.985;p.life-=.012;
-      if(p.life>0){ctx.globalAlpha=Math.max(p.life,0);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,1.8,0,Math.PI*2);ctx.fill();}});
-    frames++;
-    if(frames<240) requestAnimationFrame(tick); else ctx.clearRect(0,0,innerWidth,innerHeight);
+
+/* ================= SOUND: moments, never wallpaper =================
+   One switch. The lamp's bell is the only sound that plays without asking,
+   because the guest has just struck the lamp themselves. Everything after it
+   waits for the switch. iPhone's silent switch mutes all of it, as it should. */
+const SND = (()=>{
+  const KEY='rk:sound:v1';
+  const FILES={bell:'bell',swell:'swell',tanpura:'tanpura',hum:'hum',launch:'launch',
+               boom1:'boom-1',boom2:'boom-2',pop1:'pop-1',pop2:'pop-2',pop3:'pop-3'};
+  let ctx=null, master=null, buffers={}, loops={}, pref=null;
+  try{ pref=localStorage.getItem(KEY); }catch(_){}
+  const on = ()=> pref==='on';
+  const btn = ()=> document.getElementById('sndBtn');
+
+  function ensure(){
+    if(ctx) { if(ctx.state==='suspended') ctx.resume(); return ctx; }
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+    ctx=new AC(); master=ctx.createGain(); master.gain.value=0.9; master.connect(ctx.destination);
+    return ctx;
+  }
+  function load(name){
+    if(buffers[name]) return buffers[name];
+    buffers[name]=fetch(`sound/${FILES[name]}.mp3`).then(r=>{ if(!r.ok) throw 0; return r.arrayBuffer(); })
+      .then(b=>new Promise((res,rej)=>ctx.decodeAudioData(b,res,rej))).catch(()=>null);
+    return buffers[name];
+  }
+  async function play(name,{gain=1,rate=1,pan=0,when=0}={}){
+    if(!ensure()) return;
+    const buf=await load(name); if(!buf) return;
+    const src=ctx.createBufferSource(); src.buffer=buf; src.playbackRate.value=rate;
+    const g=ctx.createGain(); g.gain.value=gain;
+    let node=src.connect(g);
+    if(ctx.createStereoPanner){ const p=ctx.createStereoPanner(); p.pan.value=Math.max(-1,Math.min(1,pan)); g.connect(p); p.connect(master); }
+    else g.connect(master);
+    src.start(ctx.currentTime+when);
+  }
+  async function loop(name,gain){
+    if(!on()||!ensure()) return;
+    if(loops[name]) { loops[name].g.gain.setTargetAtTime(gain,ctx.currentTime,0.8); return; }
+    const buf=await load(name); if(!buf||!on()) return;
+    if(loops[name]) return;
+    const src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+    const g=ctx.createGain(); g.gain.value=0.0001; src.connect(g); g.connect(master);
+    src.start(); g.gain.setTargetAtTime(gain,ctx.currentTime,0.9);      // fades in over a few seconds
+    loops[name]={src,g};
+  }
+  function stop(name){
+    const l=loops[name]; if(!l||!ctx) return;
+    l.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.6);
+    setTimeout(()=>{ try{l.src.stop();}catch(_){} },2600);
+    delete loops[name];
+  }
+  function stopAll(){ Object.keys(loops).forEach(stop); }
+  function paint(){
+    const b=btn(); if(!b) return;
+    b.setAttribute('aria-pressed',on()?'true':'false');
+    b.setAttribute('aria-label',on()?'Turn sound off':'Turn sound on');
+  }
+  function set(v){
+    pref=v?'on':'off';
+    try{ localStorage.setItem(KEY,pref); }catch(_){}
+    paint();
+    if(v){ ensure(); document.dispatchEvent(new CustomEvent('sitarey:sound',{detail:true})); }
+    else { stopAll(); document.dispatchEvent(new CustomEvent('sitarey:sound',{detail:false})); }
+  }
+  return {
+    on, set, paint, ensure,
+    // the bell answers the guest's own strike, unless they have turned sound off before
+    bell(){ if(pref==='off') return; if(!ensure()) return; play('bell',{gain:0.9}); },
+    moment(name,opts){ if(on()) play(name,opts); },
+    loop, stop, stopAll,
+    preload(names){ if(!ensure()) return; names.forEach(load); }
+  };
+})();
+
+function initSound(){
+  const b=document.getElementById('sndBtn'); if(!b) return;
+  SND.paint();
+  b.addEventListener('click',()=>SND.set(!SND.on()));
+  // the switch appears with the lamp strip, and invites once, quietly
+  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; if(!SND.on()){ b.classList.add('nudge'); } });
+  // it reads against whatever is under it
+  const paintGround=()=>{ const r=document.getElementById('diyarail'); b.classList.toggle('light', !!(r && r.classList.contains('onlight'))); };
+  addEventListener('scroll',()=>requestAnimationFrame(paintGround),{passive:true});
+
+  // the tanpura lives only under the three ages, the stillest place on the page
+  const ages=document.getElementById('ages');
+  let inAges=false;
+  if(ages) new IntersectionObserver(es=>es.forEach(e=>{
+      inAges=e.isIntersecting;
+      if(inAges) SND.loop('tanpura',0.55); else SND.stop('tanpura');
+    }),{threshold:0.25}).observe(ages);
+  // the dark lamp hums while it is open
+  const cur=document.getElementById('curtain');
+  if(cur) new MutationObserver(()=>{ cur.classList.contains('up') ? SND.loop('hum',0.5) : SND.stop('hum'); })
+    .observe(cur,{attributes:true,attributeFilter:['class']});
+  // turning sound on mid-page starts whatever belongs where you are
+  document.addEventListener('sitarey:sound',e=>{
+    if(!e.detail) return;
+    if(inAges) SND.loop('tanpura',0.55);
+    if(cur && cur.classList.contains('up')) SND.loop('hum',0.5);
+  });
+  // leaving the tab silences it
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) SND.stopAll(); });
+}
+
+
+/* ================= FIREWORKS: a show, not a spray =================
+   One rocket for each person in the family. Gold, warm white, saffron and a
+   little vermilion — the page's own colours. Rockets rise and slow at the top;
+   bursts fall under gravity and drag; willows droop; glitter crackles as it
+   dies. Light arrives before sound, as it does across a real field.          */
+function celebrate(opts={}){
+  const count=Math.max(1,Math.min(12, opts.count||1));
+  const fam=(opts.family||'').trim();
+  const c=document.getElementById('fw'), veil=document.getElementById('fwVeil'), note=document.getElementById('fwNote');
+  if(!c||!veil||!note) return;
+  note.innerHTML = `<b>${fam ? fam+', you are on the list.' : 'You are on the list.'}</b>
+    <span>${count>1 ? `A light for each of the ${count} of you.` : 'A light for you.'} See you on the 21st.</span>
+    <small>tap anywhere to carry on</small>`;
+  veil.classList.add('on');
+  setTimeout(()=>note.classList.add('on'),600);
+
+  let done=false;
+  const finish=()=>{
+    if(done) return; done=true;
+    note.classList.remove('on'); veil.classList.remove('on');
+    setTimeout(()=>{ const x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height); },1100);
+  };
+  veil.onclick=finish;
+
+  if(reduceMotion){ setTimeout(finish,4200); return; }
+
+  const dpr=Math.min(2,devicePixelRatio||1);
+  const W=innerWidth, H=innerHeight;
+  c.width=W*dpr; c.height=H*dpr;
+  const ctx=c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  const G=0.045, P=[], R=[];
+  const SCALE=Math.max(0.68,Math.min(1.15,W/520));      // a phone gets shells sized to it
+  const PAL=[['#FFF4DC','#F2C14E'],['#F2C14E','#F2A71B'],['#FFE7B4','#E8A33C'],['#FFF4DC','#E2553B']];
+
+  // the shape of the show: one alone, then a pair, then the rest as willows drifting down
+  const types=[]; for(let k=0;k<count;k++){
+    types.push(k===0 ? 'peony' : k===count-1 ? 'willow' : k<3 ? (k%2?'crossette':'peony') : 'willow');
+  }
+  const times=[]; let t=700;
+  for(let k=0;k<count;k++){ times.push(t); t += k===0 ? 1500 : k<3 ? 650 : 420; }
+
+  types.forEach((type,k)=>setTimeout(()=>{ if(!done) launch(type,k); },times[k]));
+  const showEnd=times[times.length-1]+4200;
+  setTimeout(()=>{ if(!done){ glitterFinale(); } }, Math.max(times[times.length-1]+1400, 2200));
+  setTimeout(finish, showEnd+1200);
+
+  function launch(type,k){
+    const x = W*(0.26+0.48*((k*0.381966+0.13)%1)), y=H+8;
+    const apex = H*(0.13+Math.random()*0.12);
+    const vy = -Math.sqrt(2*G*(y-apex))*1.02;
+    R.push({x,y,vx:(Math.random()-0.5)*0.6,vy,type,pal:PAL[k%PAL.length],trail:[]});
+    SND.moment('launch',{gain:0.45,rate:0.92+Math.random()*0.16,pan:(x/W-0.5)*1.4});
+    if(navigator.vibrate){ try{ navigator.vibrate(8); }catch(_){} }
+  }
+
+  function burst(r){
+    const {x,y,type,pal}=r;
+    const n = type==='willow' ? 70 : type==='crossette' ? 26 : 90;
+    for(let i=0;i<n;i++){
+      const a=(i/n)*Math.PI*2 + Math.random()*0.08;
+      const sp = SCALE*(type==='willow' ? 1.7+Math.random()*1.0 : type==='crossette' ? 3.0+Math.random()*0.6 : 2.6+Math.random()*1.4);
+      P.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+        drag: type==='willow' ? 0.965 : 0.982,
+        g: type==='willow' ? G*0.55 : G,
+        life:1, decay: type==='willow' ? 0.0052+Math.random()*0.002 : 0.009+Math.random()*0.005,
+        c: Math.random()<0.25 ? pal[0] : pal[1],
+        r: type==='willow' ? 1.5 : 1.8,
+        twinkle: type==='willow' || Math.random()<0.2,
+        split: type==='crossette' ? 1 : 0});
+    }
+    flashes.push({x,y,life:1});
+    // light first; the sound arrives a moment later, as it does across a field
+    const dist=0.16+Math.random()*0.16;
+    SND.moment(type==='willow' ? 'boom2' : (Math.random()<0.5?'boom1':'boom2'),
+               {gain: type==='willow'?0.55:0.7, rate:0.9+Math.random()*0.2, pan:(x/W-0.5)*1.4, when:dist});
+    if(navigator.vibrate){ try{ navigator.vibrate([0,Math.round(dist*1000),22]); }catch(_){} }
+  }
+
+  function glitterFinale(){
+    // a crackle of white-gold across the top, the last light before the dawn returns
+    for(let k=0;k<5;k++) setTimeout(()=>{
+      if(done) return;
+      const x=W*(0.15+Math.random()*0.7), y=H*(0.14+Math.random()*0.2);
+      for(let i=0;i<34;i++){
+        const a=Math.random()*Math.PI*2, sp=0.6+Math.random()*1.8;
+        P.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-0.3,drag:0.95,g:G*0.4,life:1,
+          decay:0.012+Math.random()*0.01,c:Math.random()<0.6?'#FFF8EA':'#F2C14E',r:1.2,twinkle:true,split:0});
+      }
+      SND.moment('pop'+(1+Math.floor(Math.random()*3)),{gain:0.5,rate:0.95+Math.random()*0.3,pan:(x/W-0.5)*1.4,when:0.12});
+    },k*170);
+  }
+
+  const flashes=[];
+  (function frame(){
+    if(done && !P.length && !R.length) return;
+    // fade the last frame instead of clearing it: the motion leaves its own trail
+    ctx.globalCompositeOperation='destination-out';
+    ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+
+    // each burst lights the sky around it for an instant
+    for(let i=flashes.length-1;i>=0;i--){
+      const f=flashes[i]; f.life-=0.06; if(f.life<=0){ flashes.splice(i,1); continue; }
+      const g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,220);
+      g.addColorStop(0,`rgba(255,226,170,${0.22*f.life})`); g.addColorStop(1,'rgba(255,226,170,0)');
+      ctx.fillStyle=g; ctx.fillRect(f.x-220,f.y-220,440,440);
+    }
+    // rockets, with the thin bright trail of a real shell
+    for(let i=R.length-1;i>=0;i--){
+      const r=R[i];
+      r.trail.push([r.x,r.y]); if(r.trail.length>10) r.trail.shift();
+      r.x+=r.vx; r.y+=r.vy; r.vy+=G; r.vx+=(Math.random()-0.5)*0.04;
+      ctx.strokeStyle='rgba(255,226,170,.55)'; ctx.lineWidth=1.6; ctx.beginPath();
+      r.trail.forEach(([tx,ty],j)=> j?ctx.lineTo(tx,ty):ctx.moveTo(tx,ty)); ctx.lineTo(r.x,r.y); ctx.stroke();
+      ctx.fillStyle='#FFF4DC'; ctx.beginPath(); ctx.arc(r.x,r.y,1.8,0,6.2832); ctx.fill();
+      if(r.vy>=-0.4){ burst(r); R.splice(i,1); }
+    }
+    // the stars of each shell
+    for(let i=P.length-1;i>=0;i--){
+      const p=P[i];
+      p.vx*=p.drag; p.vy=p.vy*p.drag+p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.decay;
+      if(p.split && p.life<0.62){            // a crossette splits into four
+        p.split=0;
+        for(let k=0;k<4;k++){ const a=k*Math.PI/2+Math.PI/4;
+          P.push({x:p.x,y:p.y,vx:Math.cos(a)*1.6,vy:Math.sin(a)*1.6,drag:0.97,g:G,life:0.6,decay:0.016,c:p.c,r:1.4,twinkle:true,split:0}); }
+      }
+      if(p.life<=0){ P.splice(i,1); continue; }
+      let a=Math.min(1,p.life*1.4);
+      if(p.twinkle && p.life<0.55) a*= Math.random()<0.5 ? 0.25 : 1;      // dying stars flicker
+      ctx.globalAlpha=a; ctx.fillStyle=p.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(0.6+p.life*0.6),0,6.2832); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    requestAnimationFrame(frame);
   })();
+}
+
+/* a "no" is not celebrated — it is honoured, with a single lamp, quietly */
+function quietLamp(){
+  const veil=document.getElementById('fwVeil'), note=document.getElementById('fwNote');
+  if(!veil||!note) return;
+  note.innerHTML = `<svg class="quiet-diya" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="58" cy="20" r="26" fill="url(#g-glow)" opacity=".9"/><use href="#diya-body"/>
+      <path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></svg>
+    <b>We will miss you.</b><span>A lamp is lit for you anyway. We will send photographs.</span>
+    <small>tap anywhere to carry on</small>`;
+  veil.classList.add('on'); setTimeout(()=>note.classList.add('on'),300);
+  SND.moment('bell',{gain:0.5});
+  const finish=()=>{ note.classList.remove('on'); veil.classList.remove('on'); };
+  veil.onclick=finish; setTimeout(finish,5200);
 }
 
 
@@ -3406,6 +3875,7 @@ function initForms(){
     btn.disabled=true; const label=btn.textContent; btn.textContent='Sending';
     status.textContent='';
     const headcount = yes ? (+val('r-count')||1) : 0;   // read before the form is replaced
+    const famName = val('r-family');
     try{
       await post('/rsvp', payload);
       rsvp.innerHTML = yes
@@ -3413,7 +3883,8 @@ function initForms(){
         : '<div class="sent"><p class="h3">Thank you for telling us.</p><p class="t-body">We will miss you, and we will send photographs.</p></div>';
       remember({name, coming: yes?'yes':'no', count: headcount, when: Date.now()});
       $('#rsvp').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
-      if(yes) setTimeout(celebrate, 500);
+      if(yes) setTimeout(()=>celebrate({count:headcount, family:famName}), 500);
+      else setTimeout(quietLamp, 400);
     }catch(err){
       btn.disabled=false; btn.textContent=label;
       status.textContent = EVENT.endpoint
@@ -3471,7 +3942,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
   embedForm('cosponsorSlot',EVENT.cosponsorFormUrl,EVENT.cosponsorFormHeight,'Co-sponsor form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initCalendar(); initShare();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initCalendar(); initShare();
 });
 </script>
 </body>
