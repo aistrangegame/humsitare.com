@@ -342,7 +342,7 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 .hero-head{display:grid;justify-items:center;gap:var(--s-2)}
 .hero-titles{display:grid;justify-items:center;gap:2px}
 .lit .hero-head{display:flex;align-items:center;justify-content:center;gap:var(--s-3)}
-.hero-head{transition:transform .9s var(--ease-out)}
+
 .lit .hero-titles{justify-items:start}
 .lit .hero-name{font-size:clamp(1.8rem,7.5vw,2.6rem);line-height:1}
 .lit .hero-rom{font-size:.72rem;letter-spacing:.26em}
@@ -396,21 +396,23 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 .hero .hero-rom{color:#D6CCBA}
 .hero.inked .hero-rom{color:#4A3828}
 .hold-wrap{transition:opacity .7s var(--ease-out)}
-.lit .hold-wrap{opacity:0;pointer-events:none}
+.kindling .hold-wrap,.lit .hold-wrap{opacity:0;pointer-events:none}
+.hold-wrap{transition:opacity .55s var(--ease-out)}
 .hero-rom{font-family:var(--font-ceremony);letter-spacing:.3em;text-transform:uppercase;font-size:var(--fs-sm);color:var(--fg-muted)}
 .lamp{width:min(30vw,104px);margin:0 auto;overflow:visible}
 .lamp .flame{transform-box:fill-box;transform-origin:50% 100%;opacity:0;transform:scale(.14);
  transition:opacity 1.1s var(--ease-out),transform 1.35s cubic-bezier(.22,.78,.3,1.08)}
 .lamp .halo{opacity:0;transform-box:fill-box;transform-origin:50% 60%;transform:scale(.4);
  transition:opacity 2.2s var(--ease-out) .25s,transform 2.4s var(--ease-out) .25s}
-.lit .lamp .flame{opacity:1;transform:none;animation:flicker 2.8s ease-in-out 1.5s infinite}
-.lamp{transition:width .9s var(--ease-out)}
-.lit .lamp .halo{opacity:.85;transform:none}
+.kindling .lamp .flame,.lit .lamp .flame{opacity:1;transform:none;animation:flicker 2.8s ease-in-out 1.3s infinite}
+
+.kindling .lamp .halo,.lit .lamp .halo{opacity:.85;transform:none}
 @keyframes flicker{0%,100%{transform:scale(1) rotate(0)}24%{transform:scale(1.04,.97) rotate(-2deg)}
  52%{transform:scale(.97,1.05) rotate(1.5deg)}76%{transform:scale(1.02,.99) rotate(-1deg)}}
 .hold-slot{display:grid;grid-template-rows:1fr;transition:grid-template-rows .85s var(--ease-out) .15s}
 .hold-slot > *{overflow:hidden;min-height:0}
 .lit .hold-slot{grid-template-rows:0fr}
+.travelling .hold-slot{transition:none}
 .lit .hold-wrap{visibility:hidden}
 .hold-wrap{display:grid;justify-items:center;gap:var(--s-4);padding-top:var(--s-5)}
 .whoami{display:grid;justify-items:center;gap:var(--s-2);margin-bottom:var(--s-2)}
@@ -525,7 +527,12 @@ body.held{overflow:hidden}
 .slot-media:has(img) .ceremony,.slot-circle:has(img) .ceremony,
 .slot-media:has(img) > span:not(.ceremony){display:none}
 .slot-media.awaiting,.slot-circle.awaiting{display:grid}
-.story-media{width:100%;height:100%;object-fit:contain;border-radius:var(--radius-sm)}
+.story-media{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;border-radius:var(--radius-sm)}
+/* the frame is 9:16; a photograph that is not fills the rest with a blurred copy of itself,
+   the way Instagram and WhatsApp Status do, so nothing is ever cropped and nothing floats in black */
+.story-wash{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
+ filter:blur(26px) saturate(1.25) brightness(.62);transform:scale(1.18);pointer-events:none}
+@media (prefers-reduced-motion:reduce){.story-wash{filter:blur(18px) brightness(.6)}}
 .ring-img.awaiting::after{content:"";display:block;width:100%;height:100%;background:var(--surface)}
 
 /* ---- image slots ---- */
@@ -1902,6 +1909,31 @@ function sayWhen(){
   el.textContent=t;
 }
 
+/* measure where things are, change the layout, measure again, then animate from
+   the old place to the new one — so a layout that cannot transition still moves */
+function travel(els, change, dur, done){
+  els=els.filter(Boolean);
+  const first=els.map(e=>e.getBoundingClientRect());
+  change();
+  const last=els.map(e=>e.getBoundingClientRect());
+  els.forEach((e,i)=>{
+    const f=first[i], l=last[i];
+    if(!l.width||!l.height){ return; }
+    const dx=f.left-l.left, dy=f.top-l.top, sx=f.width/l.width, sy=f.height/l.height;
+    e.style.transformOrigin='0 0';
+    e.style.transition='none';
+    e.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+  });
+  void document.body.offsetWidth;                 // commit the inverted start
+  requestAnimationFrame(()=>{
+    els.forEach(e=>{
+      e.style.transition=`transform ${dur}ms cubic-bezier(.3,.7,.25,1)`;
+      e.style.transform='';
+    });
+  });
+  setTimeout(()=>{ els.forEach(e=>{ e.style.transition=''; e.style.transformOrigin=''; }); done&&done(); }, dur+60);
+}
+
 function initHero(){
   const hero=$('#hero'), gate=$('#page .gate'), dawn=$('.dawn'), lamp=$('.lamp');
 
@@ -1952,12 +1984,12 @@ function initHero(){
     const who=document.getElementById('whoName');
     if(who){ setGuest(who.value); who.blur(); }
     paintGuest();
-    hero.classList.add('lit');
-    requestAnimationFrame(()=>requestAnimationFrame(stageReveal));
     document.body.classList.remove('held');
     if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }
 
     if(reduceMotion){
+      hero.classList.add('lit');
+      requestAnimationFrame(()=>requestAnimationFrame(stageReveal));
       hero.classList.add('assembled','daybreak','inked');
       $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
       gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw'));
@@ -1965,7 +1997,20 @@ function initHero(){
       return;
     }
 
-    // the flame catches, the lamp takes its place beside the name and burns there
+    // 1. the flame catches where the lamp stands — nothing moves yet
+    hero.classList.add('kindling');
+
+    // 2. then the lamp carries its light up beside the name: measured, then animated,
+    //    so the change of layout is a journey rather than a jump
+    setTimeout(()=>{
+      const lampEl=$('.lamp',hero), titles=$('.hero-titles',hero);
+      travel([lampEl,titles], ()=>{
+        hero.classList.add('travelling','lit');
+        requestAnimationFrame(()=>requestAnimationFrame(stageReveal));
+      }, 1100, ()=>hero.classList.remove('travelling'));
+    }, 1300);
+
+    // 3. once it has arrived, the sparkler
     setTimeout(()=>{
       runSparkler(hero,
         (fx,fy)=>{                    // the detonation is what lights the page
@@ -1978,7 +2023,7 @@ function initHero(){
         },
         ()=>hero.classList.add('assembled')   // they arrive as the points land
       );
-    }, 1500);
+    }, 2550);
   }
   $('#lightBtn').addEventListener('click',open);
   addEventListener('resize',()=>{ if(hero.classList.contains('lit')) stageReveal(); });
@@ -2255,7 +2300,7 @@ function initStories(){
       if(k===i) b.classList.add('run');
       bars.appendChild(b);
     }
-    stage.querySelectorAll('.story-slot,.story-media').forEach(e=>e.remove());
+    stage.querySelectorAll('.story-slot,.story-media,.story-wash').forEach(e=>e.remove());
     const key=`${st.slug}-${i+1}`;
     const el=document.createElement(VIDEOS.includes(key)?'video':'img');
     el.className='story-media';
@@ -2269,6 +2314,12 @@ function initStories(){
       slot.innerHTML=`<span class="ceremony" style="color:var(--gold)">${st.t.toUpperCase()}</span><span>photograph ${i+1} of ${st.n}</span><span class="t-whisper" style="font-size:var(--fs-sm)">not dropped in yet</span>`;
       stage.insertBefore(slot,stage.firstChild);
     };
+    // a blurred still of the same frame fills whatever the photograph does not
+    const wash=document.createElement('img');
+    wash.className='story-wash'; wash.alt=''; wash.decoding='async';
+    wash.src = VIDEOS.includes(key) ? `images/story-${st.slug}-1.jpg` : el.src;
+    wash.onerror=()=>wash.remove();
+    stage.insertBefore(wash,stage.firstChild);
     stage.insertBefore(el,stage.firstChild);
     clearTimeout(timer);
     if(!paused) timer=setTimeout(next,MS);
