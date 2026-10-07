@@ -276,6 +276,13 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
  background:var(--surface);transition:border-color .2s,background .2s}
 .years a:hover{border-color:var(--gold);background:color-mix(in oklch,var(--gold) 10%,var(--surface))}
 .years a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.now-album{display:grid;gap:var(--s-2)}
+.qr-tile{display:block;width:min(100%,232px);margin-top:var(--s-3);box-sizing:border-box;line-height:0;
+ background:#000;padding:22px;border-radius:24px;          /* the black margin a scanner needs; nothing is clipped */
+ box-shadow:0 8px 24px rgba(28,23,18,.18);transition:transform .2s}
+.qr-tile:hover{transform:translateY(-2px)}
+.qr-tile:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.qr-tile img{width:100%;height:auto;display:block}
 .years a svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;opacity:.55}
 .door.pending .door-cover{opacity:.55}
 .grid-2{display:grid;gap:var(--s-7);grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center}
@@ -869,6 +876,11 @@ main.threshold{position:relative;z-index:1}
 .snd .on{display:none} .snd[aria-pressed="true"] .on{display:inline} .snd[aria-pressed="true"] .off{display:none}
 .snd.light{background:rgba(247,243,236,.8);color:#1C1712}
 .snd.nudge{animation:sndnudge 1.6s ease-in-out 2}
+.snd.replay{right:calc(env(safe-area-inset-right) + 56px)}
+.snd.replay .dot{fill:currentColor;stroke:none}
+.snd.replay.arrive{animation:sndnudge 1.6s ease-in-out 2}
+body.has-replay .diyarail{padding-inline:108px}
+@media(max-width:480px){body.has-replay .diyarail{padding-left:12px;padding-right:108px;justify-content:flex-start}}
 @keyframes sndnudge{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 7px rgba(242,193,78,.35)}}
 .diyarail{padding-inline:56px}
 @media(max-width:420px){.diyarail{gap:clamp(6px,3vw,26px)}}
@@ -1017,7 +1029,7 @@ body.has-replied .rsvp-fab{display:none}
   <div class="ages-rail" id="agesRail">
     <div class="ages-stick">
       <div class="rk-in">
-        <p class="eyebrow">THE WAY ARCHANA JI TELLS IT</p>
+        <p class="eyebrow">THE WAY ARCHANA TELLS IT</p>
         <h2 class="title ages-title">This season holds the memory of three ages.</h2>
         <div class="ages-view" id="agesView"><div class="ages-track" id="agesTrack"><article class="age" data-age="0">
             <svg class="glyph" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="34"/><circle cx="60" cy="60" r="22"/><path d="M26 60 q17 -14 34 0 q17 14 34 0"/><path d="M26 70 q17 -14 34 0 q17 14 34 0"/><circle cx="60" cy="60" r="4" class="pip"/><path d="M60 26 l6 10 -12 0 Z"/></svg>
@@ -1050,15 +1062,15 @@ body.has-replied .rsvp-fab{display:none}
     <h2 class="title">Lit far from Ayodhya.</h2>
     <p class="prose t-body">For families living away from where it began, the meaning has grown. It is not only about remembering a homecoming. It is how we make one.</p>
     <blockquote class="bigquote">
-      <p>Archana ji adds one more light for our own time: Saraswati, goddess of knowledge, music and the arts, who arrives every year when the stage lights up.</p>
+      <p>Archana adds one more light for our own time: Saraswati, goddess of knowledge, music and the arts, who arrives every year when the stage lights up.</p>
     </blockquote>
 
     <figure class="said">
-      <span class="face-circle slot-circle" data-lightbox data-cap="Archana ji" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana ji" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCHANA JI</span></span>
+      <span class="face-circle slot-circle" data-lightbox data-cap="Archana" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCHANA</span></span>
       <blockquote>
         <p>Our children will not learn this from a textbook. They will learn it from a puja they sat through, a bhajan they half-sang, a stage they were gently nudged onto, and a room full of people who were glad they did.</p>
       </blockquote>
-      <figcaption>Archana ji</figcaption>
+      <figcaption>Archana</figcaption>
     </figure>
   </div>
 </section>
@@ -1330,10 +1342,13 @@ body.has-replied .rsvp-fab{display:none}
         <p class="eyebrow">THE YEARS BEFORE</p>
         <div class="years" id="albumYears"></div>
       </div>
-      <div class="door">
+      <div class="door now-album">
         <p class="eyebrow">ON THE NIGHT</p>
         <strong>This year's album</strong>
-        <span id="qrHolder" class="t-whisper">A code appears here closer to the day, to add your photographs as they happen.</span>
+        <span class="t-body" style="font-size:var(--fs-ui)">Scan it on the night, or tap it now, and add your photographs as they happen.</span>
+        <a class="qr-tile" id="album2026" href="#" target="_blank" rel="noopener" aria-label="Open this year's album">
+          <img src="images/album-2026-qr.png" alt="QR code for the Sitaron Ki Diwali 2026 album" width="600" height="600" loading="lazy" decoding="async">
+        </a>
       </div>
     </div>
   </div>
@@ -1501,6 +1516,9 @@ body.has-replied .rsvp-fab{display:none}
 <canvas id="fw" class="fw" aria-hidden="true"></canvas>
 <div class="fw-veil" id="fwVeil" aria-hidden="true"></div>
 <div class="fw-note" id="fwNote" role="status" aria-live="polite"></div>
+<button class="snd replay" id="replayBtn" type="button" aria-label="Replay your fireworks" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
+</button>
 <button class="snd" id="sndBtn" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
   <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
 </button>
@@ -1955,7 +1973,7 @@ const EVENT={
     {year:2022, url:"https://photos.app.goo.gl/F2eje5xkVG725TCF7"},
     {year:2021, url:"https://photos.app.goo.gl/4Lk49QvSzHZX3Lvd8"}
   ],
-  album2026Url:"",          // this year's album; a QR is drawn from it
+  album2026Url:"https://photos.app.goo.gl/pPMxVNuq4AozNs5S8",   // this year — its code is images/album-2026-qr.png
   calendar:{title:"Diwali with the Sitare",startUTC:"20261121T220000Z",
     location:"1370 Adams Road, Bensalem, PA 19020",details:"Sitaron Ki Mehfil Diwali 2026. From 5pm, no set end."},
   share:{title:"Diwali with the Sitare — you are invited",text:"Saturday 21 November 2026, from 5pm in Bensalem PA."}
@@ -3121,14 +3139,8 @@ function initLinks(){
   if(EVENT.album2025Url){ a.href=EVENT.album2025Url; }
   else { a.removeAttribute('href'); a.removeAttribute('target'); a.classList.add('pending');
     a.querySelector('strong').insertAdjacentHTML('afterend','<span class="t-whisper">Link coming shortly.</span>'); }
-  if(EVENT.album2026Url){
-    const sc=document.createElement('script');
-    sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-    sc.onload=()=>{const h=$('#qrHolder'); h.innerHTML='';
-      new QRCode(h,{text:EVENT.album2026Url,width:132,height:132,colorDark:'#1C1712',colorLight:'#FDFBF5'});
-      const img=h.querySelector('img'); if(img) img.alt='QR code for this year\'s album';};
-    document.head.appendChild(sc);
-  }
+  const now=$('#album2026');
+  if(now){ if(EVENT.album2026Url) now.href=EVENT.album2026Url; else now.removeAttribute('href'); }
 }
 function attachMark(){
   let m=null;
@@ -3418,7 +3430,8 @@ function initSound(){
   // the switch appears with the lamp strip, and invites once, quietly
   document.addEventListener('sitarey:lit',()=>{ b.hidden=false; if(!SND.on()){ b.classList.add('nudge'); } });
   // it reads against whatever is under it
-  const paintGround=()=>{ const r=document.getElementById('diyarail'); b.classList.toggle('light', !!(r && r.classList.contains('onlight'))); };
+  const paintGround=()=>{ const r=document.getElementById('diyarail'), on=!!(r && r.classList.contains('onlight'));
+    b.classList.toggle('light', on); const rp=document.getElementById('replayBtn'); if(rp) rp.classList.toggle('light', on); };
   addEventListener('scroll',()=>requestAnimationFrame(paintGround),{passive:true});
 
   // the tanpura lives only under the three ages, the stillest place on the page
@@ -3739,10 +3752,25 @@ function paintGuest(){
   if(w && !w.value && n) w.value=n;
 }
 
+/* --- once they have said yes, their fireworks can be lit again, any time --- */
+function showReplay(r){
+  const b=$('#replayBtn'); if(!b) return;
+  const yes = r && r.coming==='yes';
+  if(!yes){ b.hidden=true; document.body.classList.remove('has-replay'); return; }
+  b.onclick=()=>celebrate({count:r.count||1, family:r.family||''});
+  // the door stays dark and uncluttered: the button arrives with the light, like the sound switch
+  const reveal=()=>{ if(!b.hidden) return; b.hidden=false; document.body.classList.add('has-replay');
+    b.classList.add('arrive'); setTimeout(()=>b.classList.remove('arrive'),3400); };
+  const hero=document.getElementById('hero');
+  if(hero && hero.classList.contains('lit')) reveal();
+  else document.addEventListener('sitarey:lit', reveal, {once:true});
+}
+
 /* --- the page remembers that this device has replied --- */
 const REPLY_KEY='rk:sitarey-reply:v6';
 function remember(r){ store.set(REPLY_KEY, JSON.stringify(r)); showReplied(r); }
 function showReplied(r){
+  showReplay(r);
   const bar=$('#repliedBar'); if(!bar||!r) return;
   const d=new Date(r.when||Date.now());
   const when=d.toLocaleDateString('en-US',{day:'numeric',month:'long'});
@@ -3820,6 +3848,7 @@ function initLookup(){
     }
     $('#lkRows').innerHTML = rows.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
     box.hidden=true; body.hidden=true; found.hidden=false;
+    try{ remember({name:r.name, family:r.family, coming:r.coming, count:r.count, when:r.submitted?Date.parse(r.submitted):Date.now()}); }catch(_){}
     const sr=$('#sendRow'); if(sr) sr.hidden=true;
     found.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
   }
@@ -3903,7 +3932,7 @@ function initForms(){
       rsvp.innerHTML = yes
         ? '<div class="sent"><p class="h3">Thank you. You are on the list.</p><p class="t-body">We will see you on the 21st. Anything to change, just message us.</p></div>'
         : '<div class="sent"><p class="h3">Thank you for telling us.</p><p class="t-body">We will miss you, and we will send photographs.</p></div>';
-      remember({name, coming: yes?'yes':'no', count: headcount, when: Date.now()});
+      remember({name, family: famName, coming: yes?'yes':'no', count: headcount, when: Date.now()});
       $('#rsvp').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
       if(yes) setTimeout(()=>celebrate({count:headcount, family:famName}), 500);
       else setTimeout(quietLamp, 400);
