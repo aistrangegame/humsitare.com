@@ -121,7 +121,7 @@ color:var(--fg);
 /* the descent back into the night the story lives in */
 .to-night{height:78px;background:transparent}
 /* one held, near-empty screen: the sky goes dark here and the stars come out */
-.descent-line{min-height:64svh;display:grid;place-items:center;text-align:center;position:relative;z-index:1;padding:var(--s-8) var(--s-5)}
+.descent-line{min-height:calc(var(--vh-lock,1svh) * 64);display:grid;place-items:center;text-align:center;position:relative;z-index:1;padding:var(--s-8) var(--s-5)}
 .descent-say{font-family:var(--font-display);font-style:italic;font-size:var(--fs-h3);line-height:1.4;color:var(--t-high);max-width:24ch;margin:0 auto;text-wrap:balance}
 .g-night2 {background:#1B1434}
 .g-plum   {background:#241A3A}
@@ -166,7 +166,7 @@ html[data-chassis]{font-size:100%;-webkit-text-size-adjust:100%;scroll-padding-t
 [data-ground="cream"]{color-scheme:light}
 [data-chassis]{background:var(--bg);color:var(--fg);font-family:var(--font-ui)}
 body{margin:0;background:var(--bg);color:var(--fg);font-size:var(--fs-body);line-height:var(--lh-body);font-optical-sizing:auto;text-rendering:optimizeLegibility}
-.rk-page{min-height:100svh}
+.rk-page{min-height:calc(var(--vh-lock,1svh) * 100)}
 *,*::before,*::after{box-sizing:border-box}
 button{font:inherit;color:inherit;background:none;border:0}
 img,video,canvas,svg{max-width:100%;height:auto;display:block}
@@ -195,8 +195,8 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .band.deep{padding-block:var(--band-deep);background:var(--surface-deep);color:var(--fg-on-deep)}
 .band.deep .eyebrow{color:var(--sig-tint)}
 .ages-walk{padding-block:0}
-.ages-rail{height:320vh;position:relative}
-.ages-stick{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.ages-rail{height:calc(var(--vh-lock,1svh) * 320);position:relative}
+.ages-stick{position:sticky;top:0;height:calc(var(--vh-lock,1svh) * 100);display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .ages-stick > .rk-in{min-width:0}
 .ages-view{overflow:hidden;width:100%;margin-top:var(--s-6)}
 .ages-title{text-align:center;max-width:22ch;margin-inline:auto}
@@ -291,7 +291,7 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .media.sq{aspect-ratio:1}
 /* a photograph whose whole frame matters: the image sets the height, nothing is cut */
 .media.whole{aspect-ratio:auto;display:block}
-.media.whole img{width:100%;height:auto;max-height:70svh;object-fit:contain;display:block}
+.media.whole img{width:100%;height:auto;max-height:calc(var(--vh-lock,1svh) * 70);object-fit:contain;display:block}
 .media.whole.awaiting{aspect-ratio:16/9;display:grid}
 /* where a slot must crop, the focal point is steerable per photograph */
 [data-focus] img{object-position:var(--focus,50% 50%)}
@@ -387,7 +387,7 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 @media(min-width:900px){.hero-who{width:min(32vw,380px,100%)}.plate{width:min(100%,520px)}}
 
 /* ---- the hero: one lamp, held ---- */
-.hero{min-height:100svh;display:grid;place-items:center;text-align:center;position:relative;z-index:1;overflow:hidden;
+.hero{min-height:calc(var(--vh-lock,1svh) * 100);display:grid;place-items:center;text-align:center;position:relative;z-index:1;overflow:hidden;
  padding:calc(var(--s-6) + env(safe-area-inset-top)) var(--s-5) calc(var(--s-6) + env(safe-area-inset-bottom))}
 @media (max-height:860px){
   .hero{padding-block:calc(var(--s-5) + env(safe-area-inset-top)) calc(var(--s-5) + env(safe-area-inset-bottom))}
@@ -815,8 +815,8 @@ body.held{overflow:hidden}
 .daytext strong{color:var(--fg)}
 
 /* ---- the sky: a real star field behind the night half ---- */
-.ground{position:fixed;inset:0;z-index:0;pointer-events:none;background:#14102A;transform:translateZ(0)}
-.sky{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out);transform:translateZ(0)}
+.ground{position:fixed;top:0;left:0;width:100%;height:calc(var(--vh-max,1lvh) * 100);z-index:0;pointer-events:none;background:#14102A;transform:translateZ(0)}
+.sky{position:fixed;top:0;left:0;width:100%;height:calc(var(--vh-max,1lvh) * 100);z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out);transform:translateZ(0)}
 .sky.on{opacity:1}
 main.threshold{position:relative;z-index:1}
 /* the night bands let the sky through */
@@ -920,6 +920,27 @@ body.has-replied .rsvp-fab{display:none}
 .lotus .pc{fill:none;stroke:var(--line-wash)}
 .lotus.full .pc{fill:var(--gold);stroke:var(--gold)}
 </style>
+<script>
+/* Lock the page's sense of height when it opens. Safari on a phone recalculates
+   viewport units as its toolbar slides in and out; anything sized from them moves,
+   and everything below it jumps. One number, measured once, re-measured only on a
+   rotation, keeps every height still while the toolbar does what it likes. */
+(function(){
+  var d=document.documentElement, w=0;
+  function lock(force){
+    var iw=window.innerWidth;
+    if(!force && Math.abs(iw-w)<2) return;         // a height-only change is the toolbar
+    w=iw;
+    var h=window.innerHeight;
+    var tall=Math.max(h, (window.screen&&screen.height)||0);
+    d.style.setProperty('--vh-lock', (h/100)+'px');
+    d.style.setProperty('--vh-max', (tall/100)+'px');
+  }
+  lock(true);
+  window.addEventListener('resize',function(){ lock(false); },{passive:true});
+  window.addEventListener('orientationchange',function(){ setTimeout(function(){ lock(true); },250); });
+})();
+</script>
 </head>
 <body class="rk-page held">
 
@@ -2037,6 +2058,23 @@ function sayWhen(){
 
 /* measure where things are, change the layout, measure again, then animate from
    the old place to the new one — so a layout that cannot transition still moves */
+/* On a phone, Safari fires "resize" on every frame while its toolbar slides in or out.
+   That is a change of height only. Rebuilding anything then stalls the main thread
+   mid-animation, and Safari snaps instead of gliding — the page appears to jump by
+   the toolbar's height. So: a real resize is a change of WIDTH (rotation, a window
+   being resized). Height alone is ignored everywhere. */
+const onWidthChange=(()=>{
+  const fns=[]; let w=innerWidth, q=false;
+  addEventListener('resize',()=>{
+    if(q) return; q=true;
+    requestAnimationFrame(()=>{ q=false;
+      if(Math.abs(innerWidth-w)<2) return;             // the toolbar, not a resize
+      w=innerWidth; fns.forEach(f=>{ try{ f(); }catch(_){} });
+    });
+  },{passive:true});
+  return f=>fns.push(f);
+})();
+
 function travel(els, change, dur, done){
   els=els.filter(Boolean);
   const first=els.map(e=>e.getBoundingClientRect());
@@ -2155,7 +2193,7 @@ function initHero(){
     }, 2550);
   }
   $('#lightBtn').addEventListener('click',open);
-  addEventListener('resize',()=>{ if(hero.classList.contains('lit')) stageReveal(); });
+  onWidthChange(()=>{ if(hero.classList.contains('lit')) stageReveal(); });
 
   // motes
   const m=$('.motes');
@@ -2208,7 +2246,8 @@ function initAges(){
   function paint(){
     q=false;
     const r=rail.getBoundingClientRect();
-    const span=rail.offsetHeight - innerHeight;
+    const stick=rail.firstElementChild;
+    const span=rail.offsetHeight - (stick ? stick.offsetHeight : innerHeight);
     const p=Math.max(0,Math.min(1, -r.top/Math.max(1,span)));
     const n=ages.length, x=position(p);
     const vw=document.getElementById('agesView').clientWidth;
@@ -2224,7 +2263,7 @@ function initAges(){
     dots.forEach((d,k)=>d.classList.toggle('on',k===i));
   }
   addEventListener('scroll',()=>{ if(!q){q=true;requestAnimationFrame(paint);} },{passive:true});
-  addEventListener('resize',paint); paint();
+  onWidthChange(paint); paint();
 }
 
 /* --- the five days: tap a lamp, it lights and tells you its day --- */
@@ -2260,7 +2299,8 @@ function initSky(){
   let stars=[], deep=[], w=0, h=0, raf=0, alpha=0, progress=0, deepA=0, lastC='', lastInk='';
   const TAU=Math.PI*2;
   function size(){
-    w=cv.width=innerWidth; h=cv.height=innerHeight;
+    // as tall as the screen gets with the toolbar hidden: the toolbar sliding never changes it
+    w=cv.width=innerWidth; h=cv.height=Math.max(innerHeight, (screen && screen.height)||0, document.documentElement.clientHeight);
     const n=innerWidth<500?170:280;
     stars=[]; for(let i=0;i<n;i++) stars.push({x:Math.random()*w,y:Math.random()*h,r:0.5+Math.random()*1.5,
       base:0.35+Math.random()*0.65,tw:Math.random()*TAU,sp:0.004+Math.random()*0.016,depth:0.2+Math.random()*0.8,warm:Math.random()>0.78});
@@ -2332,7 +2372,7 @@ function initSky(){
   const wake=()=>{ if(!raf && alpha>0.01) raf=requestAnimationFrame(draw); };
   size(); measure(); if(!reduceMotion) draw(); else { alpha&&draw(); }
   let q=false; addEventListener('scroll',()=>{ if(!q){q=true;requestAnimationFrame(()=>{measure();wake();q=false;});} },{passive:true});
-  addEventListener('resize',()=>{size();measure();});
+  onWidthChange(()=>{size();measure();});
   document.addEventListener('sitarey:lit',()=>setTimeout(measure,100));
 }
 
@@ -2384,7 +2424,7 @@ function initRail(){
   let queued=false;
   const paint=()=>{ queued=false; rail.classList.toggle('onlight', groundUnder()>0.45); };
   addEventListener('scroll',()=>{ if(!queued){queued=true;requestAnimationFrame(paint);} },{passive:true});
-  addEventListener('resize',paint);
+  onWidthChange(paint);
   document.addEventListener('sitarey:lit',()=>setTimeout(paint,2600));
   paint();
 }
@@ -2398,7 +2438,7 @@ function initFab(){
   const practical=$('#details');
   const check=()=>{ if(!practical) return; inPractical = practical.getBoundingClientRect().top < innerHeight*0.9; paint(); };
   addEventListener('scroll',()=>requestAnimationFrame(check),{passive:true});
-  addEventListener('resize',check); check();
+  onWidthChange(check); check();
   document.addEventListener('sitarey:lit',paint);
 }
 
@@ -3097,7 +3137,7 @@ function initCurtain(){
     after(4200,()=>{ tg.hidden=false; tw.hidden=true; tg.focus({preventScroll:true}); });
   });
   $('#thoughtGo').addEventListener('click',toSeal);
-  addEventListener('resize',()=>{ if(c.classList.contains('up')) fit(); });
+  onWidthChange(()=>{ if(c.classList.contains('up')) fit(); });
 
   function check(){
     if(shown||store.get(KEY)) return;
