@@ -917,6 +917,54 @@ body.newcomer .age .gloss{margin-top:var(--s-3);max-width:34ch;margin-inline:aut
 .carriers-list .who{font:600 var(--fs-ui)/1.25 var(--font-ui);color:var(--fg);overflow-wrap:anywhere}
 .carriers-list .amt-v{font:500 var(--fs-ui)/1 var(--font-display);color:var(--fg-2)}
 
+
+/* ================= the menu: one button in the corner, everything inside ================= */
+.menu-btn{position:relative}
+.menu-btn svg{width:22px;height:22px;stroke-width:2}
+.menu-btn.snd-on::after{content:"";position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#F2C14E;
+  box-shadow:0 0 0 2px rgba(8,6,16,.55)}
+.menu-btn.light.snd-on::after{box-shadow:0 0 0 2px rgba(247,243,236,.85)}
+.menu-btn.waiting{animation:sndbreathe 2.6s ease-in-out 4}
+.menu-panel{position:absolute;top:52px;right:0;width:min(320px,calc(100vw - 16px));padding:6px;border-radius:18px;
+  background:#1C1712;color:#F4EFE4;box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 0 1px rgba(242,193,78,.3);z-index:3;
+  display:grid;gap:2px;transform-origin:top right;animation:menuIn .18s var(--ease-out)}
+@keyframes menuIn{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+.menu-panel[hidden]{display:none}
+.mrow{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:12px;min-height:50px;padding:0 12px;border:0;border-radius:12px;
+  background:none;color:inherit;text-align:left;font:500 var(--fs-ui)/1.25 var(--font-ui);cursor:pointer}
+.mrow:hover,.mrow:focus-visible{background:rgba(242,193,78,.14);outline:none}
+.mrow:focus-visible{box-shadow:inset 0 0 0 2px #F2C14E}
+.mrow .mi{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:#F7D88A}
+.mrow .mi .spk,.mrow .mi .dot{fill:currentColor;stroke:none}
+.mrow .mx{width:18px;height:18px;fill:none;stroke:#BDB2A2;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#sndBtn .on{display:none} #sndBtn[aria-pressed="true"] .on{display:inline} #sndBtn[aria-pressed="true"] .off{display:none}
+.mrow .sw{position:relative;width:42px;height:26px;border-radius:999px;background:#4A4236;transition:background .2s}
+.mrow .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#F4EFE4;transition:transform .2s var(--ease-out)}
+.mrow[aria-pressed="true"] .sw{background:#F2C14E}
+.mrow[aria-pressed="true"] .sw::after{transform:translateX(16px);background:#1C1530}
+.mrow.play .ml{color:#F7D88A}
+.msep{height:1px;margin:4px 10px;background:rgba(244,239,228,.12)}
+@media (prefers-reduced-motion:reduce){.menu-panel{animation:none}}
+
+
+/* ---- directions and calendar: ask once, then remember ---- */
+.pick{position:fixed;inset:0;z-index:80;background:rgba(10,8,22,.55);display:flex;align-items:flex-end;justify-content:center}
+.pick[hidden]{display:none}
+.pick-sheet{width:min(100%,440px);background:#FBF7EF;color:#1C1712;border-radius:22px 22px 0 0;
+  padding:var(--s-4) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.3);animation:pickUp .28s var(--ease-out)}
+@media(min-width:700px){.pick{align-items:center}.pick-sheet{border-radius:22px}}
+@keyframes pickUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.pick-t{margin:var(--s-2) var(--s-2) var(--s-3);font:500 var(--fs-lg)/1.3 var(--font-display)}
+.pick-list{display:grid;gap:6px}
+.pick-list a,.pick-list button{display:flex;align-items:center;gap:var(--s-3);min-height:54px;padding:var(--s-2) var(--s-4);border-radius:14px;
+  border:0;background:#fff;box-shadow:inset 0 0 0 1px rgba(28,23,18,.14);color:#1C1712;text-decoration:none;
+  font:600 var(--fs-ui)/1.25 var(--font-ui);cursor:pointer;text-align:left;width:100%}
+.pick-list a:hover,.pick-list button:hover,.pick-list a:focus-visible,.pick-list button:focus-visible{box-shadow:inset 0 0 0 2px #B8862B;outline:none}
+.pick-list .sub{display:block;font-weight:400;font-size:var(--fs-sm);color:#4F463D;margin-top:2px}
+.pick-list .last{margin-left:auto;flex:0 0 auto;font:600 .75rem/1 var(--font-ui);color:#6B4E0E;background:#F6E7C1;padding:5px 8px;border-radius:999px}
+.pick-x{display:block;width:100%;min-height:50px;margin-top:var(--s-3);border:0;border-radius:14px;background:transparent;color:#1C1712;font:600 var(--fs-ui)/1 var(--font-ui);cursor:pointer}
+@media (prefers-reduced-motion:reduce){.pick-sheet{animation:none}}
+
 /* ---- the five days as five lamps ---- */
 .daylamps{display:flex;justify-content:space-between;gap:var(--s-1)}
 .daylamp{flex:1 1 0;min-width:0;display:grid;justify-items:center;gap:var(--s-1);background:none;border:0;cursor:pointer;
@@ -1266,7 +1314,7 @@ body.has-replied .rsvp-fab{display:none}
             <p class="age-name">Treta</p>
             <p class="age-kicker">THE RETURN &middot; IT COMPLETES</p>
             <p class="age-text">After fourteen years of exile and the defeat of Ravana, Ram returns to Ayodhya. The people light rows of lamps to guide him home.</p>
-<p class="gloss">Ram is the prince at the heart of the Ramayana, one of India’s great epics. Ravana was the demon king who took his wife, Sita. Ayodhya is Ram’s home city, which lit every lamp it had for his return.</p>
+<p class="gloss">Ram, the 7th avatar of Lord Vishnu, is the prince at the heart of the Ramayana. Ravana was the demon king who took his wife, Sita. Ayodhya is Ram’s home city, which lit every lamp it had for his return.</p>
           </article><article class="age" data-age="2">
             <svg class="glyph" viewBox="0 0 120 120" aria-hidden="true"><path d="M22 86 L60 26 L98 86 Z"/><path d="M34 86 q26 -22 52 0"/><circle cx="48" cy="74" r="3.4"/><circle cx="60" cy="70" r="3.4"/><circle cx="72" cy="74" r="3.4"/><path d="M60 26 L60 14" /><circle cx="60" cy="10" r="4" class="pip"/></svg>
             <p class="age-name">Dwapar</p>
@@ -1399,10 +1447,9 @@ body.has-replied .rsvp-fab{display:none}
     </div>
 
     <div class="fab-clear" style="display:flex;gap:var(--s-3);flex-wrap:wrap;margin-top:var(--s-5)">
-      <a class="btn ghost" id="mapsBtn" href="https://www.google.com/maps/search/?api=1&amp;query=1370+Adams+Road+Bensalem+PA+19020" target="_blank" rel="noopener">Open in Maps</a>
-      <a class="btn ghost" id="calBtn" href="diwali-2026.ics">Add to calendar</a>
+      <button class="btn ghost" id="mapsBtn" type="button" aria-haspopup="dialog">Get directions</button>
+      <button class="btn ghost" id="calBtn" type="button" aria-haspopup="dialog">Add to calendar</button>
     </div>
-    <p class="cal-alt" id="calAlt"><a id="gcalLink" href="#" target="_blank" rel="noopener">Use Google Calendar instead</a></p>
 
     
   </div>
@@ -1825,20 +1872,45 @@ body.has-replied .rsvp-fab{display:none}
   <button class="snd-ask-x" id="sndAskX" type="button" aria-label="No sound, thank you"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
 </div>
 <div class="snd-tip" id="sndTip" role="status" hidden><button type="button" id="sndTipGo">A tanpura plays here. <b>Tap to hear it.</b></button></div>
-<div class="corner" id="corner">
-<button class="snd notes" id="notesBtn" type="button" aria-label="Show the notes for a first Diwali" aria-pressed="false" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r="1.2" class="dot"/></svg>
-</button>
-<button class="snd replay" id="replayBtn" type="button" aria-label="Replay your fireworks" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
-</button>
-<div class="replay-menu" id="replayMenu" role="menu" hidden>
-  <button type="button" role="menuitem" data-play="rsvp">Your welcome — the fireworks</button>
-  <button type="button" role="menuitem" data-play="gift">Your gift — the shower of light</button>
+<div class="pick" id="pick" hidden>
+  <div class="pick-sheet" role="dialog" aria-modal="true" aria-labelledby="pickT">
+    <p class="pick-t" id="pickT"></p>
+    <div class="pick-list" id="pickList"></div>
+    <button class="pick-x" id="pickX" type="button">Cancel</button>
+  </div>
 </div>
-<button class="snd" id="sndBtn" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+<div class="corner" id="corner">
+<button class="snd menu-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menuPanel" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
 </button>
+<div class="menu-panel" id="menuPanel" role="menu" aria-label="Menu" hidden>
+  <button class="mrow" id="sndBtn" type="button" role="menuitemcheckbox" aria-label="Sound" aria-pressed="false" aria-checked="false">
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+    <span class="ml">Sound</span><span class="sw" aria-hidden="true"></span>
+  </button>
+  <button class="mrow" id="notesBtn" type="button" role="menuitemcheckbox" aria-label="Notes for a first Diwali" aria-pressed="false" aria-checked="false">
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r="1.2" class="dot"/></svg>
+    <span class="ml">Notes for a first Diwali</span><span class="sw" aria-hidden="true"></span>
+  </button>
+  <span class="msep" aria-hidden="true"></span>
+  <button class="mrow go" id="goRsvp" type="button" role="menuitem" data-go="#rsvp">
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>
+    <span class="ml" id="goRsvpL">Reply to the invitation</span><svg class="mx" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <button class="mrow play" id="replayRsvp" type="button" role="menuitem" hidden>
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
+    <span class="ml">Replay your fireworks</span>
+  </button>
+  <span class="msep" aria-hidden="true"></span>
+  <button class="mrow go" id="goCarry" type="button" role="menuitem" data-go="#carry">
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.5 3 4 5.4 4 8a4 4 0 0 1-8 0c0-2.6 1.5-5 4-8z"/><path d="M6 21h12"/></svg>
+    <span class="ml">Carry the light</span><svg class="mx" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <button class="mrow play" id="replayGift" type="button" role="menuitem" hidden>
+    <svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><circle cx="12" cy="15" r="1.6" class="dot"/><path d="M6 21l2.5-4M18 21l-2.5-4M12 21v-3M3 21h18"/></svg>
+    <span class="ml">Replay your gift’s shower</span>
+  </button>
+</div>
 </div>
 
 <!-- this device has already replied -->
@@ -3464,7 +3536,9 @@ function initCurtain(){
     if(document.body.classList.contains('held')) return;       // page still gated by the lamp
     const gate=document.querySelector('#page .gate');
     if(!gate || gate.hidden || trig.offsetParent===null) return;
-    if(trig.getBoundingClientRect().top < innerHeight*0.9){ up(); removeEventListener('scroll',check); }
+    if(Date.now() < (window.__jumpUntil||0)) return;              // a jump someone asked for passes through quietly
+    const t=trig.getBoundingClientRect().top;
+    if(t < innerHeight*0.9 && t > -innerHeight*0.6){ up(); removeEventListener('scroll',check); }   // only when they have reached it
   }
   addEventListener('scroll',check,{passive:true});
   const tap=$('#heldTap'); if(tap) tap.addEventListener('click',up);
@@ -3772,8 +3846,9 @@ const SND = (()=>{
   function stopAll(){ Object.keys(loops).forEach(stop); }
   function paint(){
     const b=btn(); if(!b) return;
-    b.setAttribute('aria-pressed',on()?'true':'false');
-    b.setAttribute('aria-label',on()?'Turn sound off':'Turn sound on');
+    b.setAttribute('aria-pressed',on()?'true':'false'); b.setAttribute('aria-checked',on()?'true':'false');
+    const mb=document.getElementById('menuBtn'); if(mb){ mb.classList.toggle('snd-on', on());
+      mb.setAttribute('aria-label', on()?'Menu, sound is on':'Menu'); }
   }
   function set(v){
     pref=v?'on':'off';
@@ -3805,10 +3880,10 @@ function initSound(){
   SND.paint();
   b.addEventListener('click',()=>SND.set(!SND.on()));
   // the switch appears with the lamp strip, and invites once, quietly
-  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; const nb=document.getElementById('notesBtn'); if(nb) nb.hidden=false; sizeCorner(); });
+  document.addEventListener('sitarey:lit',()=>{ const mb=document.getElementById('menuBtn'); if(mb) mb.hidden=false; sizeCorner(); });
   // it reads against whatever is under it
   const paintGround=()=>{ const r=document.getElementById('diyarail'), on=!!(r && r.classList.contains('onlight'));
-    b.classList.toggle('light', on); const rp=document.getElementById('replayBtn'); if(rp) rp.classList.toggle('light', on); };
+    const mb=document.getElementById('menuBtn'); if(mb) mb.classList.toggle('light', on); };
   addEventListener('scroll',()=>requestAnimationFrame(paintGround),{passive:true});
 
   // the tanpura lives only under the three ages, the stillest place on the page
@@ -4031,7 +4106,7 @@ function initFirstDiwali(){
   function paint(state, arriving){
     const yes = state==='yes';
     document.body.classList.toggle('newcomer', yes);
-    if(nb){ nb.setAttribute('aria-pressed', yes?'true':'false');
+    if(nb){ nb.setAttribute('aria-pressed', yes?'true':'false'); nb.setAttribute('aria-checked', yes?'true':'false');
       nb.setAttribute('aria-label', yes ? 'Hide the notes for a first Diwali' : 'Show the notes for a first Diwali'); }
     ask.hidden = !!state;
     card.hidden = !yes;
@@ -4059,7 +4134,7 @@ function initFirstDiwali(){
 
 /* --- inviting sound: once, after the family has arrived, then never nagging --- */
 function initSoundAsk(){
-  const ask=$('#sndAsk'), go=$('#sndAskGo'), x=$('#sndAskX'), btn=$('#sndBtn'), tip=$('#sndTip');
+  const ask=$('#sndAsk'), go=$('#sndAskGo'), x=$('#sndAskX'), btn=$('#menuBtn'), tip=$('#sndTip');
   if(!ask||!btn) return;
   const KEY='rk:sound-asked:v1';
   // asked already this visit, or sound chosen either way before: say nothing
@@ -4354,34 +4429,49 @@ function shower(g){
 
 /* ---- replay, for either celebration or both ---- */
 function paintReplay(){
-  const b=document.getElementById('replayBtn'), menu=document.getElementById('replayMenu');
-  if(!b) return;
+  const rr=document.getElementById('replayRsvp'), rg=document.getElementById('replayGift'), gl=document.getElementById('goRsvpL');
   let r=null, g=null;
   try{ r=JSON.parse(localStorage.getItem(REPLY_KEY)||'null'); }catch(_){}
   try{ g=JSON.parse(localStorage.getItem('rk:gift:v1')||'null'); }catch(_){}
   const yes=!!(r && r.coming==='yes'), gave=!!(g && g.amount);
-  if(!yes && !gave){ b.hidden=true; if(menu) menu.hidden=true; document.body.classList.remove('has-replay'); sizeCorner(); return; }
-  const playRsvp=()=>celebrate({count:r.count||1, family:r.family||''});
-  const playGift=()=>shower(g);
-  b.setAttribute('aria-label', yes&&gave ? 'Replay a celebration' : gave ? 'Replay your gift’s celebration' : 'Replay your fireworks');
-  b.setAttribute('aria-haspopup', yes&&gave ? 'menu' : 'false');
-  b.onclick=e=>{
-    e.stopPropagation();
-    if(yes && gave){ menu.hidden=!menu.hidden; if(!menu.hidden) menu.querySelector('button').focus(); return; }
-    (gave?playGift:playRsvp)();
-  };
-  if(menu){
-    menu.querySelector('[data-play="rsvp"]').onclick=()=>{ menu.hidden=true; playRsvp(); };
-    menu.querySelector('[data-play="gift"]').onclick=()=>{ menu.hidden=true; playGift(); };
-  }
-  // like the sound switch, it arrives with the light
-  const reveal=()=>{ if(!b.hidden) return; b.hidden=false; document.body.classList.add('has-replay'); sizeCorner();
-    b.classList.add('arrive'); setTimeout(()=>b.classList.remove('arrive'),3400); };
-  const hero=document.getElementById('hero');
-  if(hero && hero.classList.contains('lit')) reveal(); else document.addEventListener('sitarey:lit', reveal, {once:true});
+  if(rr){ rr.hidden=!yes; rr.onclick=()=>{ closeMenu(); celebrate({count:r.count||1, family:r.family||''}); }; }
+  if(rg){ rg.hidden=!gave; rg.onclick=()=>{ closeMenu(); shower(g); }; }
+  if(gl) gl.textContent = r ? 'Your reply' : 'Reply to the invitation';
 }
-document.addEventListener('click',e=>{ const m=document.getElementById('replayMenu'); if(m && !m.hidden && !e.target.closest('#replayMenu')) m.hidden=true; });
-document.addEventListener('keydown',e=>{ const m=document.getElementById('replayMenu'); if(e.key==='Escape' && m && !m.hidden){ m.hidden=true; document.getElementById('replayBtn').focus(); } });
+function closeMenu(focusBack){
+  const p=document.getElementById('menuPanel'), b=document.getElementById('menuBtn');
+  if(!p||p.hidden) return; p.hidden=true; if(b){ b.setAttribute('aria-expanded','false'); if(focusBack) b.focus(); }
+}
+function initMenu(){
+  const b=document.getElementById('menuBtn'), p=document.getElementById('menuPanel');
+  if(!b||!p) return;
+  b.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(!p.hidden){ closeMenu(); return; }
+    paintReplay(); p.hidden=false; b.setAttribute('aria-expanded','true'); b.classList.remove('waiting');
+    const first=p.querySelector('.mrow:not([hidden])'); if(first) first.focus({preventScroll:true});
+  });
+  // a jump closes the menu and goes there
+  p.querySelectorAll('[data-go]').forEach(row=>row.addEventListener('click',()=>{
+    closeMenu(); const t=document.querySelector(row.dataset.go); if(!t) return;
+    window.__jumpUntil=Date.now()+1800;
+    t.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+  }));
+  // switches stay open, so you can see what you changed
+  document.addEventListener('click',e=>{ if(!p.hidden && !e.target.closest('#menuPanel') && !e.target.closest('#menuBtn')) closeMenu(); });
+  document.addEventListener('keydown',e=>{
+    if(p.hidden) return;
+    if(e.key==='Escape'){ e.preventDefault(); closeMenu(true); return; }
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      const rows=[...p.querySelectorAll('.mrow:not([hidden])')], k=rows.indexOf(document.activeElement);
+      e.preventDefault(); rows[(k+(e.key==='ArrowDown'?1:-1)+rows.length)%rows.length].focus();
+    }
+  });
+  // close when a person scrolls the page — a finger or a wheel — never when the page shifts itself
+  // (turning the notes on adds text above you, and the browser moves the scroll to keep your place)
+  const away=e=>{ if(!p.hidden && !e.target.closest('#menuPanel')) closeMenu(); };
+  addEventListener('touchmove',away,{passive:true}); addEventListener('wheel',away,{passive:true});
+}
 
 /* a "no" is not celebrated — it is honoured, with a single lamp, quietly */
 function quietLamp(){
@@ -4562,7 +4652,7 @@ function showReplied(r){
 function initReplied(){
   let r=null; try{ r=JSON.parse(store.get(REPLY_KEY)||'null'); }catch(_){}
   if(r) showReplied(r);
-  const chg=$('#rbChange'); if(chg) chg.addEventListener('click',e=>{e.preventDefault(); $('#rsvp').scrollIntoView({behavior:reduceMotion?'auto':'smooth'});});
+  const chg=$('#rbChange'); if(chg) chg.addEventListener('click',e=>{e.preventDefault(); (window.__jumpUntil=Date.now()+1800, $('#rsvp')).scrollIntoView({behavior:reduceMotion?'auto':'smooth'});});
 }
 
 function post(path, payload){
@@ -4715,7 +4805,7 @@ function initForms(){
         ? '<div class="sent"><p class="h3">Thank you. You are on the list.</p><p class="t-body">We will see you on the 21st. Anything to change, just message us.</p></div>'
         : '<div class="sent"><p class="h3">Thank you for telling us.</p><p class="t-body">We will miss you, and we will send photographs.</p></div>';
       remember({name, family: famName, coming: yes?'yes':'no', count: headcount, when: Date.now()});
-      $('#rsvp').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
+      (window.__jumpUntil=Date.now()+1800, $('#rsvp')).scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
       if(yes) setTimeout(()=>celebrate({count:headcount, family:famName}), 500);
       else setTimeout(quietLamp, 400);
     }catch(err){
@@ -4730,36 +4820,63 @@ function initForms(){
 }
 
 function initCalendar(){
-  // ---- each device opens its own calendar and its own maps ----
+  // ---- directions and calendar. A page cannot see which apps a phone prefers,
+  //      so it offers the ones that fit the device, and remembers the choice ----
   const ua=navigator.userAgent||'';
   const isIOS=/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints>1);
-  const isAndroid=/Android/.test(ua);
-  const c=EVENT.calendar, addr=c.location;
-  const gcal='https://calendar.google.com/calendar/render?action=TEMPLATE'
-    +'&text='+encodeURIComponent(c.title)
-    +'&dates='+c.startUTC+'/'+c.endUTC
-    +'&details='+encodeURIComponent(c.details+' https://humsitare.com/')
-    +'&location='+encodeURIComponent(addr)+'&ctz=America/New_York';
-  const cal=$('#calBtn'), alt=$('#calAlt'), g=$('#gcalLink');
-  if(g) g.href=gcal;
-  if(isAndroid){
-    // Android's own calendar is Google Calendar: open it with the event filled in
-    cal.href=gcal; cal.target='_blank'; cal.rel='noopener'; if(alt) alt.hidden=true;
+  const isMac=/Macintosh/.test(ua) && !isIOS, isAndroid=/Android/.test(ua);
+  const c=EVENT.calendar, addr=c.location, q=encodeURIComponent(addr);
+  const gcal='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(c.title)
+    +'&dates='+c.startUTC+'/'+c.endUTC+'&details='+encodeURIComponent(c.details+' https://humsitare.com/')+'&location='+q+'&ctz=America/New_York';
+  const outlook='https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent'
+    +'&subject='+encodeURIComponent(c.title)+'&startdt=2026-11-21T17%3A00%3A00-05%3A00&enddt=2026-11-22T00%3A00%3A00-05%3A00'
+    +'&location='+q+'&body='+encodeURIComponent(c.details+' https://humsitare.com/');
+  const MAPS=[
+    // maps:// opens the Maps app itself on an iPhone; maps.apple.com can stay in Safari as a page
+    {id:'apple', name:'Apple Maps', href:(isIOS?'maps://?daddr=':'https://maps.apple.com/?daddr=')+q+'&dirflg=d', when:isIOS||isMac},
+    {id:'device', name:'Your maps app', sub:'Whichever app this phone uses', href:'geo:0,0?q='+q, when:isAndroid},
+    {id:'google', name:'Google Maps', href:'https://www.google.com/maps/dir/?api=1&destination='+q+'&travelmode=driving', web:!isIOS&&!isAndroid, when:true},
+    {id:'waze', name:'Waze', href:'https://waze.com/ul?q='+q+'&navigate=yes', web:!isIOS&&!isAndroid, when:true},
+    {id:'copy', name:'Copy the address', sub:addr, copy:addr, when:true}];
+  const CALS=[
+    {id:'apple', name:isIOS||isMac?'Apple Calendar':'Your calendar app', sub:isIOS||isMac?'':'Outlook, Apple, or whichever this computer uses', href:'diwali-2026.ics', when:!isAndroid},
+    {id:'google', name:'Google Calendar', href:gcal, web:true, when:true},
+    {id:'outlook', name:'Outlook', sub:'Outlook.com, in the browser', href:outlook, web:true, when:true},
+    {id:'file', name:'Another calendar app', sub:'A calendar file any app can open', href:'diwali-2026.ics', when:isAndroid||isIOS||isMac}];
+  const pick=$('#pick'), list=$('#pickList'); let back=null;
+  function openPick(kind){
+    const KEY='rk:pick-'+kind, items=(kind==='maps'?MAPS:CALS).filter(x=>x.when);
+    let last=null; try{ last=localStorage.getItem(KEY); }catch(_){}
+    items.sort((x,y)=>(y.id===last)-(x.id===last));                 // last time's choice comes first
+    $('#pickT').textContent = kind==='maps' ? 'Get directions with' : 'Add Diwali to';
+    list.innerHTML = items.map(x=>{
+      const inner=`<span>${x.name}${x.sub?`<span class="sub">${x.sub}</span>`:''}</span>${x.id===last?'<span class="last">Last time</span>':''}`;
+      return x.copy ? `<button type="button" data-id="${x.id}" data-copy="${x.copy}">${inner}</button>`
+                    : `<a href="${x.href}" data-id="${x.id}"${x.web?' target="_blank" rel="noopener"':''}>${inner}</a>`;
+    }).join('');
+    list.querySelectorAll('[data-id]').forEach(el=>el.addEventListener('click',async e=>{
+      try{ localStorage.setItem(KEY, el.dataset.id); }catch(_){}
+      if(el.dataset.copy){ e.preventDefault();
+        try{ await navigator.clipboard.writeText(el.dataset.copy); el.querySelector('.sub').textContent='Copied'; }catch(_){}
+        setTimeout(closePick,700); return; }
+      setTimeout(closePick,150);
+    }));
+    back=document.activeElement; pick.hidden=false;
+    (list.querySelector('a,button')||$('#pickX')).focus();
   }
-  // iPhone, iPad, Mac and Windows open the real calendar file: Apple Calendar or Outlook asks to add it
-  const maps=$('#mapsBtn');
-  if(maps){
-    const q=encodeURIComponent(addr);
-    if(isIOS){ maps.href='https://maps.apple.com/?q='+encodeURIComponent('1370 Adams Road')+'&address='+q; maps.removeAttribute('target'); }
-    else if(isAndroid){ maps.href='geo:0,0?q='+q; maps.removeAttribute('target'); }
-    else { maps.href='https://www.google.com/maps/search/?api=1&query='+q; }
-  }}
+  function closePick(){ pick.hidden=true; if(back) back.focus({preventScroll:true}); }
+  $('#mapsBtn').addEventListener('click',()=>openPick('maps'));
+  $('#calBtn').addEventListener('click',()=>openPick('cal'));
+  $('#pickX').addEventListener('click',closePick);
+  pick.addEventListener('click',e=>{ if(e.target===pick) closePick(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !pick.hidden) closePick(); });
+}
 
 document.addEventListener('sitarey:mark',attachMark);
 document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initSoundAsk(); initFirstDiwali(); initGive(); initPersonPhotos(); paintReplay(); initCalendar();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initSoundAsk(); initFirstDiwali(); initGive(); initPersonPhotos(); initMenu(); paintReplay(); initCalendar();
 });
 </script>
 </body>
