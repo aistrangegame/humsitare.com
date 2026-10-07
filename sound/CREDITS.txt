@@ -6,7 +6,10 @@ RECORDED
   bell.mp3     A ghanta (Hindu ritual bell) struck with a leather mallet.
                "274316 the-very-real-horst ghanta-leather-mallet-2015-05-16.wav"
                by the_very_Real_Horst, Wikimedia Commons — CC0 (public domain dedication).
-               One strike, trimmed and faded. Rings at about 1014 Hz.
+               Made calm for this page: one strike taken an octave lower, its bright
+               partials filtered away, a slow one-second bloom instead of a strike,
+               a soft singing-bowl tone beneath it tuned to the same Sa, and a long
+               tail in a large quiet space. Rings for about thirteen seconds.
   boom-1.mp3   Fireworks bursting in the distance.
   boom-2.mp3   "Fireworks in distance 3.ogg" by ezwa, Wikimedia Commons — public domain.
   pop-1.mp3    Trimmed into single bursts and crackles, and brought up in level.

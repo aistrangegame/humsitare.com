@@ -270,6 +270,13 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .door strong{font-family:var(--font-display);font-weight:500;font-size:var(--fs-lg);display:block;margin-bottom:var(--s-1);line-height:var(--lh-h)}
 .door.rung{border-left-color:var(--sig)}
 .door.pending{border-left-style:dashed;cursor:default}
+.years{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-2)}
+.years a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 var(--s-4);border-radius:var(--radius-pill);
+ border:1px solid var(--line);color:var(--fg);text-decoration:none;font-family:var(--font-display);font-size:var(--fs-lg);
+ background:var(--surface);transition:border-color .2s,background .2s}
+.years a:hover{border-color:var(--gold);background:color-mix(in oklch,var(--gold) 10%,var(--surface))}
+.years a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.years a svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;opacity:.55}
 .door.pending .door-cover{opacity:.55}
 .grid-2{display:grid;gap:var(--s-7);grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center}
 .grid-3{display:grid;gap:var(--s-5);grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
@@ -1310,7 +1317,7 @@ body.has-replied .rsvp-fab{display:none}
   <div class="rk-in rk-reading">
     <p class="eyebrow">AFTER YOU REPLY</p>
     <h2 class="title">Thank you. Truly.</h2>
-    <p class="prose t-body">We will see you on the 21st. While you wait, here is last year — and on the night, this is where our photographs will live.</p>
+    <p class="prose t-body">We will see you on the 21st. While you wait, here are the years behind us — and on the night, this is where this year's photographs will live.</p>
 
     <div class="doors" style="margin-top:var(--s-6)">
       <a class="door rung" id="album2025" href="#" target="_blank" rel="noopener">
@@ -1319,6 +1326,10 @@ body.has-replied .rsvp-fab{display:none}
         <strong>Sitaron Ki Diwali 2025</strong>
         Last year's album, in full.
       </a>
+      <div class="door earlier" id="earlierAlbums">
+        <p class="eyebrow">THE YEARS BEFORE</p>
+        <div class="years" id="albumYears"></div>
+      </div>
       <div class="door">
         <p class="eyebrow">ON THE NIGHT</p>
         <strong>This year's album</strong>
@@ -1938,7 +1949,12 @@ const EVENT={
   eventName:"Diwali 2026",     // the row this reply is filed against in Airtable
   rsvpFormUrl:"", rsvpFormHeight:1500,
   cosponsorFormUrl:"", cosponsorFormHeight:1100,
-  album2025Url:"",          // last year's Google Photos album — becomes the rung
+  album2025Url:"https://photos.app.goo.gl/CYBTQACQF7TjUP9d7",   // last year — the featured door
+  albums:[                                                         // the years before, newest first
+    {year:2023, url:"https://photos.app.goo.gl/yCtx6wcpzCnG8LAG7"},
+    {year:2022, url:"https://photos.app.goo.gl/F2eje5xkVG725TCF7"},
+    {year:2021, url:"https://photos.app.goo.gl/4Lk49QvSzHZX3Lvd8"}
+  ],
   album2026Url:"",          // this year's album; a QR is drawn from it
   calendar:{title:"Diwali with the Sitare",startUTC:"20261121T220000Z",
     location:"1370 Adams Road, Bensalem, PA 19020",details:"Sitaron Ki Mehfil Diwali 2026. From 5pm, no set end."},
@@ -3096,6 +3112,12 @@ function embedForm(slotId,url,h,title){
 }
 function initLinks(){
   const a=$('#album2025');
+  // the years before, as quiet links beside last year's door
+  const yrs=$('#albumYears'), box=$('#earlierAlbums');
+  const list=(EVENT.albums||[]).filter(x=>x && x.url);
+  if(yrs && list.length){
+    yrs.innerHTML=list.map(x=>`<a href="${x.url}" target="_blank" rel="noopener" aria-label="Sitaron Ki Diwali ${x.year} album">${x.year}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>`).join('');
+  } else if(box) box.hidden=true;
   if(EVENT.album2025Url){ a.href=EVENT.album2025Url; }
   else { a.removeAttribute('href'); a.removeAttribute('target'); a.classList.add('pending');
     a.querySelector('strong').insertAdjacentHTML('afterend','<span class="t-whisper">Link coming shortly.</span>'); }
