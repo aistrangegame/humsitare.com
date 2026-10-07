@@ -283,6 +283,29 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .qr-tile:hover{transform:translateY(-2px)}
 .qr-tile:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .qr-tile img{width:100%;height:auto;display:block}
+.coming{margin-top:var(--s-7)}
+.coming-count{font-family:var(--font-display);font-size:var(--fs-lg);color:var(--fg);margin:var(--s-2) 0 var(--s-4)}
+.faces{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s-4) var(--s-3)}
+.faces li{width:68px}
+.face{position:relative;width:100%;display:grid;justify-items:center;gap:6px;text-align:center;
+ background:none;border:0;padding:0 0 2px;cursor:pointer;font:inherit;color:inherit;min-height:44px}
+.face:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:12px}
+.who{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,4px);
+ background:#1C1712;color:#F4EFE4;font-size:var(--fs-sm);line-height:1.25;white-space:nowrap;
+ padding:7px var(--s-3);border-radius:var(--radius-pill);box-shadow:0 6px 18px rgba(28,23,18,.26);
+ opacity:0;visibility:hidden;transition:opacity .18s,transform .18s;pointer-events:none;z-index:3}
+.who::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#1C1712}
+.face:hover .who,.face:focus-visible .who,.face.named .who{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.face.named .ph,.face:hover .ph{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--sig)}
+.faces .ph{width:58px;height:58px;border-radius:50%;overflow:hidden;background:var(--surface);
+ box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--gold);display:grid;place-items:center;
+ opacity:0;transform:scale(.9);animation:faceIn .6s var(--ease-out) forwards}
+.faces .ph{position:relative}
+.faces .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+.faces .ph .ini{font-family:var(--font-display);font-size:clamp(.78rem,3.4vw,1.05rem);color:var(--fg-2);letter-spacing:.02em}
+.faces .nm{font-size:var(--fs-sm);color:var(--t-mid);line-height:1.15;overflow-wrap:anywhere}
+@keyframes faceIn{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.faces .ph{animation:none;opacity:1;transform:none}}
 .years a svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;opacity:.55}
 .door.pending .door-cover{opacity:.55}
 .grid-2{display:grid;gap:var(--s-7);grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center}
@@ -1352,6 +1375,12 @@ body.has-replied .rsvp-fab{display:none}
     <h2 class="title">Thank you. Truly.</h2>
     <p class="prose t-body">We will see you on the 21st. While you wait, here are the years behind us — and on the night, this is where this year's photographs will live.</p>
 
+    <section class="coming" id="coming" hidden>
+      <p class="eyebrow">WHO IS COMING</p>
+      <p class="coming-count" id="comingCount"></p>
+      <ul class="faces" id="faces"></ul>
+    </section>
+
     <div class="doors" style="margin-top:var(--s-6)">
       <a class="door rung" id="album2025" href="#" target="_blank" rel="noopener">
         <span class="door-cover slot-media"><img src="images/album-2025-cover.jpg" alt="Sitaron Ki Diwali 2025" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">COVER</span></span>
@@ -1387,7 +1416,6 @@ body.has-replied .rsvp-fab{display:none}
       </div>
       <p class="t-mid">Archana &amp; Sidharth</p>
       <div style="margin-top:var(--s-6)">
-        <button class="btn voice" id="shareBtn" type="button">Share this invitation</button>
         <p class="t-whisper" id="shareStatus" style="font-size:var(--fs-sm);min-height:1.3em;margin-top:var(--s-3)"></p>
       </div>
     </div>
@@ -1997,7 +2025,6 @@ const EVENT={
   album2026Url:"https://photos.app.goo.gl/pPMxVNuq4AozNs5S8",   // this year — its code is images/album-2026-qr.png
   calendar:{title:"Diwali with the Sitare",startUTC:"20261121T220000Z",
     location:"1370 Adams Road, Bensalem, PA 19020",details:"Sitaron Ki Mehfil Diwali 2026. From 5pm, no set end."},
-  share:{title:"Diwali with the Sitare — you are invited",text:"Saturday 21 November 2026, from 5pm in Bensalem PA."}
 };
 
 /* ============ rk.js — shared runtime ============ */
@@ -3840,6 +3867,52 @@ function post(path, payload){
 const val = id => { const el=document.getElementById(id); return el ? String(el.value||'').trim() : ''; };
 
 
+
+/* --- who is coming: first names and portraits, filled from the People table --- */
+function initComing(){
+  const box=$('#coming'), list=$('#faces'), count=$('#comingCount');
+  if(!box||!EVENT.endpoint) return;
+  const replied=()=>{ try{ return !!JSON.parse(store.get(REPLY_KEY)||'null'); }catch(_){ return false; } };
+  const draw=async()=>{
+    if(!replied()) return;                       // it opens only to someone who has answered
+    let d=null;
+    try{
+      const r=await fetch(`${EVENT.endpoint}/guests?event=${encodeURIComponent(EVENT.eventName)}`,{headers:{'Accept':'application/json'}});
+      if(!r.ok) return; d=await r.json();
+    }catch(_){ return; }
+    const g=(d&&d.guests)||[];
+    if(!g.length) return;                       // before the first reply, the page says nothing
+    count.textContent = g.length===1 ? 'One of us, so far.' : `${g.length} of us, so far.`;
+    list.innerHTML = g.map((p,i)=>{
+      // the initials sit underneath; a portrait covers them when it arrives, and if it
+      // never arrives they are simply what you see
+      const img = p.photo
+        ? `<img src="${EVENT.endpoint}/photo/${p.id}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`
+        : '';
+      const full=(p.name||p.first||'').replace(/"/g,'&quot;');
+      return `<li><button class="face" type="button" aria-label="${full}">`
+           + `<span class="ph" style="animation-delay:${Math.min(i*60,900)}ms"><span class="ini">${p.initials}</span>${img}</span>`
+           + `<span class="nm">${p.first}</span><span class="who" aria-hidden="true">${full}</span></button></li>`;
+    }).join('');
+    // tap one and its name stays until you tap elsewhere — hover does the same on a laptop
+    list.querySelectorAll('.face').forEach(btn=>btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=btn.classList.contains('named');
+      list.querySelectorAll('.face.named').forEach(x=>x.classList.remove('named'));
+      if(!open) btn.classList.add('named');
+    }));
+    if(!list.dataset.bound){ list.dataset.bound='1';
+      document.addEventListener('click',()=>list.querySelectorAll('.face.named').forEach(x=>x.classList.remove('named')));
+      document.addEventListener('keydown',e=>{ if(e.key==='Escape') list.querySelectorAll('.face.named').forEach(x=>x.classList.remove('named')); });
+    }
+    box.hidden=false;
+  };
+  // drawn when the section comes into view, and again after a reply
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ draw(); io.disconnect(); } }),{threshold:0.05});
+  io.observe($('#after'));
+  document.addEventListener('sitarey:replied',()=>setTimeout(draw,1200));
+}
+
 /* --- find a reply before changing it: nothing is overwritten unseen --- */
 function initLookup(){
   const box=$('#lookup'), found=$('#lkFound'), body=$('#formBody');
@@ -3973,6 +4046,7 @@ function initForms(){
         ? '<div class="sent"><p class="h3">Thank you. You are on the list.</p><p class="t-body">We will see you on the 21st. Anything to change, just message us.</p></div>'
         : '<div class="sent"><p class="h3">Thank you for telling us.</p><p class="t-body">We will miss you, and we will send photographs.</p></div>';
       remember({name, family: famName, coming: yes?'yes':'no', count: headcount, when: Date.now()});
+      document.dispatchEvent(new CustomEvent('sitarey:replied'));
       $('#rsvp').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
       if(yes) setTimeout(()=>celebrate({count:headcount, family:famName}), 500);
       else setTimeout(quietLamp, 400);
@@ -4019,21 +4093,13 @@ function initCalendar(){
     a.download='sitarey-diwali-2026.ics'; document.body.appendChild(a); a.click(); a.remove();
   });
 }
-function initShare(){
-  $('#shareBtn').addEventListener('click',async()=>{
-    const data={title:EVENT.share.title,text:EVENT.share.text,url:location.href};
-    if(navigator.share){try{await navigator.share(data);}catch(_){} return;}
-    try{await navigator.clipboard.writeText(location.href); $('#shareStatus').textContent='Link copied. Paste it into WhatsApp.';}
-    catch(_){ $('#shareStatus').textContent="Copy this page's address from your browser to share it."; }
-  });
-}
 
 document.addEventListener('sitarey:mark',attachMark);
 document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
   embedForm('cosponsorSlot',EVENT.cosponsorFormUrl,EVENT.cosponsorFormHeight,'Co-sponsor form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initCalendar(); initShare();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initComing(); initCalendar();
 });
 </script>
 </body>
