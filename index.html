@@ -106,23 +106,24 @@
 --t-body:color-mix(in oklch,var(--fg) 76%,transparent);--t-soft:color-mix(in oklch,var(--fg) 72%,transparent);
 color:var(--fg);
 }
-/* the light itself — a circle opening from the flame */
-@property --dwave{syntax:'<length>';inherits:true;initial-value:0px}
-.dawn{position:absolute;inset:0;z-index:0;pointer-events:none;
+/* the light itself — a circle opening from the detonation.
+   It spreads by TRANSFORM: a small disc of light is painted once and scaled up,
+   which the graphics chip does without repainting anything. (It used to spread by
+   animating a full-screen mask every frame; Safari's tiled painting occasionally
+   left one tile on an earlier frame — a dark square that stayed.) When the light
+   has arrived, the disc is replaced by a plain, still background, so the finished
+   page never depends on an animation having rendered correctly.               */
+.dawn{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
  background:radial-gradient(120% 86% at var(--dx,50%) var(--dy,40%),#FFF9EC 0%,#F7EBD2 42%,#EFD9B0 100%);
- clip-path:circle(0px at var(--dx,50%) var(--dy,40%));
- transition:clip-path 3.1s cubic-bezier(.45,.05,.55,.95)}
-.hero.daybreak .dawn{clip-path:circle(var(--dr,160vmax) at var(--dx,50%) var(--dy,40%))}
-/* where custom properties can animate, the edge is light rather than a cut */
-@supports (background: paint(x)) or (transition: --dwave 1s){
-  .dawn{clip-path:none;--dwave:0px;
-   -webkit-mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,40%),
-     #000 calc(var(--dwave) - 110px), rgba(0,0,0,.55) calc(var(--dwave) - 46px), transparent var(--dwave));
-   mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,40%),
-     #000 calc(var(--dwave) - 110px), rgba(0,0,0,.55) calc(var(--dwave) - 46px), transparent var(--dwave));
-   transition:--dwave 3.1s cubic-bezier(.45,.05,.55,.95)}
-  .hero.daybreak .dawn{--dwave:var(--dr,160vmax)}
-}
+ transition:opacity .6s ease}
+.hero.dawned .dawn{opacity:1}
+.dawnwave{position:absolute;z-index:0;pointer-events:none;width:400px;height:400px;border-radius:50%;
+ left:calc(var(--dx,50%) - 200px);top:calc(var(--dy,40%) - 200px);
+ background:radial-gradient(circle,#FFF9EC 0%,#F7EBD2 40%,#EFD9B0 78%,rgba(239,217,176,.55) 92%,rgba(239,217,176,0) 100%);
+ transform:scale(.001);transform-origin:50% 50%;will-change:transform;
+ transition:transform 3.1s cubic-bezier(.45,.05,.55,.95)}
+.hero.daybreak .dawnwave{transform:scale(var(--ws,6))}
+.hero.dawned .dawnwave{opacity:0;transition:opacity .6s ease .1s;will-change:auto}
 /* a warmth that runs just ahead of the edge */
 .dawnglow{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
  background:radial-gradient(circle at var(--dx,50%) var(--dy,40%),
@@ -263,7 +264,7 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .breathe{animation:rk-breathe var(--dur-breath) ease-in-out infinite}
 .pulse{animation:rk-pulse 2.4s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.rise,.breathe,.pulse,.seed,.dawnglow{animation:none!important;opacity:1!important;transform:none!important}
- .dawn{transition:none!important}
+ .dawn,.dawnwave{transition:none!important}
  .veil{transition:none}}
 .hold{--p:0;position:relative;display:inline-grid;place-items:center;width:88px;height:88px;border-radius:50%;
  border:1px solid var(--line-wash);background:var(--surface);color:var(--fg-2);font-family:var(--font-ui);
@@ -297,6 +298,8 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .qr-tile:hover{transform:translateY(-2px)}
 .qr-tile:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .qr-tile img{width:100%;height:auto;display:block}
+.cal-alt{margin:var(--s-3) 0 0;font-size:var(--fs-sm)}
+.cal-alt a{color:var(--fg-2);text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px}
 .years a svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;opacity:.55}
 .door.pending .door-cover{opacity:.55}
 .grid-2{display:grid;gap:var(--s-7);grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center}
@@ -383,8 +386,8 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 /* the invitation arrives with the light itself */
 .hero .hero-on-in > .plate{opacity:0;transition:opacity 1s var(--ease-out) .45s}
 .hero.daybreak .hero-on-in > .plate{opacity:1}
-.hero .hero-on-in > .scrollhint{opacity:0;transition:opacity 1s var(--ease-out) .9s}
-.hero.daybreak .hero-on-in > .scrollhint{opacity:1}
+.hero .hero-on-in > .scrollhint{opacity:0;transition:opacity .8s var(--ease-out) .1s}
+.hero.dawned .hero-on-in > .scrollhint{opacity:1}   /* it arrives with the settled light, never ahead of it */
 .hero-family{width:100%;height:auto;display:block;
  filter:drop-shadow(0 18px 28px rgba(60,30,10,.28))}
 .plate{
@@ -811,6 +814,109 @@ body.held{overflow:hidden}
 #descentLine > .rk-in,#opening > .rk-in,.g-night2 > .rk-in,.g-plum > .rk-in,.band.deep .rk-in,.g-wine > .rk-in,.g-wine2 > .rk-in,.g-ember > .rk-in{
   opacity:var(--night-ink,1);transition:opacity .35s linear}
 
+
+/* ================= a first Diwali: one question, then the page explains itself ================= */
+.firstd{padding-block:var(--s-6) var(--s-7)}
+.fd-ask{border-radius:var(--radius);padding:var(--s-5);text-align:center;
+ background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(242,193,78,.35)}
+.fd-q{font-family:var(--font-display);font-size:clamp(1.35rem,5.4vw,1.75rem);line-height:1.25;color:#FBF3E4;margin:0 0 var(--s-4)}
+.fd-choices{display:flex;flex-wrap:wrap;gap:var(--s-3);justify-content:center}
+.fd-btn{min-height:50px;padding:0 var(--s-5);border-radius:999px;border:0;cursor:pointer;font:600 var(--fs-ui)/1.2 var(--font-ui);
+ background:transparent;color:#FBF3E4;box-shadow:inset 0 0 0 1.5px rgba(251,243,228,.45)}
+.fd-btn:hover{box-shadow:inset 0 0 0 1.5px #F2C14E}
+.fd-btn.yes{background:#F2C14E;color:#1C1530;box-shadow:none}
+.fd-btn.yes:hover{background:#F7D88A}
+.fd-btn:focus-visible,.fd-toggle:focus-visible,.fd-more a:focus-visible{outline:2px solid #F2C14E;outline-offset:3px}
+.fd-card{border-radius:var(--radius);padding:var(--s-5) var(--s-5) var(--s-5);background:rgba(20,16,42,.72);
+ box-shadow:inset 0 0 0 1px rgba(242,193,78,.4),0 18px 40px rgba(0,0,0,.28);outline:none}
+.fd-card.arrive{animation:fdIn .5s var(--ease-out) both}
+@keyframes fdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fd-kicker{font-family:var(--font-display);font-size:1.3rem;color:#F7D88A;margin:0 0 var(--s-2)}
+.fd-lead{color:#FBF3E4;font-size:var(--fs-body);line-height:1.55;margin:0 0 var(--s-4)}
+.fd-list{display:grid;gap:var(--s-3);margin:0 0 var(--s-4)}
+.fd-list div{display:grid;gap:2px}
+.fd-list dt{font-weight:700;color:#F7D88A;font-size:var(--fs-ui)}
+.fd-list dd{margin:0;color:#E9E1F2;font-size:var(--fs-ui);line-height:1.5}
+.fd-close{font-family:var(--font-display);font-style:italic;color:#FBF3E4;font-size:1.08rem;line-height:1.5;margin:0 0 var(--s-3)}
+.fd-more{color:#E9E1F2;font-size:var(--fs-sm);line-height:1.55;margin:0}
+.fd-more a{color:#F7D88A;text-underline-offset:3px}
+.fd-toggle{display:block;margin:var(--s-4) auto 0;min-height:44px;padding:0 var(--s-4);border:0;border-radius:999px;cursor:pointer;
+ background:transparent;color:#E9E1F2;font:500 var(--fs-sm)/1 var(--font-ui);text-decoration:underline;text-underline-offset:4px}
+.fd-toggle:hover{color:#F7D88A}
+/* the notes beside the names: present only for a first Diwali */
+.gloss{display:none}
+body.newcomer .gloss{display:block;margin:var(--s-3) 0 0;padding:var(--s-2) var(--s-3);border-radius:10px;
+ background:rgba(242,193,78,.08);box-shadow:inset 2px 0 0 #F2C14E;color:#F1E9F7;font:400 var(--fs-sm)/1.5 var(--font-ui);text-align:left}
+body.newcomer .age .gloss{margin-top:var(--s-3);max-width:34ch;margin-inline:auto}
+@media (prefers-reduced-motion:reduce){.fd-card.arrive{animation:none}}
+
+
+/* ================= carry the light: the gift, the wall, and the photo pickers ================= */
+#carry .field label:not(.btn){font-size:var(--fs-ui)}
+#carry .field input{font-size:var(--fs-body);min-height:50px}
+#carry fieldset,.giveform fieldset{border:0;margin:0;padding:0;min-width:0}
+.giveform{display:grid;gap:var(--s-5);margin-top:var(--s-6)}
+.giveform legend{font-family:var(--font-display);font-size:var(--fs-lg);color:var(--fg);margin-bottom:var(--s-3);padding:0}
+.opt{color:var(--fg-muted);font-weight:400}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.amt-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(5.6rem,1fr));gap:var(--s-2)}
+.amt{position:relative}
+.amt input{position:absolute;opacity:0;width:0;height:0}
+.amt span{display:grid;place-items:center;min-height:52px;border-radius:var(--radius-sm);border:1.5px solid var(--line);
+ background:var(--surface);font:600 var(--fs-lg)/1 var(--font-ui);color:var(--fg);cursor:pointer;transition:background .15s,border-color .15s}
+.amt input:checked + span{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.amt input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+.amt-other{margin-top:var(--s-3)}
+.money{display:flex;align-items:center;gap:var(--s-2)}
+.money span{font:600 var(--fs-lg)/1 var(--font-ui);color:var(--fg-2)}
+.money input{max-width:12rem}
+.check{display:flex;align-items:center;gap:var(--s-3);min-height:44px;cursor:pointer;font-size:var(--fs-ui);color:var(--fg);margin-top:var(--s-3)}
+.check input{width:22px;height:22px;accent-color:var(--fg);flex:0 0 auto}
+.g-photo,.p-photo{display:flex;gap:var(--s-4);align-items:center;margin-top:var(--s-4)}
+.g-photo-ph{flex:0 0 auto;width:64px;height:64px;border-radius:50%;background:var(--surface) center/cover no-repeat;
+ box-shadow:0 0 0 1.5px var(--line);display:grid;place-items:center;color:var(--fg-muted);font:600 .8rem/1 var(--font-ui)}
+.g-photo-ph.has{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--gold)}
+.filein{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.filein:focus-visible + .linkbtn,.btn.small:has(+ .filein:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.btn.small{min-height:44px;padding:0 var(--s-4);font-size:var(--fs-sm)}
+.linkbtn{background:none;border:0;padding:0 var(--s-2);min-height:44px;color:var(--fg-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:inherit;font-size:var(--fs-sm)}
+.seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:999px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line)}
+.seg3.two{grid-template-columns:1fr 1fr}
+.seg3 label{position:relative;cursor:pointer}
+.seg3 input{position:absolute;opacity:0;width:0;height:0}
+.seg3 span{display:grid;place-items:center;min-height:46px;border-radius:999px;font:600 var(--fs-ui)/1 var(--font-ui);color:var(--fg-2);transition:background .15s,color .15s}
+.seg3 input:checked + span{background:var(--fg);color:var(--bg)}
+.seg3 input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+.payhow{margin-top:var(--s-4);padding:var(--s-4) var(--s-5);border-radius:var(--radius-sm);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.payhow h4{margin:0 0 var(--s-2);font:600 var(--fs-ui)/1.3 var(--font-ui);color:var(--fg)}
+.payhow p{margin:var(--s-2) 0 0;font-size:var(--fs-ui);line-height:1.55;color:var(--fg-2)}
+.payhow b{color:var(--fg)}
+.payhow .copyrow{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);margin-top:var(--s-3)}
+.payhow .copyval{font:600 var(--fs-body)/1.3 var(--font-ui);color:var(--fg);word-break:break-all}
+.payhow .zl{background:#6D1ED4;color:#fff;border-color:#6D1ED4}
+.payhow .zl:hover{background:#5A14B8}
+.payhow .qr{display:block;width:min(100%,240px);margin-top:var(--s-4);border-radius:14px;background:#fff;padding:8px}
+.payhow .qr-toggle{margin-top:var(--s-3)}
+@media(max-width:699px){.payhow .qr.desk{display:none}}
+@media(min-width:700px){.payhow .qr-toggle{display:none}}
+.payhow .soon{color:var(--fg-2);font-style:italic}
+.give-done{margin-top:var(--s-6);padding:var(--s-5);border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--gold);outline:none}
+.give-done h3{font-family:var(--font-display);font-weight:500;font-size:var(--fs-h3);margin:0 0 var(--s-3);color:var(--fg)}
+.give-done .steps{margin:var(--s-3) 0 var(--s-4);padding-left:1.4em;color:var(--fg-2);font-size:var(--fs-ui);line-height:1.55;display:grid;gap:6px}
+.give-done .steps b{color:var(--fg)}
+.give-done p{margin:0 0 var(--s-3);color:var(--fg-2);font-size:var(--fs-ui);line-height:1.55}
+.legal{margin-top:var(--s-6);font-size:var(--fs-sm);line-height:1.6;color:var(--fg-2);max-width:62ch}
+.carriers{margin:var(--s-6) 0 0;padding:var(--s-5);border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.carriers-h{font-family:var(--font-display);font-size:var(--fs-lg);color:var(--fg);margin:0}
+.carriers-total{margin:var(--s-1) 0 var(--s-4);color:var(--fg-2);font-size:var(--fs-ui)}
+.carriers-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:var(--s-4) var(--s-3)}
+.carriers-list li{display:grid;justify-items:center;gap:6px;text-align:center}
+.carriers-list .ph{width:72px;height:72px;border-radius:50%;overflow:hidden;position:relative;display:grid;place-items:center;
+ background:var(--bg);box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--gold);font:600 1rem/1 var(--font-display);color:var(--fg-2)}
+.carriers-list .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.carriers-list .who{font:600 var(--fs-ui)/1.25 var(--font-ui);color:var(--fg);overflow-wrap:anywhere}
+.carriers-list .amt-v{font:500 var(--fs-ui)/1 var(--font-display);color:var(--fg-2)}
+
 /* ---- the five days as five lamps ---- */
 .daylamps{display:flex;justify-content:space-between;gap:var(--s-1)}
 .daylamp{flex:1 1 0;min-width:0;display:grid;justify-items:center;gap:var(--s-1);background:none;border:0;cursor:pointer;
@@ -880,7 +986,9 @@ main.threshold{position:relative;z-index:1}
 .fw-note .quiet-diya{width:64px;height:auto;margin:0 auto var(--s-4);display:block;overflow:visible}
 
 /* one switch for every sound on the page; the story videos obey it too */
-.snd{position:fixed;top:calc(env(safe-area-inset-top) + 2px);right:calc(env(safe-area-inset-right) + 6px);z-index:25;
+.corner{position:fixed;top:calc(env(safe-area-inset-top) + 2px);right:calc(env(safe-area-inset-right) + 6px);z-index:25;
+ display:flex;flex-direction:row;gap:6px;align-items:center}
+.snd{position:relative;flex:0 0 auto;
  width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;
  background:rgba(8,6,16,.55);color:#F4EFE4;transition:background .2s,transform .2s,box-shadow .4s}
 .snd:hover{background:rgba(8,6,16,.75)}
@@ -890,7 +998,17 @@ main.threshold{position:relative;z-index:1}
 .snd .on{display:none} .snd[aria-pressed="true"] .on{display:inline} .snd[aria-pressed="true"] .off{display:none}
 .snd.light{background:rgba(247,243,236,.8);color:#1C1712}
 .snd.nudge{animation:sndnudge 1.6s ease-in-out 2}
-.snd.replay{right:calc(env(safe-area-inset-right) + 56px)}
+.snd.notes .dot{fill:currentColor;stroke:none}
+.corner{position:fixed}
+.replay-menu{position:absolute;top:50px;right:0;display:grid;gap:4px;padding:6px;border-radius:16px;background:#1C1712;
+  box-shadow:0 14px 36px rgba(0,0,0,.45),0 0 0 1px rgba(242,193,78,.35);min-width:240px;z-index:2}
+.replay-menu button{min-height:46px;padding:0 14px;border:0;border-radius:11px;background:none;color:#F4EFE4;text-align:left;
+  font:500 var(--fs-ui)/1.2 var(--font-ui);cursor:pointer}
+.replay-menu button:hover,.replay-menu button:focus-visible{background:rgba(242,193,78,.16);outline:none}
+.fw-note.top{top:16%;transform:translate(-50%,0)}
+.fw-note .as{color:#F7D88A!important;font-style:italic}
+.snd.notes[aria-pressed="true"]{background:#F2C14E;color:#1C1530}
+.snd.notes[aria-pressed="true"]:hover{background:#F7D88A}
 
 /* ---- asking once, where the eyes already are, then going home to the corner ---- */
 .snd-ask{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);z-index:30;
@@ -930,10 +1048,10 @@ body.has-replied .snd-ask{bottom:calc(env(safe-area-inset-bottom) + 92px)}
 @media (prefers-reduced-motion:reduce){.snd-ask,.snd-ask.home,.snd-tip{transition:opacity .2s}.snd-ask-ic::after,.snd.waiting{animation:none}}
 .snd.replay .dot{fill:currentColor;stroke:none}
 .snd.replay.arrive{animation:sndnudge 1.6s ease-in-out 2}
-body.has-replay .diyarail{padding-inline:108px}
-@media(max-width:480px){body.has-replay .diyarail{padding-left:12px;padding-right:108px;justify-content:flex-start}}
+.diyarail{padding-right:var(--corner-w,56px)}
+@media(max-width:480px){body.corner-wide .diyarail{padding-left:12px;justify-content:flex-start}}
 @keyframes sndnudge{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 7px rgba(242,193,78,.35)}}
-.diyarail{padding-inline:56px}
+.diyarail{padding-left:var(--corner-w,56px)}
 @media(max-width:420px){.diyarail{gap:clamp(6px,3vw,26px)}}
 
 /* ---- this device has already replied ---- */
@@ -999,6 +1117,7 @@ body.has-replied .rsvp-fab{display:none}
 <header class="band hero g-night" id="hero">
   <div class="yantra turn" aria-hidden="true"><svg viewBox="0 0 300 300"><rect x="12" y="12" width="276" height="276" rx="2"/><rect x="22" y="22" width="256" height="256" rx="2"/><rect x="32" y="32" width="236" height="236" rx="2"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(0)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(90)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(180)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(270)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(0.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(22.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(45.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(67.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(90.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(112.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(135.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(157.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(180.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(202.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(225.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(247.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(270.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(292.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(315.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(337.5)"/><circle cx="150" cy="150" r="92"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(0)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(45)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(90)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(135)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(180)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(225)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(270)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(315)"/><circle cx="150" cy="150" r="72"/><path d="M150.0,84.0 L207.2,183.0 L92.8,183.0 Z"/><path d="M150.0,102.0 L196.8,183.0 L103.2,183.0 Z"/><path d="M150.0,119.0 L186.4,182.0 L113.6,182.0 Z"/><path d="M150.0,137.0 L174.2,179.0 L125.8,179.0 Z"/><path d="M150.0,220.0 L89.4,115.0 L210.6,115.0 Z"/><path d="M150.0,203.0 L99.8,116.0 L200.2,116.0 Z"/><path d="M150.0,186.0 L110.2,117.0 L189.8,117.0 Z"/><path d="M150.0,169.0 L121.4,119.5 L178.6,119.5 Z"/><path d="M150.0,153.0 L132.7,123.0 L167.3,123.0 Z"/><circle class="bindu-dot" cx="150" cy="150" r="3.2"/></svg></div>
   <div class="dawn" aria-hidden="true"></div>
+  <div class="dawnwave" aria-hidden="true"></div>
   <div class="dawnglow" aria-hidden="true"></div>
   <div class="motes" aria-hidden="true"></div>
   <canvas class="zone" id="zone" aria-hidden="true"></canvas>
@@ -1067,6 +1186,38 @@ body.has-replied .rsvp-fab{display:none}
   <div class="rk-in rk-reading"><p class="descent-say">On the darkest night of the month, we fill every corner with light.</p></div>
 </section>
 
+
+<!-- ============ 1b · FIRST DIWALI? ============ -->
+<section class="band g-night2 firstd" id="firstDiwali" aria-labelledby="fdQ">
+  <div class="rk-in rk-reading">
+    <div class="fd-ask" id="fdAsk">
+      <p class="fd-q" id="fdQ">Is this your first Diwali?</p>
+      <div class="fd-choices">
+        <button class="fd-btn yes" id="fdYes" type="button">Yes, show me the way in</button>
+        <button class="fd-btn" id="fdNo" type="button">I know Diwali</button>
+      </div>
+    </div>
+
+    <div class="fd-card" id="fdCard" hidden tabindex="-1">
+      <p class="fd-kicker">Your first Diwali</p>
+      <p class="fd-lead">You do not need to know anything, or believe anything, to be here. You are invited, and that is all it takes.</p>
+      <dl class="fd-list">
+        <div><dt>What to wear</dt><dd>Anything bright and festive is perfect. If you have something Indian, wonderful; if not, your most colourful outfit is exactly right.</dd></div>
+        <div><dt>The puja</dt><dd>The evening opens with a prayer, lamps and song. You are welcome to simply watch. Shoes come off for the puja, and go back on afterwards.</dd></div>
+        <div><dt>The stage</dt><dd>Families make an entrance to their own song. You can join in, or watch from your seat — nobody will pull you up.</dd></div>
+        <div><dt>The food</dt><dd>All vegetarian, and no alcohol.</dd></div>
+        <div><dt>What to bring</dt><dd>Only yourselves.</dd></div>
+        <div><dt>What to say</dt><dd>Happy Diwali. That is all anyone expects, and it is always right.</dd></div>
+      </dl>
+      <p class="fd-close">If someone hands you a lamp, light it from the one already burning. That is the whole etiquette.</p>
+      <p class="fd-more">As you go down the page, the names explain themselves. And if you want the day itself, hour by hour,
+        <a href="https://aistrangegame.com/learning/calendar/diwali" target="_blank" rel="noopener">there is a calendar of Diwali here</a>.</p>
+    </div>
+
+    <button class="fd-toggle" id="fdToggle" type="button" hidden>New to Diwali? Show the notes</button>
+  </div>
+</section>
+
 <!-- ============ 2 · OPENING ============ -->
 <section class="band g-night2" id="opening" data-petal="0">
   <div class="rk-in rk-reading">
@@ -1085,6 +1236,7 @@ body.has-replied .rsvp-fab{display:none}
     <h2 class="title">What is Diwali?</h2>
     <p class="lede">Diwali comes from <em>Deepavali</em>, a row of lamps. It is marked across India and around the world, on the new-moon night of autumn — the darkest night of the month.</p>
     <p class="prose t-body">That is the whole festival in one picture: a row of lamps against the darkest night.</p>
+<p class="gloss">It is one of the biggest festivals of the year in India, and for many families it feels like Christmas and New Year at once: new clothes, lights in every window, sweets, family, and fireworks.</p>
 
     <div class="fivedays" style="margin-top:var(--s-6)">
       <p class="t-soft" style="font-size:var(--fs-sm);margin:0 0 var(--s-3)">It runs five days, each with its own reason to light a lamp. Tap one.</p>
@@ -1108,19 +1260,23 @@ body.has-replied .rsvp-fab{display:none}
             <p class="age-name">Satyug</p>
             <p class="age-kicker">THE CHURNING &middot; IT REVERSES</p>
             <p class="age-text">Lakshmi rises from the churning of the cosmic ocean and is welcomed as abundance itself. It is why we light the way to our doors.</p>
+<p class="gloss">Satyug is the first of four great ages of time. Gods and demons churned the ocean for the nectar of immortality, and Lakshmi, goddess of wealth and good fortune, rose out of it.</p>
           </article><article class="age" data-age="1">
             <svg class="glyph" viewBox="0 0 120 120" aria-hidden="true"><path d="M34 86 q26 -58 52 0"/><path d="M34 86 L86 86"/><circle cx="46" cy="34" r="5"/><circle cx="60" cy="28" r="5"/><circle cx="74" cy="34" r="5"/><path d="M60 86 L60 52"/><circle cx="60" cy="60" r="4" class="pip"/></svg>
             <p class="age-name">Treta</p>
             <p class="age-kicker">THE RETURN &middot; IT COMPLETES</p>
             <p class="age-text">After fourteen years of exile and the defeat of Ravana, Ram returns to Ayodhya. The people light rows of lamps to guide him home.</p>
+<p class="gloss">Ram is the prince at the heart of the Ramayana, one of India’s great epics. Ravana was the demon king who took his wife, Sita. Ayodhya is Ram’s home city, which lit every lamp it had for his return.</p>
           </article><article class="age" data-age="2">
             <svg class="glyph" viewBox="0 0 120 120" aria-hidden="true"><path d="M22 86 L60 26 L98 86 Z"/><path d="M34 86 q26 -22 52 0"/><circle cx="48" cy="74" r="3.4"/><circle cx="60" cy="70" r="3.4"/><circle cx="72" cy="74" r="3.4"/><path d="M60 26 L60 14" /><circle cx="60" cy="10" r="4" class="pip"/></svg>
             <p class="age-name">Dwapar</p>
             <p class="age-kicker">THE SHELTER &middot; IT HOLDS</p>
             <p class="age-text">Krishna lifts Govardhan hill to shelter the people of Vraj from Indra’s storm. Annakut, a mountain of food, is offered in its memory.</p>
+<p class="gloss">Krishna is among the most loved figures in Hindu tradition. Vraj was the countryside where he grew up; Indra is the king of the gods and of the rain. Annakut means a mountain of food.</p>
           </article></div></div>
         <div class="ages-dots" id="agesDots" aria-hidden="true"><i></i><i></i><i></i></div>
         <p class="amavasya">Amavasya &middot; the night with no moon</p>
+<p class="gloss">Amavasya is the new-moon night, the darkest of the month — the night Diwali falls on.</p>
       </div>
     </div>
   </div>
@@ -1133,6 +1289,7 @@ body.has-replied .rsvp-fab{display:none}
     <p class="eyebrow">AND NOW</p>
     <h2 class="title">Lit far from Ayodhya.</h2>
     <p class="prose t-body">For families living away from where it began, the meaning has grown. It is not only about remembering a homecoming. It is how we make one.</p>
+<p class="gloss">Ayodhya is the city in India where the first lamps were lit for Ram’s homecoming. For families who have made a home far from there, the festival is how the homecoming happens here.</p>
     <blockquote class="bigquote">
       <p>Archana adds one more light for our own time: Saraswati, goddess of knowledge, music and the arts, who arrives every year when the stage lights up.</p>
     </blockquote>
@@ -1176,13 +1333,16 @@ body.has-replied .rsvp-fab{display:none}
     <p class="t-whisper" style="font-size:var(--fs-sm);text-align:center;margin-top:var(--s-3)">These are the years behind us. Tap a circle; tap the right of a photograph to move on, the left to go back.</p>
 
     <div class="grid-2 rk-reading" style="margin-top:var(--s-7);display:grid;gap:var(--s-5)">
-      <div><p class="h3">We open with puja</p><p class="t-soft" style="font-size:var(--fs-ui)">Before anything else, we gather and pray together. It sets the tone for the whole evening.</p></div>
+      <div><p class="h3">We open with puja</p><p class="t-soft" style="font-size:var(--fs-ui)">Before anything else, we gather and pray together. It sets the tone for the whole evening.</p>
+<p class="gloss">A puja is a prayer offered together, with lamps, flowers and song. You are welcome to simply watch.</p></div>
       <div><p class="h3">Every family takes the stage</p><p class="t-soft" style="font-size:var(--fs-ui)">Each couple or family brings a signature entry dance. Tell us your song when you RSVP.</p></div>
-      <div><p class="h3">Every talent has a place</p><p class="t-soft" style="font-size:var(--fs-ui)">Bhajans, songs, skits, poems, games. Whatever you bring, there is room for it.</p></div>
+      <div><p class="h3">Every talent has a place</p><p class="t-soft" style="font-size:var(--fs-ui)">Bhajans, songs, skits, poems, games. Whatever you bring, there is room for it.</p>
+<p class="gloss">A bhajan is a devotional song, often sung together.</p></div>
       <div><p class="h3">We close with fireworks</p><p class="t-soft" style="font-size:var(--fs-ui)">The last light of the night belongs to the sky.</p></div>
     </div>
 
     <p class="seed rk-reading" style="margin-top:var(--s-7);text-align:center;margin-inline:auto">For years our people have called this place Sharmaji ka Adda. Devkinandan ji named it Balam Dham, the home of the eternal beloved.<br>Call it what you will. You do not come here to be an audience. You come to be a Sitara.</p>
+<p class="gloss" style="text-align:center;margin-inline:auto">Sharmaji ka Adda means, roughly, “the Sharmas’ hangout.” Balam Dham means “home of the eternal beloved.” A Sitara is a star; the Sitare are the stars.</p>
   </div>
 </section>
 
@@ -1191,13 +1351,14 @@ body.has-replied .rsvp-fab{display:none}
   <div class="rk-in rk-reading">
     <p class="eyebrow">THE EVENING</p>
     <p class="welcome">Welcome to the Sharma Diwali Dhamaka.</p>
+<p class="gloss">A dhamaka is a blast — the joyful, noisy kind.</p>
     <p class="welcome-by">Sidharth</p>
     <h2 class="title">The shape of the night</h2>
     <p class="lede">We begin at 5. There is no set end. Last year the energy carried us to midnight.</p>
     <ol class="beats">
       <li class="beat"><span class="pip"></span><div><p class="beat-when">5pm</p><p class="beat-name">We gather</p><span class="beat-thumb slot-circle" data-lightbox data-cap="arriving" role="button" tabindex="0"><img src="images/beat-arriving.jpg" alt="arriving" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">arriving</span></span><p class="beat-what">Come in, find your people, settle in.</p></div></li>
       <li class="beat"><span class="pip"></span><div><p class="beat-when">To begin</p><p class="beat-name">Puja</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the puja" role="button" tabindex="0"><img src="images/beat-puja.jpg" alt="the puja" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the puja</span></span><p class="beat-what">We start together, in prayer and in light.</p></div></li>
-      <li class="beat"><span class="pip"></span><div><p class="beat-when">Through the evening</p><p class="beat-name">The Mehfil</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the stage" role="button" tabindex="0"><img src="images/beat-stage.jpg" alt="the stage" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the stage</span></span><p class="beat-what">Dances, songs, skits, poems and games, and food along the way.</p></div></li>
+      <li class="beat"><span class="pip"></span><div><p class="beat-when">Through the evening</p><p class="beat-name">The Mehfil</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the stage" role="button" tabindex="0"><img src="images/beat-stage.jpg" alt="the stage" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the stage</span></span><p class="beat-what">Dances, songs, skits, poems and games, and food along the way.</p><p class="gloss">A mehfil is an evening gathering for music, poetry and performance.</p></div></li>
       <li class="beat held-beat" id="heldBeat">
         <span class="pip"></span>
         <div class="inner"><p class="beat-when">Somewhere in the evening</p><p class="beat-name">Something new</p>
@@ -1231,32 +1392,19 @@ body.has-replied .rsvp-fab{display:none}
         <div><dt>Date</dt><dd>Saturday 21 November 2026</dd></div>
         <div><dt>Time</dt><dd>From 5pm &middot; no set end</dd></div>
         <div><dt>Place</dt><dd>1370 Adams Road<br>Bensalem PA 19020</dd></div>
-        <div><dt>Dress</dt><dd>Festive Indian</dd></div>
+        <div><dt>Dress</dt><dd>Bright and festive, Indian if you have it</dd></div>
         <div><dt>Food</dt><dd>Still coming together</dd></div>
         <div><dt>Presented by</dt><dd>The Sharma Foundation</dd></div>
       </dl>
     </div>
 
     <div class="fab-clear" style="display:flex;gap:var(--s-3);flex-wrap:wrap;margin-top:var(--s-5)">
-      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=1370+Adams+Road+Bensalem+PA+19020" target="_blank" rel="noopener">Open in Maps</a>
-      <button class="btn ghost" id="calBtn" type="button">Add to calendar</button>
+      <a class="btn ghost" id="mapsBtn" href="https://www.google.com/maps/search/?api=1&amp;query=1370+Adams+Road+Bensalem+PA+19020" target="_blank" rel="noopener">Open in Maps</a>
+      <a class="btn ghost" id="calBtn" href="diwali-2026.ics">Add to calendar</a>
     </div>
+    <p class="cal-alt" id="calAlt"><a id="gcalLink" href="#" target="_blank" rel="noopener">Use Google Calendar instead</a></p>
 
-    <details class="acc" style="margin-top:var(--s-6)">
-      <summary>Help carry the light as a co-sponsor</summary>
-      <div id="cosponsorSlot">
-        <p class="t-body" style="font-size:var(--fs-sm);margin-bottom:var(--s-4)">Food, decor, fireworks, something of your own. Nothing is too small.</p>
-        <form id="cosponsorPreview" style="display:grid;gap:var(--s-4)">
-          <div class="field"><label for="c-name">Your name</label><input id="c-name" type="text" placeholder="First and last"></div>
-          <div class="field"><label for="c-from">Family or business</label><input id="c-from" type="text" placeholder="Who the support comes from"></div>
-          <div class="field"><label for="c-contact">How to reach you</label><input id="c-contact" type="text" placeholder="Phone or email"></div>
-          <div class="field"><label for="c-note">What you have in mind</label><textarea id="c-note" placeholder="Tell us and we will come back to you"></textarea></div>
-          <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-            <div><button class="btn ghost" type="submit" id="spSend">Send it to us</button>
-              <p class="formstatus" id="spStatus" role="status" aria-live="polite"></p></div>
-        </form>
-      </div>
-    </details>
+    
   </div>
 </section>
 <svg class="kolam" viewBox="0 0 520 76" preserveAspectRatio="none" aria-hidden="true"><circle class="kd" cx="20" cy="18" r="1.6"/><circle class="kd" cx="20" cy="40" r="1.6"/><circle class="kd" cx="20" cy="62" r="1.6"/><circle class="kd" cx="60" cy="18" r="1.6"/><circle class="kd" cx="60" cy="40" r="1.6"/><circle class="kd" cx="60" cy="62" r="1.6"/><circle class="kd" cx="100" cy="18" r="1.6"/><circle class="kd" cx="100" cy="40" r="1.6"/><circle class="kd" cx="100" cy="62" r="1.6"/><circle class="kd" cx="140" cy="18" r="1.6"/><circle class="kd" cx="140" cy="40" r="1.6"/><circle class="kd" cx="140" cy="62" r="1.6"/><circle class="kd" cx="180" cy="18" r="1.6"/><circle class="kd" cx="180" cy="40" r="1.6"/><circle class="kd" cx="180" cy="62" r="1.6"/><circle class="kd" cx="220" cy="18" r="1.6"/><circle class="kd" cx="220" cy="40" r="1.6"/><circle class="kd" cx="220" cy="62" r="1.6"/><circle class="kd" cx="260" cy="18" r="1.6"/><circle class="kd" cx="260" cy="40" r="1.6"/><circle class="kd" cx="260" cy="62" r="1.6"/><circle class="kd" cx="300" cy="18" r="1.6"/><circle class="kd" cx="300" cy="40" r="1.6"/><circle class="kd" cx="300" cy="62" r="1.6"/><circle class="kd" cx="340" cy="18" r="1.6"/><circle class="kd" cx="340" cy="40" r="1.6"/><circle class="kd" cx="340" cy="62" r="1.6"/><circle class="kd" cx="380" cy="18" r="1.6"/><circle class="kd" cx="380" cy="40" r="1.6"/><circle class="kd" cx="380" cy="62" r="1.6"/><circle class="kd" cx="420" cy="18" r="1.6"/><circle class="kd" cx="420" cy="40" r="1.6"/><circle class="kd" cx="420" cy="62" r="1.6"/><circle class="kd" cx="460" cy="18" r="1.6"/><circle class="kd" cx="460" cy="40" r="1.6"/><circle class="kd" cx="460" cy="62" r="1.6"/><circle class="kd" cx="500" cy="18" r="1.6"/><circle class="kd" cx="500" cy="40" r="1.6"/><circle class="kd" cx="500" cy="62" r="1.6"/><path class="kl" d="M20,40 q20,-30 40,0 q20,30 40,0 M100,40 q20,-30 40,0 q20,30 40,0 M180,40 q20,-30 40,0 q20,30 40,0 M260,40 q20,-30 40,0 q20,30 40,0 M340,40 q20,-30 40,0 q20,30 40,0 M420,40 q20,-30 40,0 q20,30 40,0"/></svg>
@@ -1271,7 +1419,13 @@ body.has-replied .rsvp-fab{display:none}
     <details class="acc"><summary>What time should we actually arrive?</summary>
       <p>Any time from 5. The puja begins shortly after, so come before it if you would like to be there for it.</p></details>
     <details class="acc"><summary>What should we wear?</summary>
-      <p>Festive Indian. Nobody has ever been underdressed or overdressed at one of these.</p></details>
+      <p>Anything bright and festive is perfect, and festive Indian if you have it. Nobody has ever been underdressed or overdressed at one of these.</p></details>
+    <details class="acc"><summary>What food will there be?</summary>
+      <p>All vegetarian, and no alcohol.</p></details>
+    <details class="acc"><summary>Do we take our shoes off?</summary>
+      <p>For the puja, yes. They go back on for the rest of the evening.</p></details>
+    <details class="acc"><summary>Is this my first Diwali — will I know what to do?</summary>
+      <p>You will be fine. You can simply watch the puja and the dances; nobody will pull you up. Say “Happy Diwali” and you have said everything right. <a href="#firstDiwali" data-fd-open>Here is a little more for a first Diwali.</a></p></details>
     <details class="acc"><summary>Do we need to bring anything?</summary>
       <p>Only yourselves. If you would like to bring something sweet, made rather than bought is the tradition here.</p></details>
     <details class="acc"><summary>Are children welcome?</summary>
@@ -1393,6 +1547,81 @@ body.has-replied .rsvp-fab{display:none}
     </div>
   </div>
 </section>
+
+<!-- ============ CARRY THE LIGHT ============ -->
+<section class="band s-paper" id="carry" aria-labelledby="carryTitle">
+  <div class="rk-in rk-reading">
+    <p class="eyebrow">CARRY THE LIGHT</p>
+    <h2 class="title" id="carryTitle">Help carry the evening</h2>
+    <p class="prose t-body">Every Sitare Diwali is made possible by a few families who help carry it: the food, the lamps, the fireworks. If you would like to be one of them this year, this is where. Every gift is recognised on the night, and here.</p>
+
+    <div class="carriers" id="carriers" hidden>
+      <p class="carriers-h">Carrying the light this year</p>
+      <p class="carriers-total" id="carriersTotal"></p>
+      <ul class="carriers-list" id="carriersList"></ul>
+    </div>
+
+    <form class="giveform" id="giveForm" novalidate>
+      <input type="text" name="website" id="g-website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+
+      <fieldset class="g-amounts">
+        <legend>How much would you like to give?</legend>
+        <div class="amt-row" id="amtRow"></div>
+        <div class="field amt-other" id="amtOtherWrap" hidden>
+          <label for="g-amount">Another amount</label>
+          <div class="money"><span aria-hidden="true">$</span><input id="g-amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+        </div>
+        <p class="hint">Amounts ending in one are a Diwali tradition — a gift that keeps going.</p>
+      </fieldset>
+
+      <div class="field"><label for="g-name">Your name</label>
+        <input id="g-name" type="text" autocomplete="name" placeholder="First and last"></div>
+      <div class="field"><label for="g-from">Family or business <span class="opt">(optional)</span></label>
+        <input id="g-from" type="text" autocomplete="organization" placeholder="Your family, or your business"></div>
+      <div class="field"><label for="g-phone">Phone</label>
+        <p class="hint">So we can reach you about your gift.</p>
+        <input id="g-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555"></div>
+      <div class="field"><label for="g-email">Email</label>
+        <p class="hint">Your acknowledgment letter comes here, for your records.</p>
+        <input id="g-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"></div>
+
+      <fieldset class="g-recog">
+        <legend>How should we recognise you?</legend>
+        <div class="field"><label for="g-recog" class="sr">Your name as it should appear</label>
+          <input id="g-recog" type="text" placeholder="Your name, as it should appear"></div>
+        <label class="check"><input id="g-anon" type="checkbox"> <span>Keep my gift anonymous</span></label>
+        <div class="g-photo" id="gPhotoWrap">
+          <span class="g-photo-ph" id="gPhotoPrev" aria-hidden="true"></span>
+          <div>
+            <label class="btn ghost small" for="g-photo">Add a photo</label>
+            <input id="g-photo" class="filein" type="file" accept="image/*">
+            <button class="linkbtn" id="gPhotoClear" type="button" hidden>Remove</button>
+            <p class="hint">Optional. Shown with your name here once your gift arrives — never the amount.</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="g-pay">
+        <legend>How will you give?</legend>
+        <div class="seg3 two" role="radiogroup" aria-label="How will you give?">
+          <label><input type="radio" name="g-method" value="Check" checked><span>Check</span></label>
+          <label><input type="radio" name="g-method" value="Zelle"><span>Zelle</span></label>
+        </div>
+        <div class="payhow" id="payHow" aria-live="polite"></div>
+      </fieldset>
+
+      <div class="send-row">
+        <button class="btn act" id="giveSend" type="submit">Pledge my gift</button>
+        <p class="formstatus" id="giveStatus" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <div class="give-done" id="giveDone" hidden tabindex="-1"></div>
+
+    <p class="legal" id="giveLegal"></p>
+  </div>
+</section>
+
 
 <div class="silence"></div>
 
@@ -1588,9 +1817,6 @@ body.has-replied .rsvp-fab{display:none}
 <canvas id="fw" class="fw" aria-hidden="true"></canvas>
 <div class="fw-veil" id="fwVeil" aria-hidden="true"></div>
 <div class="fw-note" id="fwNote" role="status" aria-live="polite"></div>
-<button class="snd replay" id="replayBtn" type="button" aria-label="Replay your fireworks" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
-</button>
 <div class="snd-ask" id="sndAsk" hidden>
   <button class="snd-ask-go" id="sndAskGo" type="button">
     <span class="snd-ask-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></span>
@@ -1599,9 +1825,21 @@ body.has-replied .rsvp-fab{display:none}
   <button class="snd-ask-x" id="sndAskX" type="button" aria-label="No sound, thank you"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
 </div>
 <div class="snd-tip" id="sndTip" role="status" hidden><button type="button" id="sndTipGo">A tanpura plays here. <b>Tap to hear it.</b></button></div>
+<div class="corner" id="corner">
+<button class="snd notes" id="notesBtn" type="button" aria-label="Show the notes for a first Diwali" aria-pressed="false" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r="1.2" class="dot"/></svg>
+</button>
+<button class="snd replay" id="replayBtn" type="button" aria-label="Replay your fireworks" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
+</button>
+<div class="replay-menu" id="replayMenu" role="menu" hidden>
+  <button type="button" role="menuitem" data-play="rsvp">Your welcome — the fireworks</button>
+  <button type="button" role="menuitem" data-play="gift">Your gift — the shower of light</button>
+</div>
 <button class="snd" id="sndBtn" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
   <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
 </button>
+</div>
 
 <!-- this device has already replied -->
 <div class="replied" id="repliedBar" hidden role="status">
@@ -2054,7 +2292,16 @@ const EVENT={
     {year:2021, url:"https://photos.app.goo.gl/4Lk49QvSzHZX3Lvd8"}
   ],
   album2026Url:"https://photos.app.goo.gl/pPMxVNuq4AozNs5S8",   // this year — its code is images/album-2026-qr.png
-  calendar:{title:"Diwali with the Sitare",startUTC:"20261121T220000Z",
+  // giving: the Foundation, suggested amounts, and how each way of giving works.
+  give:{
+    foundation:"The Sharma Foundation", ein:"86-1259655",
+    amounts:[101,251,501,1001],
+    check:{ payee:"The Sharma Foundation", memo:"Diwali 2026",
+            handover:"Hand it to Archana or Sidharth, or bring it with you on the 21st." },
+    // read from the Foundation's own Zelle QR code: the same link the code opens
+    zelle:{ link:"https://enroll.zellepay.com/qr-codes?data=ewogICJ0b2tlbiIgOiAic2hhcm1hLWZvdW5kYXRpb24iLAogICJhY3Rpb24iIDogInBheW1lbnQiLAogICJuYW1lIiA6ICJUSEUgU0hBUk1BIEZPVU5EQVRJT04iCn0=", to:"sharma-foundation", qr:"images/zelle-qr.png" }
+  },
+  calendar:{title:"Diwali with the Sitare",startUTC:"20261121T220000Z",endUTC:"20261122T050000Z",
     location:"1370 Adams Road, Bensalem, PA 19020",details:"Sitaron Ki Mehfil Diwali 2026. From 5pm, no set end."},
 };
 
@@ -2171,6 +2418,7 @@ function initHero(){
       Math.hypot(ox,oy), Math.hypot(h.width-ox,oy),
       Math.hypot(ox,h.height-oy), Math.hypot(h.width-ox,h.height-oy));
     hero.style.setProperty('--dr', Math.ceil(far*1.04)+'px');
+    hero.style.setProperty('--ws', (far*1.04/200).toFixed(3));   // a 400px disc, rim at the far corner
 
     if(reduceMotion) return;
     const SWEEP=3.1, LEAD=0.15;
@@ -2201,6 +2449,14 @@ function initHero(){
     setTimeout(()=>hero.classList.remove('blind'), back);
   }
 
+  // whatever the animation did, the hero ends on a plain still background
+  function settleLight(){
+    const wave=$('.dawnwave',hero); let done=false;
+    const settle=()=>{ if(done) return; done=true; hero.classList.add('dawned'); };
+    if(wave) wave.addEventListener('transitionend',e=>{ if(e.propertyName==='transform') settle(); },{once:true});
+    setTimeout(settle, 3400);
+  }
+
   function open(){
     if(hero.classList.contains('lit')) return;
     const who=document.getElementById('whoName');
@@ -2212,7 +2468,7 @@ function initHero(){
     if(reduceMotion){
       hero.classList.add('lit');
       requestAnimationFrame(()=>requestAnimationFrame(stageReveal));
-      hero.classList.add('assembled','daybreak','inked');
+      hero.classList.add('assembled','daybreak','inked','dawned');
       $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
       gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw'));
       document.dispatchEvent(new CustomEvent('sitarey:lit'));
@@ -2240,6 +2496,7 @@ function initHero(){
         (fx,fy)=>{                    // the detonation is what lights the page
           if(typeof fx==='number' && typeof fy==='number'){ origin=[fx,fy]; stageReveal(); }
           hero.classList.add('daybreak');
+          settleLight();
           SND.moment('swell',{gain:0.7});
           inkTitle();
           $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
@@ -2494,7 +2751,12 @@ function initFab(){
   new IntersectionObserver(([e])=>{past=!e.isIntersecting;paint();},{threshold:.3}).observe($('#hero'));
   // from the facts downward the reply is a thumb away; the button would only sit on what you are reading
   const practical=$('#details');
-  const check=()=>{ if(!practical) return; inPractical = practical.getBoundingClientRect().top < innerHeight*0.9; paint(); };
+  const card=$('#fdCard');
+  const check=()=>{ if(!practical) return;
+    // it steps aside for the practical half, and while a newcomer is reading their first-Diwali card
+    const r = card && !card.hidden ? card.getBoundingClientRect() : null;
+    const reading = !!r && r.top < innerHeight*0.85 && r.bottom > innerHeight*0.25;
+    inPractical = practical.getBoundingClientRect().top < innerHeight*0.9 || reading; paint(); };
   addEventListener('scroll',()=>requestAnimationFrame(check),{passive:true});
   onWidthChange(check); check();
   document.addEventListener('sitarey:lit',paint);
@@ -3266,6 +3528,15 @@ function initRsvp(){
         <input id="p${i}-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555"></div>
       <div class="field"><label for="p${i}-dob">Date of birth</label>
         <input id="p${i}-dob" type="date" max="2026-12-31"></div>
+      <div class="p-photo">
+        <span class="g-photo-ph" id="p${i}-prev" aria-hidden="true"></span>
+        <div>
+          <label class="btn ghost small" for="p${i}-photo">${first?'Add your photo':'Add a photo'}</label>
+          <input id="p${i}-photo" class="filein" type="file" accept="image/*" data-person="${i}">
+          <button class="linkbtn" type="button" data-clear="${i}" hidden>Remove</button>
+          <p class="hint">Optional. Only Archana, Sidharth and Ashrey see it.</p>
+        </div>
+      </div>
     </div>`;
   }
   function paintPeople(){
@@ -3521,12 +3792,20 @@ const SND = (()=>{
   };
 })();
 
+function sizeCorner(){
+  const c=document.getElementById('corner'); if(!c) return;
+  const n=[...c.children].filter(b=>b.tagName==='BUTTON' && !b.hidden).length;
+  const w=n ? n*44 + (n-1)*6 + 14 : 12;
+  document.documentElement.style.setProperty('--corner-w', w+'px');
+  document.body.classList.toggle('corner-wide', n>=2);
+}
+
 function initSound(){
   const b=document.getElementById('sndBtn'); if(!b) return;
   SND.paint();
   b.addEventListener('click',()=>SND.set(!SND.on()));
   // the switch appears with the lamp strip, and invites once, quietly
-  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; });
+  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; const nb=document.getElementById('notesBtn'); if(nb) nb.hidden=false; sizeCorner(); });
   // it reads against whatever is under it
   const paintGround=()=>{ const r=document.getElementById('diyarail'), on=!!(r && r.classList.contains('onlight'));
     b.classList.toggle('light', on); const rp=document.getElementById('replayBtn'); if(rp) rp.classList.toggle('light', on); };
@@ -3554,6 +3833,229 @@ function initSound(){
 }
 
 
+
+
+
+/* --- photos: shrunk on the phone before they travel. Redrawing on a canvas
+       also leaves behind everything else a phone writes into a photo,
+       including where it was taken. --- */
+const PHOTOS = {};      // the reply form's photos, by person
+async function shrinkPhoto(file, max=800){
+  if(!file) throw new Error('none');
+  if(file.size > 40*1024*1024) throw new Error('too large');
+  let img;
+  try { img = await createImageBitmap(file, { imageOrientation:'from-image' }); }
+  catch(_){
+    img = await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=URL.createObjectURL(file); });
+  }
+  const w=img.width||img.naturalWidth, h=img.height||img.naturalHeight;
+  if(!w||!h) throw new Error('unreadable');
+  const k=Math.min(1, max/Math.max(w,h));
+  const c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  const url=c.toDataURL('image/jpeg',0.85);
+  return { type:'image/jpeg', data:url.slice(url.indexOf(',')+1), preview:url };
+}
+function setPrev(el, url){ if(!el) return; el.style.backgroundImage = url ? `url("${url}")` : ''; el.classList.toggle('has', !!url); }
+
+/* --- a photo for each person on the reply: kept aside, so redrawing the list never loses one --- */
+function initPersonPhotos(){
+  const list=document.getElementById('people'), form=document.getElementById('rsvpPreview');
+  if(!list||!form) return;
+  form.addEventListener('change', async e=>{
+    const inp=e.target.closest('input[data-person]'); if(!inp||!inp.files||!inp.files[0]) return;
+    const i=+inp.dataset.person;
+    try{ PHOTOS[i]=await shrinkPhoto(inp.files[0]); restore(); }
+    catch(_){ const st=document.getElementById('rsvpStatus'); if(st){ st.textContent='That photo could not be read. Try another.'; st.className='formstatus bad'; } }
+    inp.value='';
+  });
+  form.addEventListener('click', e=>{
+    const b=e.target.closest('[data-clear]'); if(!b) return;
+    delete PHOTOS[+b.dataset.clear]; restore();
+  });
+  function restore(){
+    const n=list.querySelectorAll('.person').length;
+    Object.keys(PHOTOS).forEach(k=>{ if(+k>=n) delete PHOTOS[k]; });     // a removed person takes their photo with them
+    for(let i=0;i<n;i++){
+      setPrev(document.getElementById(`p${i}-prev`), PHOTOS[i] && PHOTOS[i].preview);
+      const c=form.querySelector(`[data-clear="${i}"]`); if(c) c.hidden=!PHOTOS[i];
+    }
+  }
+  new MutationObserver(restore).observe(list,{childList:true});
+}
+
+/* --- carry the light: the gift, how to give it, and the wall of those who have --- */
+function initGive(){
+  const G=EVENT.give, f=document.getElementById('giveForm');
+  if(!f||!G) return;
+  const $g=id=>document.getElementById(id);
+  const money=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+  const escH=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const GIFT_KEY='rk:gift:v1';
+  let photo=null;
+
+  // ---- the legal line, true for every way of giving ----
+  $g('giveLegal').innerHTML = `${escH(G.foundation)} is a tax-exempt organization under Section 501(c)(3) of the Internal Revenue Code
+    (EIN ${escH(G.ein)}). Contributions are tax-deductible to the extent allowed by law. No goods or services are provided in exchange for
+    your contribution, and you will receive a written acknowledgment of your gift for your records. Once your gift is received, the name you give and your photo if you add one are shown on this page. Amounts are never shown;
+    if you choose to stay anonymous, you are thanked without a name.`;
+
+  // ---- amounts ----
+  $g('amtRow').innerHTML = G.amounts.map(a=>`<label class="amt"><input type="radio" name="g-amt" value="${a}"><span>${money(a)}</span></label>`).join('')
+    + `<label class="amt"><input type="radio" name="g-amt" value="other"><span>Other</span></label>`;
+  const amount=()=>{ const r=f.querySelector('input[name="g-amt"]:checked'); if(!r) return 0;
+    if(r.value==='other') return Math.round((parseFloat(($g('g-amount').value||'').replace(/[^0-9.]/g,''))||0)*100)/100;
+    return +r.value; };
+  const method=()=>(f.querySelector('input[name="g-method"]:checked')||{}).value||'Check';
+  function paint(){
+    const a=amount();
+    $g('giveSend').textContent = a>0 ? `Pledge ${money(a)}` : 'Pledge my gift';
+    $g('payHow').innerHTML = howTo(method(), a); bindHow($g('payHow'));
+  }
+  $g('amtRow').addEventListener('change',()=>{
+    const other=f.querySelector('input[name="g-amt"][value="other"]').checked;
+    $g('amtOtherWrap').hidden=!other; if(other) $g('g-amount').focus(); paint(); });
+  $g('g-amount').addEventListener('input',paint);
+  f.querySelectorAll('input[name="g-method"]').forEach(r=>r.addEventListener('change',paint));
+
+  // ---- how each way of giving works ----
+  function howTo(m, a){
+    const amt = a>0 ? `<b>${money(a)}</b>` : 'your gift';
+    if(m==='Zelle'){
+      const z=G.zelle||{};
+      return `<h4>By Zelle</h4><p>Send ${amt} with Zelle to <b>${escH(G.foundation)}</b>. On your phone, this opens Zelle with the Foundation already chosen:</p>
+        <div class="copyrow"><a class="btn small zl" href="${escH(z.link)}" target="_blank" rel="noopener">Pay with Zelle</a></div>
+        <p>Or scan the code in your bank’s app. If your bank asks for the recipient, it is
+          <b>${escH(z.to)}</b> <button class="linkbtn" type="button" data-copy="${escH(z.to)}">Copy</button></p>
+        <p>Please add <b>${escH(G.check.memo)}</b> as the memo.</p>
+        ${z.qr ? `<button class="linkbtn qr-toggle" type="button" data-qr>Show the code to scan</button>
+                  <img class="qr desk" src="${escH(z.qr)}" alt="Zelle code for ${escH(G.foundation)}" loading="lazy">` : ''}`;
+    }
+    return `<h4>By check</h4><p>Make your check payable to <b>${escH(G.check.payee)}</b>${a>0?` for ${amt}`:''}, with <b>${escH(G.check.memo)}</b> in the memo line.</p>
+      <p>${escH(G.check.handover)}</p>`;
+  }
+  function bindHow(box){
+    box.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{
+      try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1800); }catch(_){ } }));
+    box.querySelectorAll('[data-qr]').forEach(b=>b.addEventListener('click',()=>{
+      const q=box.querySelector('.qr'); if(q){ q.classList.remove('desk'); } b.remove(); }));
+  }
+
+  // ---- recognition follows their name until they write their own ----
+  const recog=$g('g-recog'); let own=false;
+  recog.addEventListener('input',()=>{ own = !!recog.value.trim(); });
+  const follow=()=>{ if(!own) recog.value = val('g-from') || val('g-name'); };
+  $g('g-name').addEventListener('input',follow); $g('g-from').addEventListener('input',follow);
+  $g('g-anon').addEventListener('change',()=>{ const a=$g('g-anon').checked; recog.disabled=a; $g('gPhotoWrap').hidden=a; });
+
+  // ---- the photo ----
+  $g('g-photo').addEventListener('change', async e=>{
+    const file=e.target.files&&e.target.files[0]; if(!file) return;
+    try{ photo=await shrinkPhoto(file); setPrev($g('gPhotoPrev'),photo.preview); $g('gPhotoClear').hidden=false; }
+    catch(_){ say('That photo could not be read. Try another.', true); }
+    e.target.value='';
+  });
+  $g('gPhotoClear').addEventListener('click',()=>{ photo=null; setPrev($g('gPhotoPrev'),null); $g('gPhotoClear').hidden=true; });
+
+  // ---- sending ----
+  function say(t,bad){ const st=$g('giveStatus'); st.textContent=t; st.className='formstatus'+(bad?' bad':''); }
+  function stop(t, el){ say(t,true); if(el){ el.focus({preventScroll:true}); el.scrollIntoView({block:'center',behavior:reduceMotion?'auto':'smooth'}); } }
+  f.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const a=amount(), name=val('g-name'), phone=val('g-phone'), email=val('g-email'), anon=$g('g-anon').checked;
+    if(!(a>0))  return stop('The amount you would like to give.', f.querySelector('input[name="g-amt"]'));
+    if(!name)   return stop('Your name, first.', $g('g-name'));
+    if(phone.replace(/\D/g,'').length<7) return stop('A phone number, so we can reach you.', $g('g-phone'));
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return stop('An email address, for your acknowledgment letter.', $g('g-email'));
+    const btn=$g('giveSend'); btn.disabled=true; say('Sending…');
+    const body={ event:EVENT.eventName, name, from:val('g-from'), phone, email, amount:a, method:method(),
+      recognition: anon ? '' : (recog.value.trim() || val('g-from') || name), anonymous:anon, website:val('g-website'),
+      ...(photo && !anon ? { photo:{ type:photo.type, data:photo.data } } : {}) };
+    try{
+      await post('/sponsor', body);
+      const gift={ name, amount:a, method:method(), email, when:Date.now() };
+      gift.as = anon ? '' : (recog.value.trim() || val('g-from') || name);
+      try{ localStorage.setItem(GIFT_KEY, JSON.stringify(gift)); }catch(_){}
+      thanks(gift, true);
+      setTimeout(()=>shower(gift), 350);
+      paintReplay();
+    }catch(err){ say(err.message || 'That did not go through. Try again.', true); }
+    btn.disabled=false;
+  });
+
+  // ---- after: the instructions stay in reach ----
+  function thanks(g, fresh){
+    const d=$g('giveDone'), nm=escH(String(g.name).split(' ')[0]);
+    d.innerHTML = `<h3>${fresh?`Thank you, ${nm}.`:`${nm}, thank you again.`}</h3>
+      <p>You are carrying the light with us this Diwali. Your pledge of <b>${money(g.amount)}</b> is noted${fresh?'':`, from ${new Date(g.when).toLocaleDateString('en-US',{month:'long',day:'numeric'})}`}.</p>
+      <ol class="steps">
+        <li><b>Send your gift</b>${g.method==='Zelle'?' with Zelle, below.':' by check, below.'}</li>
+        <li><b>We confirm it</b> when it arrives.</li>
+        <li><b>You appear on this page</b>, and your acknowledgment letter comes to ${escH(g.email)}.</li>
+      </ol>
+      <div class="payhow">${howTo(g.method, g.amount)}</div>
+      <p style="margin-top:var(--s-4)"><button class="linkbtn" type="button" id="giveAgain">Make another pledge</button></p>`;
+    bindHow(d);
+    f.hidden=true; d.hidden=false;
+    if(fresh){ setTimeout(()=>{ d.scrollIntoView({block:'start',behavior:'auto'}); d.focus({preventScroll:true}); },200); }
+    $g('giveAgain').addEventListener('click',()=>{ d.hidden=true; f.hidden=false; f.reset(); photo=null; setPrev($g('gPhotoPrev'),null);
+      $g('gPhotoClear').hidden=true; $g('amtOtherWrap').hidden=true; recog.disabled=false; $g('gPhotoWrap').hidden=false; own=false; paint(); $g('g-name').focus(); });
+  }
+  try{ const g=JSON.parse(localStorage.getItem(GIFT_KEY)||'null'); if(g&&g.amount) thanks(g,false); }catch(_){}
+
+  // ---- the wall ----
+  async function wall(){
+    if(!EVENT.endpoint) return;
+    let d; try{ const r=await fetch(`${EVENT.endpoint.replace(/\/$/,'')}/carriers?event=${encodeURIComponent(EVENT.eventName)}`); if(!r.ok) return; d=await r.json(); }catch(_){ return; }
+    const c=(d&&d.carriers)||[]; if(!c.length) return;
+    const ini=t=>/^anonymous$/i.test(String(t||'').trim()) ? '✦'
+      : String(t||'').replace(/^the\s+/i,'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,3).toUpperCase()||'✦';
+    $g('carriersTotal').textContent = c.length===1 ? 'With thanks to the first family carrying the light.' : `With thanks to the ${c.length} families and friends carrying the light.`;
+    $g('carriersList').innerHTML = c.map(x=>`<li><span class="ph">${escH(ini(x.as))}${x.photo&&x.id?`<img src="${EVENT.endpoint.replace(/\/$/,'')}/carry-photo/${x.id}" alt="" loading="lazy" onerror="this.remove()">`:''}</span>
+      <span class="who">${escH(x.as)}</span></li>`).join('');
+    $g('carriers').hidden=false;
+  }
+  const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); wall(); } },{rootMargin:'400px 0px'});
+  io.observe(document.getElementById('carry'));
+  paint();
+}
+
+/* --- a first Diwali: asked once, remembered, and always reversible --- */
+function initFirstDiwali(){
+  const ask=$('#fdAsk'), card=$('#fdCard'), tog=$('#fdToggle');
+  if(!ask||!card||!tog) return;
+  const KEY='rk:first-diwali:v1';
+  const get=()=>{ try{ return localStorage.getItem(KEY); }catch(_){ return null; } };
+  const put=v=>{ try{ localStorage.setItem(KEY,v); }catch(_){} };
+  const nb=$('#notesBtn');
+  function paint(state, arriving){
+    const yes = state==='yes';
+    document.body.classList.toggle('newcomer', yes);
+    if(nb){ nb.setAttribute('aria-pressed', yes?'true':'false');
+      nb.setAttribute('aria-label', yes ? 'Hide the notes for a first Diwali' : 'Show the notes for a first Diwali'); }
+    ask.hidden = !!state;
+    card.hidden = !yes;
+    tog.hidden = !state;
+    tog.textContent = yes ? 'I know Diwali — hide the notes' : 'New to Diwali? Show the notes';
+    if(yes && arriving){ card.classList.remove('arrive'); void card.offsetWidth; card.classList.add('arrive'); }
+  }
+  function choose(v){
+    put(v); paint(v, v==='yes');
+    window.dispatchEvent(new Event('scroll'));          // let anything watching the page re-measure
+    if(v==='yes'){
+      card.scrollIntoView({behavior: reduceMotion?'auto':'smooth', block:'start'});
+      setTimeout(()=>card.focus({preventScroll:true}), 450);
+    }
+  }
+  $('#fdYes').addEventListener('click',()=>choose('yes'));
+  $('#fdNo').addEventListener('click',()=>choose('no'));
+  tog.addEventListener('click',()=>choose(get()==='yes'?'no':'yes'));
+  // the corner icon: notes on or off from anywhere on the page, without moving the reader
+  if(nb) nb.addEventListener('click',()=>{ const v=get()==='yes'?'no':'yes'; put(v); paint(v,false);
+    window.dispatchEvent(new Event('scroll')); });
+  document.querySelectorAll('[data-fd-open]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); choose('yes'); }));
+  paint(get(), false);
+}
 
 /* --- inviting sound: once, after the family has arrived, then never nagging --- */
 function initSoundAsk(){
@@ -3752,6 +4254,135 @@ function celebrate(opts={}){
   })();
 }
 
+
+/* ================= THE GIFT'S CELEBRATION: the RSVP show, turned over =================
+   The RSVP show sends rockets up into the sky. A gift brings the light down to us:
+   one shell falls from the top of the page and bursts on its floor into a shower of
+   exactly as many sparks as the gift — 101 for $101, 1,001 for $1,001. They rise,
+   fall back, and settle on the floor as embers, while the thank-you holds the top. */
+function shower(g){
+  const c=document.getElementById('fw'), veil=document.getElementById('fwVeil'), note=document.getElementById('fwNote');
+  if(!c||!veil||!note||!g) return;
+  const amt=Math.max(1,+g.amount||101);
+  const N=Math.round(Math.max(51,Math.min(1501,amt)));             // one spark for every dollar
+  const t=Math.max(.35,Math.min(1.15,Math.log10(amt)/Math.log10(1001)));   // 101 small, 501 larger, 1,001 grand
+  const nm=String(g.name||'').trim().split(/\s+/)[0]||'friend';
+  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  note.classList.add('top');
+  note.innerHTML=`<b>${esc(nm)}, thank you.</b>
+    <span>You are carrying the light with us this Diwali. Because of you, every family who walks in on the 21st will feel a little more at home.</span>
+    ${g.as?`<span class="as">${esc(g.as)} — welcome to the families who carry the light.</span>`:`<span class="as">Quietly, and with all our thanks.</span>`}
+    <small>tap anywhere to carry on</small>`;
+  veil.classList.add('on'); setTimeout(()=>note.classList.add('on'),250);
+  let done=false;
+  const finish=()=>{ if(done) return; done=true; note.classList.remove('on'); veil.classList.remove('on');
+    setTimeout(()=>{ note.classList.remove('top'); const x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height); },1100); };
+  veil.onclick=finish;
+  if(reduceMotion){ setTimeout(finish,5200); return; }
+
+  const dpr=Math.min(2,devicePixelRatio||1), W=innerWidth, H=innerHeight;
+  c.width=W*dpr; c.height=H*dpr;
+  const ctx=c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  const SC=Math.max(.7,Math.min(1.2,W/520));
+  const floor=H-Math.max(16,(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sab'))||0)+16);
+  const G=.11*SC, P=[], embers=[];
+  const PAL=['#FFF4DC','#F2C14E','#F7D88A','#F2A71B','#FFE7B4'];
+  const shell={x:W*(.5+(Math.random()-.5)*.12),y:-14,vy:1.2,r:2.6+3.2*t,trail:[]};
+  let impact=0, flash=0, falling=true;
+  SND.moment('launch',{gain:.4,rate:.62+.12*(1-t)});
+
+  function burst(){
+    falling=false; impact=performance.now(); flash=1;
+    SND.moment(t>.85?'boom1':'boom2',{gain:.55+.25*t,rate:1.1-.25*t,pan:(shell.x/W-.5)*1.2,when:.06});
+    if(navigator.vibrate){ try{ navigator.vibrate(t>.85?[0,30,40,30]:[0,25]); }catch(_){} }
+    for(let i=0;i<N;i++){
+      // a fan thrown up from the floor: most near upright, a few low and wide
+      const a=-Math.PI/2+(Math.random()-.5)*(1.25+.5*t)*Math.pow(Math.random(),.6)*1.6;
+      const sp=(2.4+Math.random()*(4.2+6.5*t))*SC*(.55+.45*Math.random());
+      P.push({x:shell.x+(Math.random()-.5)*6,y:floor-2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+        c:PAL[(Math.random()*PAL.length)|0], r:.9+Math.random()*1.4*(.7+.5*t), life:1,
+        tw:Math.random()<.35, bounced:false});
+    }
+    // and a crackle a moment later, for the larger gifts
+    for(let k=0;k<Math.round(2+4*t);k++) setTimeout(()=>{ if(!done) SND.moment('pop'+(1+(k%3)),{gain:.32,rate:.9+Math.random()*.4,pan:(Math.random()-.5)}); },420+k*160);
+  }
+
+  (function frame(){
+    if(done && !P.length) return;
+    ctx.globalCompositeOperation='destination-out'; ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+    // the floor, warmed by what lands on it
+    const glow=Math.min(1,embers.length/Math.max(40,N*.4));
+    if(impact){ const gr=ctx.createLinearGradient(0,floor-80*SC,0,H); gr.addColorStop(0,'rgba(242,193,78,0)');
+      gr.addColorStop(1,`rgba(242,193,78,${.10+.22*glow*(1-Math.min(1,(performance.now()-impact)/9000))})`); ctx.fillStyle=gr; ctx.fillRect(0,floor-80*SC,W,H); }
+    if(flash>0){ flash-=.045; const fr=ctx.createRadialGradient(shell.x,floor,0,shell.x,floor,260*SC*(.6+.6*t));
+      fr.addColorStop(0,`rgba(255,226,170,${.55*flash})`); fr.addColorStop(1,'rgba(255,226,170,0)'); ctx.fillStyle=fr; ctx.fillRect(0,0,W,H); }
+    // the falling shell, with its tail of sparks
+    if(falling){
+      shell.vy+=G*1.35; shell.y+=shell.vy; shell.trail.push([shell.x,shell.y]); if(shell.trail.length>14) shell.trail.shift();
+      ctx.strokeStyle='rgba(255,226,170,.6)'; ctx.lineWidth=1.4+1.2*t; ctx.beginPath();
+      shell.trail.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.stroke();
+      ctx.fillStyle='#FFF4DC'; ctx.beginPath(); ctx.arc(shell.x,shell.y,shell.r,0,6.2832); ctx.fill();
+      if(Math.random()<.8) P.push({x:shell.x+(Math.random()-.5)*shell.r*2,y:shell.y-4,vx:(Math.random()-.5)*.8,vy:-.4-Math.random(),c:'#F7D88A',r:.8,life:.6,tw:true,bounced:true,trailOnly:true});
+      if(shell.y>=floor-shell.r){ shell.y=floor; burst(); }
+    }
+    // the shower
+    for(let i=P.length-1;i>=0;i--){
+      const q=P[i];
+      q.vx*=.992; q.vy=q.vy*.992+G; q.x+=q.vx; q.y+=q.vy;
+      if(q.trailOnly){ q.life-=.04; }
+      else if(q.y>=floor && q.vy>0){
+        if(!q.bounced){ q.bounced=true; q.y=floor; q.vy*=-.22; q.vx*=.5; }
+        else { embers.push({x:q.x,y:floor-Math.random()*2,c:q.c,r:q.r*.9,life:1}); P.splice(i,1); continue; }
+      }
+      q.life-= q.trailOnly?0:.0016;
+      if(q.life<=0||q.x<-20||q.x>W+20){ P.splice(i,1); continue; }
+      let a=Math.min(1,q.life*1.3); if(q.tw&&Math.random()<.3) a*=.35;
+      ctx.globalAlpha=a; ctx.fillStyle=q.c; ctx.beginPath(); ctx.arc(q.x,q.y,q.r,0,6.2832); ctx.fill();
+    }
+    // the embers lie on the floor and burn down slowly
+    for(let i=embers.length-1;i>=0;i--){
+      const e=embers[i]; e.life-=.0045; if(e.life<=0){ embers.splice(i,1); continue; }
+      ctx.globalAlpha=e.life*(Math.random()<.12?.4:1); ctx.fillStyle=e.c; ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,6.2832); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    if(!done || P.length || embers.length) requestAnimationFrame(frame);
+  })();
+  setTimeout(finish, 6200+2600*t);
+  return { sparks:N, size:+t.toFixed(2) };
+}
+
+/* ---- replay, for either celebration or both ---- */
+function paintReplay(){
+  const b=document.getElementById('replayBtn'), menu=document.getElementById('replayMenu');
+  if(!b) return;
+  let r=null, g=null;
+  try{ r=JSON.parse(localStorage.getItem(REPLY_KEY)||'null'); }catch(_){}
+  try{ g=JSON.parse(localStorage.getItem('rk:gift:v1')||'null'); }catch(_){}
+  const yes=!!(r && r.coming==='yes'), gave=!!(g && g.amount);
+  if(!yes && !gave){ b.hidden=true; if(menu) menu.hidden=true; document.body.classList.remove('has-replay'); sizeCorner(); return; }
+  const playRsvp=()=>celebrate({count:r.count||1, family:r.family||''});
+  const playGift=()=>shower(g);
+  b.setAttribute('aria-label', yes&&gave ? 'Replay a celebration' : gave ? 'Replay your gift’s celebration' : 'Replay your fireworks');
+  b.setAttribute('aria-haspopup', yes&&gave ? 'menu' : 'false');
+  b.onclick=e=>{
+    e.stopPropagation();
+    if(yes && gave){ menu.hidden=!menu.hidden; if(!menu.hidden) menu.querySelector('button').focus(); return; }
+    (gave?playGift:playRsvp)();
+  };
+  if(menu){
+    menu.querySelector('[data-play="rsvp"]').onclick=()=>{ menu.hidden=true; playRsvp(); };
+    menu.querySelector('[data-play="gift"]').onclick=()=>{ menu.hidden=true; playGift(); };
+  }
+  // like the sound switch, it arrives with the light
+  const reveal=()=>{ if(!b.hidden) return; b.hidden=false; document.body.classList.add('has-replay'); sizeCorner();
+    b.classList.add('arrive'); setTimeout(()=>b.classList.remove('arrive'),3400); };
+  const hero=document.getElementById('hero');
+  if(hero && hero.classList.contains('lit')) reveal(); else document.addEventListener('sitarey:lit', reveal, {once:true});
+}
+document.addEventListener('click',e=>{ const m=document.getElementById('replayMenu'); if(m && !m.hidden && !e.target.closest('#replayMenu')) m.hidden=true; });
+document.addEventListener('keydown',e=>{ const m=document.getElementById('replayMenu'); if(e.key==='Escape' && m && !m.hidden){ m.hidden=true; document.getElementById('replayBtn').focus(); } });
+
 /* a "no" is not celebrated — it is honoured, with a single lamp, quietly */
 function quietLamp(){
   const veil=document.getElementById('fwVeil'), note=document.getElementById('fwNote');
@@ -3878,7 +4509,7 @@ function runSparkler(hero, onDetonate, onDone){
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.2832); ctx.fill();
       }
       if(e>=0.52) onDone&&onDone();
-      if(e>=1){ ctx.clearRect(0,0,W,H); return; }
+      if(e>=1){ ctx.clearRect(0,0,W,H); zc.width=zc.height=1; zc.style.display='none'; return; }
       requestAnimationFrame(f2);
     };
     requestAnimationFrame(f2);
@@ -3912,18 +4543,7 @@ function paintGuest(){
 }
 
 /* --- once they have said yes, their fireworks can be lit again, any time --- */
-function showReplay(r){
-  const b=$('#replayBtn'); if(!b) return;
-  const yes = r && r.coming==='yes';
-  if(!yes){ b.hidden=true; document.body.classList.remove('has-replay'); return; }
-  b.onclick=()=>celebrate({count:r.count||1, family:r.family||''});
-  // the door stays dark and uncluttered: the button arrives with the light, like the sound switch
-  const reveal=()=>{ if(!b.hidden) return; b.hidden=false; document.body.classList.add('has-replay');
-    b.classList.add('arrive'); setTimeout(()=>b.classList.remove('arrive'),3400); };
-  const hero=document.getElementById('hero');
-  if(hero && hero.classList.contains('lit')) reveal();
-  else document.addEventListener('sitarey:lit', reveal, {once:true});
-}
+function showReplay(r){ paintReplay(); }
 
 /* --- the page remembers that this device has replied --- */
 const REPLY_KEY='rk:sitarey-reply:v6';
@@ -4046,7 +4666,7 @@ function initLookup(){
 }
 
 function initForms(){
-  const rsvp=$('#rsvpPreview'), sp=$('#cosponsorPreview');
+  const rsvp=$('#rsvpPreview');
 
   if(rsvp) rsvp.addEventListener('submit', async e=>{
     e.preventDefault();
@@ -4062,7 +4682,8 @@ function initForms(){
       : $$('.person').map((blk,i)=>({
       name:  (blk.querySelector(`#p${i}-name`)||{}).value || '',
       phone: (blk.querySelector(`#p${i}-phone`)||{}).value || '',
-      dob:   (blk.querySelector(`#p${i}-dob`)||{}).value || ''
+      dob:   (blk.querySelector(`#p${i}-dob`)||{}).value || '',
+      ...(PHOTOS[i] ? { photo: { type: PHOTOS[i].type, data: PHOTOS[i].data } } : {})
     })).filter(p=>p.name.trim());
     if(yes && !people.length){ status.textContent='Please give at least one name.'; status.classList.add('bad'); return; }
     // one number from anyone in the party is enough — a child has none, and that is fine
@@ -4106,47 +4727,39 @@ function initForms(){
     }
   });
 
-  if(sp) sp.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const btn=$('#spSend'), status=$('#spStatus');
-    const name=val('c-name');
-    status.className='formstatus';
-    if(!name){ status.textContent='Your name, first.'; status.classList.add('bad'); return; }
-    const payload={ event:EVENT.eventName, name,
-      from:val('c-from'), contact:val('c-contact'), note:val('c-note'),
-      website:(sp.querySelector('[name=website]')||{}).value||'' };
-    btn.disabled=true; const label=btn.textContent; btn.textContent='Sending';
-    try{
-      await post('/sponsor', payload);
-      sp.innerHTML='<div class="sent"><p class="h3">Thank you.</p><p class="t-body">We will come back to you soon.</p></div>';
-    }catch(err){
-      btn.disabled=false; btn.textContent=label;
-      status.textContent = EVENT.endpoint
-        ? 'That did not go through. Please try once more.'
-        : 'The form is not live yet. It opens here shortly.';
-      status.classList.add('bad');
-    }
-  });
 }
 
 function initCalendar(){
-  $('#calBtn').addEventListener('click',()=>{
-    const c=EVENT.calendar;
-    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sitaron Ki Mehfil//humsitare.com//EN','BEGIN:VEVENT',
-      'UID:diwali-2026@humsitare.com','DTSTAMP:20261001T000000Z','DTSTART:'+c.startUTC,'SUMMARY:'+c.title,
-      'LOCATION:'+c.location.replace(/,/g,'\\,'),'DESCRIPTION:'+c.details.replace(/,/g,'\\,'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
-    a.download='sitarey-diwali-2026.ics'; document.body.appendChild(a); a.click(); a.remove();
-  });
-}
+  // ---- each device opens its own calendar and its own maps ----
+  const ua=navigator.userAgent||'';
+  const isIOS=/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints>1);
+  const isAndroid=/Android/.test(ua);
+  const c=EVENT.calendar, addr=c.location;
+  const gcal='https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+encodeURIComponent(c.title)
+    +'&dates='+c.startUTC+'/'+c.endUTC
+    +'&details='+encodeURIComponent(c.details+' https://humsitare.com/')
+    +'&location='+encodeURIComponent(addr)+'&ctz=America/New_York';
+  const cal=$('#calBtn'), alt=$('#calAlt'), g=$('#gcalLink');
+  if(g) g.href=gcal;
+  if(isAndroid){
+    // Android's own calendar is Google Calendar: open it with the event filled in
+    cal.href=gcal; cal.target='_blank'; cal.rel='noopener'; if(alt) alt.hidden=true;
+  }
+  // iPhone, iPad, Mac and Windows open the real calendar file: Apple Calendar or Outlook asks to add it
+  const maps=$('#mapsBtn');
+  if(maps){
+    const q=encodeURIComponent(addr);
+    if(isIOS){ maps.href='https://maps.apple.com/?q='+encodeURIComponent('1370 Adams Road')+'&address='+q; maps.removeAttribute('target'); }
+    else if(isAndroid){ maps.href='geo:0,0?q='+q; maps.removeAttribute('target'); }
+    else { maps.href='https://www.google.com/maps/search/?api=1&query='+q; }
+  }}
 
 document.addEventListener('sitarey:mark',attachMark);
 document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
-  embedForm('cosponsorSlot',EVENT.cosponsorFormUrl,EVENT.cosponsorFormHeight,'Co-sponsor form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initSoundAsk(); initCalendar();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initSoundAsk(); initFirstDiwali(); initGive(); initPersonPhotos(); paintReplay(); initCalendar();
 });
 </script>
 </body>
