@@ -120,6 +120,9 @@ color:var(--fg);
 .hero{transition:background 2.6s var(--ease-out),color 2.2s var(--ease-out)}
 /* the descent back into the night the story lives in */
 .to-night{height:78px;background:transparent}
+/* one held, near-empty screen: the sky goes dark here and the stars come out */
+.descent-line{min-height:64svh;display:grid;place-items:center;text-align:center;position:relative;z-index:1;padding:var(--s-8) var(--s-5)}
+.descent-say{font-family:var(--font-display);font-style:italic;font-size:var(--fs-h3);line-height:1.4;color:var(--t-high);max-width:24ch;margin:0 auto;text-wrap:balance}
 .g-night2 {background:#1B1434}
 .g-plum   {background:#241A3A}
 .g-wine   {background:#3D1B2E}
@@ -159,7 +162,8 @@ background:var(--w-ground);color:var(--w-ink);
 </style>
 <style>
 /* ============ rk.css — the element core ============ */
-html[data-chassis]{font-size:100%;-webkit-text-size-adjust:100%;scroll-padding-top:calc(env(safe-area-inset-top) + 54px);color-scheme:light}
+html[data-chassis]{font-size:100%;-webkit-text-size-adjust:100%;scroll-padding-top:calc(env(safe-area-inset-top) + 54px);color-scheme:dark}
+[data-ground="cream"]{color-scheme:light}
 [data-chassis]{background:var(--bg);color:var(--fg);font-family:var(--font-ui)}
 body{margin:0;background:var(--bg);color:var(--fg);font-size:var(--fs-body);line-height:var(--lh-body);font-optical-sizing:auto;text-rendering:optimizeLegibility}
 .rk-page{min-height:100svh}
@@ -298,6 +302,7 @@ img,video,canvas,svg{max-width:100%;height:auto;display:block}
 .field input,.field select,.field textarea{min-height:44px;padding:var(--s-2) var(--s-3);border:1px solid var(--line);
  border-radius:var(--radius-sm);background:var(--surface);color:var(--fg);font:inherit;width:100%}
 .field textarea{min-height:5rem;resize:vertical}
+.field input::placeholder,.field textarea::placeholder,.lookup-row input::placeholder{color:var(--fg-muted);opacity:.85}
 details.acc{border-top:1px solid var(--line)}
 details.acc summary{cursor:pointer;list-style:none;padding:var(--s-4) 0;font-family:var(--font-display);
  font-size:var(--fs-lg);display:flex;justify-content:space-between;align-items:center;gap:var(--s-4)}
@@ -334,7 +339,7 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 .kolam .kl{fill:none;stroke:var(--sig);stroke-width:1;opacity:.55}
 
 /* ---- the hero: the lamp beside the name, the family on the light, a plate for the facts ---- */
-.hero-head{display:grid;justify-items:center;gap:var(--s-2);transition:grid-template-columns .9s var(--ease-out)}
+.hero-head{display:grid;justify-items:center;gap:var(--s-2)}
 .hero-titles{display:grid;justify-items:center;gap:2px}
 .lit .hero-head{display:flex;align-items:center;justify-content:center;gap:var(--s-3)}
 .hero-head{transition:transform .9s var(--ease-out)}
@@ -384,7 +389,12 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 .hero-name{font-family:var(--w-font-devanagari);font-weight:500;font-size:clamp(2.4rem,12vw,4.4rem);line-height:1.02;
  color:var(--fg);transition:color 1.8s var(--ease-out),text-shadow 1.8s var(--ease-out)}
 .lit .hero-name{color:#FBF3E4;text-shadow:0 0 30px rgba(255,214,130,.35)}
-.daybreak .hero-name{color:#2A1530;text-shadow:0 0 44px rgba(201,168,76,.55)}
+/* the title never crossfades through the dark: it leaves, turns while unseen, and returns once the light has passed it */
+.hero .hero-name,.hero .hero-rom{transition:opacity .9s var(--ease-out),color 0s,text-shadow 0s}
+.hero.blind .hero-name,.hero.blind .hero-rom{opacity:0;transition:opacity .3s linear,color 0s,text-shadow 0s}
+.hero.inked .hero-name{color:#2A1530;text-shadow:0 0 44px rgba(201,168,76,.5)}
+.hero .hero-rom{color:#D6CCBA}
+.hero.inked .hero-rom{color:#4A3828}
 .hold-wrap{transition:opacity .7s var(--ease-out)}
 .lit .hold-wrap{opacity:0;pointer-events:none}
 .hero-rom{font-family:var(--font-ceremony);letter-spacing:.3em;text-transform:uppercase;font-size:var(--fs-sm);color:var(--fg-muted)}
@@ -409,7 +419,7 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
   width:min(100%,300px);min-height:52px;padding:0 var(--s-4);text-align:center;box-sizing:border-box;
   font:500 var(--fs-lg)/1 var(--font-ui);color:var(--fg);
   background:rgba(255,255,255,.06);border:1.5px solid rgba(255,217,138,.32);border-radius:var(--radius)}
-.whoami input::placeholder{color:rgba(201,184,166,.45);font-weight:400}
+.whoami input::placeholder{color:rgba(214,204,186,.62);font-weight:400}
 .whoami input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.1)}
 .lightbtn{
  max-width:100%;box-sizing:border-box;min-height:68px;padding:var(--s-2) clamp(var(--s-5),7vw,var(--s-8));border-radius:var(--radius-pill);border:2px solid var(--gold);
@@ -436,6 +446,20 @@ body.held{overflow:hidden}
 .lit .mote{animation:rk-mote var(--d,9s) linear var(--delay,0s) infinite}
 
 /* ---- the RSVP instrument ---- */
+.lookup{padding:var(--s-5);border:1px dashed var(--line);border-radius:var(--radius);background:var(--surface)}
+.lookup-q{font-family:var(--font-display);font-size:var(--fs-lg);color:var(--fg);margin:0 0 var(--s-3)}
+.lookup-row{display:flex;gap:var(--s-3);flex-wrap:wrap}
+.lookup-row input{flex:1 1 11rem;min-width:0;min-height:50px}
+.lookup-row .btn{flex:0 0 auto}
+.found{padding:var(--s-5);border-radius:var(--radius);background:#1C1712;color:#F4EFE4}
+.found-head{font-family:var(--font-display);font-size:var(--fs-lg);margin:0 0 var(--s-4);color:#F4EFE4}
+.found-rows{display:grid;gap:var(--s-3);margin:0 0 var(--s-5)}
+.found-rows div{display:grid;grid-template-columns:auto 1fr;gap:var(--s-4);align-items:baseline}
+.found-rows dt{font-family:var(--font-mono);font-size:var(--fs-mono-floor);letter-spacing:var(--ls-mono);
+ text-transform:uppercase;color:#C9A84C;white-space:nowrap}
+.found-rows dd{margin:0;color:#F4EFE4}
+.found-acts{display:flex;gap:var(--s-3);flex-wrap:wrap}
+.found-acts .btn.ghost{color:#FFE7B4;border-color:rgba(255,231,180,.5)}
 .hint{font-size:var(--fs-sm);color:var(--fg-muted);margin:0}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .formstatus{font-size:var(--fs-sm);margin-top:var(--s-3);min-height:1.4em;color:var(--fg-muted)}
@@ -641,15 +665,11 @@ body.held{overflow:hidden}
 .cface{width:min(46vw,160px,100%);aspect-ratio:390/374;margin:0 auto;border-radius:var(--radius);overflow:hidden;
  opacity:0;filter:brightness(.04) grayscale(.9) contrast(1.15);
  transition:opacity 4.5s var(--ease-out) .8s,filter 5.5s var(--ease-out) .8s}
-.curtain.up .cface{opacity:1;filter:none}
+.cface.up{opacity:1;filter:grayscale(.7) brightness(.8) contrast(1.08)}
 .cface img{width:100%;height:100%;object-fit:cover;object-position:52% 30%}
 .cstep{opacity:0;transform:translateY(8px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
 .cstep.in{opacity:1;transform:none}
 .cstep[hidden]{display:none}
-.wheel-wrap svg{overflow:visible}
-.wface{fill:none;stroke:var(--line-wash)}
-.wpin{fill:var(--gold)}
-.whub{fill:#000;stroke:var(--line-wash)}
 .catch-wrap{position:relative;width:min(100%,340px);aspect-ratio:1;margin:var(--s-4) auto var(--s-2)}
 .catch-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
 .catch-hit{position:absolute;inset:0}
@@ -662,8 +682,23 @@ body.held{overflow:hidden}
 .thought-sub{font-size:var(--fs-sm);color:var(--fg-muted);margin:var(--s-2) 0 0}
 .curtain-in{transition:opacity .6s var(--ease-out)}
 .curtain-in.ceding{opacity:.06}
-.rangoli-cv{position:fixed;inset:0;z-index:90;pointer-events:none;display:none}
-.rangoli-cv.up{display:block}
+/* the dark lamp: one stage of light behind every step */
+.dl-cv{position:fixed;inset:0;width:100%;height:100%;z-index:0;touch-action:none}
+.curtain .curtain-in{z-index:1}
+.curtain.playing .curtain-in{pointer-events:none}
+.curtain.playing .curtain-in .yantra{opacity:.35;transition:opacity 1s}
+.dl-play{position:fixed;inset:0;z-index:2;pointer-events:none;display:grid;grid-template-rows:auto 1fr auto;
+ padding:calc(var(--s-6) + env(safe-area-inset-top)) var(--s-5) calc(var(--s-5) + env(safe-area-inset-bottom));text-align:center}
+.dl-play[hidden]{display:none}
+.dl-play button{pointer-events:auto}
+.dl-play-top{min-height:76px}
+.dl-play-foot{display:grid;justify-items:center;gap:var(--s-1);align-content:end;min-height:104px}
+.dl-help{background:none;border:1px solid #8E7AB0;border-radius:999px;color:#EFE5D2;font-size:var(--fs-ui);cursor:pointer;min-height:50px;padding:0 var(--s-5)}
+.dl-help[hidden]{display:none}
+.dl-kept{position:fixed;left:0;right:0;bottom:0;z-index:2;padding:0 var(--s-5) calc(var(--s-7) + env(safe-area-inset-bottom));text-align:center}
+.dl-kept[hidden]{display:none}
+.breath{font-family:var(--font-mono);font-size:var(--fs-mono-floor);letter-spacing:.2em;text-transform:uppercase;color:#B3A8C6;animation:rk-pulse 2.6s ease-in-out infinite}
+.breath[hidden]{display:none}
 .markrow{display:flex;align-items:center;gap:var(--s-3);justify-content:center;flex-wrap:wrap;margin-top:var(--s-4)}
 .letter{width:60px;height:60px;border-radius:var(--radius);display:grid;place-items:center;
  font-family:var(--font-display);font-size:var(--fs-h3);color:#241c08;background:var(--gold);box-shadow:0 0 30px var(--gold-glow)}
@@ -701,7 +736,7 @@ body.held{overflow:hidden}
 @media(min-width:720px){.card-rows{grid-template-columns:1fr 1fr;column-gap:var(--s-7)}}
 
 /* ---- words leave while the light changes (from the design pass's legible()) ---- */
-#opening > .rk-in,.g-night2 > .rk-in,.g-plum > .rk-in,.band.deep .rk-in,.g-wine > .rk-in,.g-wine2 > .rk-in,.g-ember > .rk-in{
+#descentLine > .rk-in,#opening > .rk-in,.g-night2 > .rk-in,.g-plum > .rk-in,.band.deep .rk-in,.g-wine > .rk-in,.g-wine2 > .rk-in,.g-ember > .rk-in{
   opacity:var(--night-ink,1);transition:opacity .35s linear}
 
 /* ---- the five days as five lamps ---- */
@@ -722,24 +757,23 @@ body.held{overflow:hidden}
 .daytext strong{color:var(--fg)}
 
 /* ---- the sky: a real star field behind the night half ---- */
-.ground{position:fixed;inset:0;z-index:0;pointer-events:none;background:#14102A}
-.sky{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out)}
+.ground{position:fixed;inset:0;z-index:0;pointer-events:none;background:#14102A;transform:translateZ(0)}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out);transform:translateZ(0)}
 .sky.on{opacity:1}
 main.threshold{position:relative;z-index:1}
 /* the night bands let the sky through */
 .g-night2,.g-plum,.band.deep,.g-wine,.g-wine2,.g-ember{background-color:transparent !important}
 .g-night2{--sky:#1B1434}.g-plum{--sky:#241A3A}.band.deep{--sky:#0B0818}.g-wine{--sky:#3D1B2E}.g-wine2{--sky:#4A2024}.g-ember{--sky:#5C2618}
 .band[class*="g-"],.band.deep{position:relative}
-.band[class*="g-"]::before,.band.deep::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--sky);opacity:.0}
 
 /* ---- the diya rail: lamps lighting up the left edge ---- */
-.diyarail{position:fixed;top:0;left:0;right:0;z-index:20;pointer-events:none;
+.diyarail{position:fixed;top:0;left:0;right:0;z-index:20;pointer-events:none;transform:translateY(-12px) translateZ(0);
  display:flex;align-items:center;justify-content:center;gap:clamp(10px,4.5vw,26px);
  padding:calc(env(safe-area-inset-top) + 7px) var(--s-4) 9px;
- background:linear-gradient(180deg,rgba(8,6,16,.82),rgba(8,6,16,.52) 62%,transparent);
- -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
- opacity:0;transform:translateY(-12px);transition:opacity var(--dur-slow),transform var(--dur-slow)}
-.diyarail.show{opacity:1;transform:none}
+ background:linear-gradient(180deg,rgba(8,6,16,.92),rgba(8,6,16,.70) 55%,rgba(8,6,16,0));
+ background-color:transparent;
+ opacity:0;transition:opacity var(--dur-slow),transform var(--dur-slow)}
+.diyarail.show{opacity:1;transform:translateZ(0)}
 .diyarail::after{content:"";position:absolute;left:var(--s-5);right:var(--s-5);bottom:7px;height:1px;
  background:linear-gradient(90deg,transparent,color-mix(in oklch,var(--gold) 45%,transparent),transparent);opacity:.5}
 .diyarail .d{width:24px;height:24px;position:relative}
@@ -752,8 +786,11 @@ main.threshold{position:relative;z-index:1}
 .diyarail .d.on .gl{opacity:1}
 @media(max-width:420px){.diyarail .d{width:20px;height:20px}}
 /* on the lit half the strip has to read against cream */
-.diyarail.onlight{background:linear-gradient(180deg,rgba(247,243,236,.92),rgba(247,243,236,.6) 62%,transparent)}
+.diyarail.onlight{background:linear-gradient(180deg,rgba(247,243,236,.96),rgba(247,243,236,.78) 55%,rgba(247,243,236,0))}
 .diyarail.onlight .bowl{fill:#8A4A22}
+@keyframes railwhole{0%,100%{filter:none}45%{filter:brightness(1.5) drop-shadow(0 0 6px rgba(255,214,130,.9))}}
+.diyarail.whole .d.on{animation:railwhole 1.8s ease-in-out both}
+@media (prefers-reduced-motion:reduce){.diyarail.whole .d.on{animation:none}}
 
 .fw{position:fixed;inset:0;z-index:50;pointer-events:none}
 
@@ -863,13 +900,15 @@ body.has-replied .rsvp-fab{display:none}
 <main class="threshold" id="page">
 <div class="gate" hidden>
 
-<div class="to-night" aria-hidden="true"></div>
+<section class="descent-line" id="descentLine">
+  <div class="rk-in rk-reading"><p class="descent-say">On the darkest night of the month, we fill every corner with light.</p></div>
+</section>
 
 <!-- ============ 2 · OPENING ============ -->
 <section class="band g-night2" id="opening" data-petal="0">
   <div class="rk-in rk-reading">
     <p class="seed">Every year around Diwali, a room fills with families who arrive as friends and leave as something closer.</p>
-    <div class="media whole slot-media rise" style="margin:var(--s-6) 0" data-lightbox data-cap="The family" role="button" tabindex="0" data-focus style="--focus:50% 38%"><img src="images/opening-group.jpg" alt="The Sitare" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">PHOTO</span><span>the family, or the whole group</span></div>
+    <div class="media whole slot-media rise" style="margin:var(--s-6) 0;--focus:50% 38%" data-lightbox data-cap="The family" role="button" tabindex="0" data-focus><img src="images/opening-group.jpg" alt="The Sitare" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">PHOTO</span><span>the family, or the whole group</span></div>
     <p class="prose t-body">We call ourselves Sitare, the stars. Not because anyone here performs for a living, but because every one of us takes a turn in the light.</p>
   </div>
 </section>
@@ -882,10 +921,10 @@ body.has-replied .rsvp-fab{display:none}
     <p class="eyebrow">THE FESTIVAL</p>
     <h2 class="title">What is Diwali?</h2>
     <p class="lede">Diwali comes from <em>Deepavali</em>, a row of lamps. It is marked across India and around the world, on the new-moon night of autumn — the darkest night of the month.</p>
-    <p class="prose t-body">That is the whole festival in one picture. On the darkest night, we fill every corner with light.</p>
+    <p class="prose t-body">That is the whole festival in one picture: a row of lamps against the darkest night.</p>
 
     <div class="fivedays" style="margin-top:var(--s-6)">
-      <p class="t-soft" style="font-size:var(--fs-sm);margin:0 0 var(--s-3)">It runs five days. Tap a lamp.</p>
+      <p class="t-soft" style="font-size:var(--fs-sm);margin:0 0 var(--s-3)">It runs five days, each with its own reason to light a lamp. Tap one.</p>
       <div class="daylamps" role="tablist" aria-label="The five days of Diwali"><button class="daylamp" type="button" role="tab" aria-selected="false" aria-controls="dayText" data-day="0"><svg class="diya" viewBox="0 0 64 64" aria-hidden="true"><circle class="glow" cx="58" cy="20" r="26" fill="url(#g-glow)"/><use href="#diya-body"/><g class="flame"><path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></g></svg><span>Dhanteras</span></button><button class="daylamp" type="button" role="tab" aria-selected="false" aria-controls="dayText" data-day="1"><svg class="diya" viewBox="0 0 64 64" aria-hidden="true"><circle class="glow" cx="58" cy="20" r="26" fill="url(#g-glow)"/><use href="#diya-body"/><g class="flame"><path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></g></svg><span>Chhoti Diwali</span></button><button class="daylamp lit" type="button" role="tab" aria-selected="true" aria-controls="dayText" data-day="2"><svg class="diya" viewBox="0 0 64 64" aria-hidden="true"><circle class="glow" cx="58" cy="20" r="26" fill="url(#g-glow)"/><use href="#diya-body"/><g class="flame"><path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></g></svg><span>Lakshmi Puja</span></button><button class="daylamp" type="button" role="tab" aria-selected="false" aria-controls="dayText" data-day="3"><svg class="diya" viewBox="0 0 64 64" aria-hidden="true"><circle class="glow" cx="58" cy="20" r="26" fill="url(#g-glow)"/><use href="#diya-body"/><g class="flame"><path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></g></svg><span>Govardhan Puja</span></button><button class="daylamp" type="button" role="tab" aria-selected="false" aria-controls="dayText" data-day="4"><svg class="diya" viewBox="0 0 64 64" aria-hidden="true"><circle class="glow" cx="58" cy="20" r="26" fill="url(#g-glow)"/><use href="#diya-body"/><g class="flame"><path d="M59 34 C53.5 28 55 20 59 9 C63 20 64.5 28 59 34 Z" fill="url(#g-flame)"/></g></svg><span>Bhai Dooj</span></button></div>
       <p class="daytext" id="dayText" role="tabpanel" aria-live="polite"><strong id="dayName">Lakshmi Puja</strong> &mdash; <span id="dayWhat">The main night. Lamps everywhere, and Lakshmi, goddess of prosperity and well-being, is welcomed into every home.</span></p>
     </div>
@@ -936,7 +975,7 @@ body.has-replied .rsvp-fab{display:none}
     </blockquote>
 
     <figure class="said">
-      <span class="face-circle slot-circle" data-lightbox data-cap="Archana ji" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana ji" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCHANA JI</span></span>
+      <span class="face-circle slot-circle" data-lightbox data-cap="Archana ji" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana ji" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCHANA JI</span></span>
       <blockquote>
         <p>Our children will not learn this from a textbook. They will learn it from a puja they sat through, a bhajan they half-sang, a stage they were gently nudged onto, and a room full of people who were glad they did.</p>
       </blockquote>
@@ -957,21 +996,21 @@ body.has-replied .rsvp-fab{display:none}
     </div>
 
     <div class="rings" id="rings" role="group" aria-label="Moments from past years"><button class="ring" data-story="0" type="button">
-        <span class="ring-img"><img src="images/story-puja-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-puja-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The puja</span></button><button class="ring" data-story="1" type="button">
-        <span class="ring-img"><img src="images/story-stage-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-stage-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The stage</span></button><button class="ring" data-story="2" type="button">
-        <span class="ring-img"><img src="images/story-littleones-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-littleones-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The little ones</span></button><button class="ring" data-story="3" type="button">
-        <span class="ring-img"><img src="images/story-couples-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-couples-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The couples</span></button><button class="ring" data-story="4" type="button">
-        <span class="ring-img"><img src="images/story-family-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-family-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The family</span></button><button class="ring" data-story="5" type="button">
-        <span class="ring-img"><img src="images/story-fireworks-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-fireworks-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">The fireworks</span></button><button class="ring" data-story="6" type="button">
-        <span class="ring-img"><img src="images/story-everyone-1.jpg" alt="" loading="lazy" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
+        <span class="ring-img"><img src="images/story-everyone-1.jpg" alt="" loading="lazy" decoding="async" onerror="this.closest('.ring-img').classList.add('awaiting')"></span>
         <span class="ring-cap">Everyone</span></button></div>
-    <p class="t-whisper" style="font-size:var(--fs-sm);text-align:center;margin-top:var(--s-3)">Tap a circle. These are the years behind us.</p>
+    <p class="t-whisper" style="font-size:var(--fs-sm);text-align:center;margin-top:var(--s-3)">These are the years behind us. Tap a circle; tap the right of a photograph to move on, the left to go back.</p>
 
     <div class="grid-2 rk-reading" style="margin-top:var(--s-7);display:grid;gap:var(--s-5)">
       <div><p class="h3">We open with puja</p><p class="t-soft" style="font-size:var(--fs-ui)">Before anything else, we gather and pray together. It sets the tone for the whole evening.</p></div>
@@ -993,18 +1032,18 @@ body.has-replied .rsvp-fab{display:none}
     <h2 class="title">The shape of the night</h2>
     <p class="lede">We begin at 5. There is no set end. Last year the energy carried us to midnight.</p>
     <ol class="beats">
-      <li class="beat"><span class="pip"></span><div><p class="beat-when">5pm</p><p class="beat-name">We gather</p><span class="beat-thumb slot-circle" data-lightbox data-cap="arriving" role="button" tabindex="0"><img src="images/beat-arriving.jpg" alt="arriving" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">arriving</span></span><p class="beat-what">Come in, find your people, settle in.</p></div></li>
-      <li class="beat"><span class="pip"></span><div><p class="beat-when">To begin</p><p class="beat-name">Puja</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the puja" role="button" tabindex="0"><img src="images/beat-puja.jpg" alt="the puja" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the puja</span></span><p class="beat-what">We start together, in prayer and in light.</p></div></li>
-      <li class="beat"><span class="pip"></span><div><p class="beat-when">Through the evening</p><p class="beat-name">The Mehfil</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the stage" role="button" tabindex="0"><img src="images/beat-stage.jpg" alt="the stage" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the stage</span></span><p class="beat-what">Dances, songs, skits, poems and games, and food along the way.</p></div></li>
+      <li class="beat"><span class="pip"></span><div><p class="beat-when">5pm</p><p class="beat-name">We gather</p><span class="beat-thumb slot-circle" data-lightbox data-cap="arriving" role="button" tabindex="0"><img src="images/beat-arriving.jpg" alt="arriving" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">arriving</span></span><p class="beat-what">Come in, find your people, settle in.</p></div></li>
+      <li class="beat"><span class="pip"></span><div><p class="beat-when">To begin</p><p class="beat-name">Puja</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the puja" role="button" tabindex="0"><img src="images/beat-puja.jpg" alt="the puja" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the puja</span></span><p class="beat-what">We start together, in prayer and in light.</p></div></li>
+      <li class="beat"><span class="pip"></span><div><p class="beat-when">Through the evening</p><p class="beat-name">The Mehfil</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the stage" role="button" tabindex="0"><img src="images/beat-stage.jpg" alt="the stage" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the stage</span></span><p class="beat-what">Dances, songs, skits, poems and games, and food along the way.</p></div></li>
       <li class="beat held-beat" id="heldBeat">
         <span class="pip"></span>
         <div class="inner"><p class="beat-when">Somewhere in the evening</p><p class="beat-name">Something new</p>
-        <p class="beat-what">Something that has never happened at a Sitarey Diwali. This is the one lamp we are keeping dark until the night.</p>
+        <p class="beat-what">Something that has never happened at a Sitare Diwali. This is the one lamp we are keeping dark until the night.</p>
         <span class="held-hint" id="heldHint">tap to look</span></div>
         <button class="held-tap" id="heldTap" type="button" aria-label="Open the dark lamp"></button>
         <div class="watcher" aria-hidden="true"><img src="images/mentalist.jpg" alt=""></div>
       </li>
-      <li class="beat"><span class="pip"></span><div><p class="beat-when">To close</p><p class="beat-name">Fireworks</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the sky" role="button" tabindex="0"><img src="images/beat-sky.jpg" alt="the sky" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the sky</span></span><p class="beat-what">The sky joins in.</p></div></li>
+      <li class="beat"><span class="pip"></span><div><p class="beat-when">To close</p><p class="beat-name">Fireworks</p><span class="beat-thumb slot-circle" data-lightbox data-cap="the sky" role="button" tabindex="0"><img src="images/beat-sky.jpg" alt="the sky" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">the sky</span></span><p class="beat-what">The sky joins in.</p></div></li>
     </ol>
     <p class="t-whisper" style="font-size:var(--fs-sm);margin-top:var(--s-5)">Exact timings will be shared closer to the day.</p>
   </div>
@@ -1077,7 +1116,7 @@ body.has-replied .rsvp-fab{display:none}
     <details class="acc"><summary>Do we have to perform?</summary>
       <p>No. Every family is invited to, and most do, but nobody is ever made to. Tell us your song if you want one.</p></details>
     <details class="acc"><summary>What if our plans change?</summary>
-      <p>Reply again from the same device and it updates what we have. Or just message us.</p></details>
+      <p>Come back to the reply, find it with your phone number, and change it there. Or just message us.</p></details>
   </div>
 </section>
 
@@ -1092,6 +1131,25 @@ body.has-replied .rsvp-fab{display:none}
     <div id="rsvpSlot">
       <form id="rsvpPreview" style="display:grid;gap:var(--s-5)">
 
+        <div class="lookup" id="lookup">
+          <p class="lookup-q">Replied already?</p>
+          <div class="lookup-row">
+            <input id="lk-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Your phone number" aria-label="Your phone number">
+            <button class="btn ghost" id="lkGo" type="button">Find my reply</button>
+          </div>
+          <p class="formstatus" id="lkStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="found" id="lkFound" hidden>
+          <p class="found-head" id="lkHead"></p>
+          <dl class="found-rows" id="lkRows"></dl>
+          <div class="found-acts">
+            <button class="btn act" id="lkKeep" type="button">Leave it as it is</button>
+            <button class="btn ghost" id="lkEdit" type="button">Change it</button>
+          </div>
+        </div>
+
+        <div id="formBody" style="display:grid;gap:var(--s-5)">
         <div class="field">
           <p class="ask">Are you coming?</p>
           <div class="choice big">
@@ -1149,7 +1207,8 @@ body.has-replied .rsvp-fab{display:none}
             <p class="t-body" style="font-size:var(--fs-ui);margin:0">We will send photographs. And since you are one of the Sitare whether or not you can make this one, leave us these three things and you are on the list for everything after.</p>
           </div>
           <div class="field"><label for="n-phone">Your phone</label>
-            <input id="n-phone" type="tel" autocomplete="tel" placeholder="(555) 555-5555"></div>
+            <p class="hint">This is how you change your reply later, from any phone.</p>
+            <input id="n-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555"></div>
           <div class="field"><label for="n-dob">Your date of birth</label>
             <input id="n-dob" type="date" max="2026-12-31"></div>
           <p class="hint privacy">We keep this to ourselves. Dates of birth are only so nobody&rsquo;s birthday slips past us.</p>
@@ -1160,8 +1219,10 @@ body.has-replied .rsvp-fab{display:none}
         <input type="hidden" id="mk-year"   name="mark_year"   value="">
         <input type="hidden" id="mk-mark"   name="mark"        value="">
 
+        </div><!-- /formBody -->
+
         <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-        <div>
+        <div id="sendRow">
           <button class="btn act" type="submit" id="rsvpSend">Send our RSVP</button>
           <p class="formstatus" id="rsvpStatus" role="status" aria-live="polite"></p>
         </div>
@@ -1181,7 +1242,7 @@ body.has-replied .rsvp-fab{display:none}
 
     <div class="doors" style="margin-top:var(--s-6)">
       <a class="door rung" id="album2025" href="#" target="_blank" rel="noopener">
-        <span class="door-cover slot-media"><img src="images/album-2025-cover.jpg" alt="Sitaron Ki Diwali 2025" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">COVER</span></span>
+        <span class="door-cover slot-media"><img src="images/album-2025-cover.jpg" alt="Sitaron Ki Diwali 2025" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">COVER</span></span>
         <p class="eyebrow">WHERE THIS LEADS</p>
         <strong>Sitaron Ki Diwali 2025</strong>
         Last year's album, in full.
@@ -1202,8 +1263,8 @@ body.has-replied .rsvp-fab{display:none}
       <p class="eyebrow" style="justify-content:center">SITARON KI MEHFIL</p>
       <p class="display" style="font-size:var(--fs-h2);margin-bottom:var(--s-3)">May our tribe continue to flourish and grow.</p>
       <div class="signers">
-        <span class="face-circle slot-circle" data-lightbox data-cap="Arch" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCH</span></span>
-        <span class="face-circle slot-circle" data-lightbox data-cap="Sid" role="button" tabindex="0"><img src="images/portrait-sid.jpg" alt="Sidharth" loading="lazy" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">SID</span></span>
+        <span class="face-circle slot-circle" data-lightbox data-cap="Arch" role="button" tabindex="0"><img src="images/portrait-arch.jpg" alt="Archana" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">ARCH</span></span>
+        <span class="face-circle slot-circle" data-lightbox data-cap="Sid" role="button" tabindex="0"><img src="images/portrait-sid.jpg" alt="Sidharth" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('awaiting');this.remove()"><span class="ceremony">SID</span></span>
       </div>
       <p class="t-mid">Archana &amp; Sidharth</p>
       <div style="margin-top:var(--s-6)">
@@ -1220,28 +1281,26 @@ body.has-replied .rsvp-fab{display:none}
 </div><!-- /gate -->
 </main>
 
-<!-- ============ THE CURTAIN ============ -->
-<canvas class="rangoli-cv" id="rangoliCv" aria-hidden="true"></canvas>
+<!-- ============ THE CURTAIN · the dark lamp ============ -->
 <div class="curtain" id="curtain" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+  <canvas class="dl-cv" id="dlCv" aria-hidden="true"></canvas>
   <div class="curtain-in">
     <div class="yantra turn" aria-hidden="true"><svg viewBox="0 0 300 300"><rect x="12" y="12" width="276" height="276" rx="2"/><rect x="22" y="22" width="256" height="256" rx="2"/><rect x="32" y="32" width="236" height="236" rx="2"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(0)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(90)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(180)"/><path d="M-10,-138 L-10,-150 L10,-150 L10,-138" transform="translate(150,150) rotate(270)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(0.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(22.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(45.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(67.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(90.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(112.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(135.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(157.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(180.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(202.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(225.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(247.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(270.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(292.5)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(315.0)"/><path d="M0,-92 C14,-104 14,-120 0,-112 C-14,-120 -14,-104 0,-92 Z" transform="translate(150,150) rotate(337.5)"/><circle cx="150" cy="150" r="92"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(0)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(45)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(90)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(135)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(180)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(225)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(270)"/><path d="M0,-72 C18,-86 18,-104 0,-92 C-18,-104 -18,-86 0,-72 Z" transform="translate(150,150) rotate(315)"/><circle cx="150" cy="150" r="72"/><path d="M150.0,84.0 L207.2,183.0 L92.8,183.0 Z"/><path d="M150.0,102.0 L196.8,183.0 L103.2,183.0 Z"/><path d="M150.0,119.0 L186.4,182.0 L113.6,182.0 Z"/><path d="M150.0,137.0 L174.2,179.0 L125.8,179.0 Z"/><path d="M150.0,220.0 L89.4,115.0 L210.6,115.0 Z"/><path d="M150.0,203.0 L99.8,116.0 L200.2,116.0 Z"/><path d="M150.0,186.0 L110.2,117.0 L189.8,117.0 Z"/><path d="M150.0,169.0 L121.4,119.5 L178.6,119.5 Z"/><path d="M150.0,153.0 L132.7,123.0 L167.3,123.0 Z"/><circle class="bindu-dot" cx="150" cy="150" r="3.2"/></svg></div>
-    <div class="cface"><img id="cFaceImg" src="images/mentalist.jpg" alt="A man in a hat, one finger at his temple"></div>
-    <p class="eyebrow" style="justify-content:center">THE LAMP WE KEPT DARK</p>
-    <h2 class="title" id="cTitle" tabindex="-1" style="margin-bottom:var(--s-2)">Someone is coming on the 21st who reads minds for a living.</h2>
-    <p class="seed" style="margin-inline:auto">He has not asked for anything. Leave him something anyway.</p>
 
-    <div class="cstep in" id="sTake">
-      <div class="catch-wrap"><canvas id="catchCv" aria-hidden="true"></canvas>
-        <div class="catch-hit" id="catchHit" role="group" aria-label="Lights"></div>
+    <div class="cstep" id="sApproach">
+      <div class="cface" id="cFace"><img id="cFaceImg" src="images/mentalist.jpg" alt="A man in a hat, one finger at his temple"></div>
+      <div class="cstep" id="sLine" style="margin-top:var(--s-6)">
+        <p class="eyebrow" style="justify-content:center">THE LAMP WE KEPT DARK</p>
+        <h2 class="title" id="cTitle" tabindex="-1" style="margin-bottom:var(--s-3)">Someone is coming on the 21st who reads minds for a living.</h2>
+        <p class="seed" id="cSub" style="margin-inline:auto">He has not asked for anything. Leave him something anyway.</p>
+        <button class="btn voice" id="cBegin" type="button" style="width:100%;min-height:56px;margin-top:var(--s-3)">Go on</button>
+        <div><button class="cskip" id="cNot" type="button">Not just now</button></div>
       </div>
-      <p class="cquiet" id="catchSay">Seven of his lights are loose. Take them.</p>
-      <p class="caught-count" id="caughtCount" aria-live="polite">0 / 7</p>
     </div>
 
     <form class="cstep" id="sYear" hidden>
-      <p class="thought">Think of someone you wish could be there on the 21st.</p>
-      <p class="thought-sub">Don&rsquo;t type it. Don&rsquo;t say it aloud.</p>
-      <p class="t-body" style="font-size:var(--fs-ui);margin-top:var(--s-5)">And a year. The one you were born in.</p>
+      <p class="seed" style="margin:0 auto var(--s-5);color:#E8CF92">The light chose. Not you.</p>
+      <p class="t-body" style="font-size:var(--fs-body);margin:0">And a year. The one you were born in.</p>
       <div class="markrow">
         <span class="letter" id="letterOut" aria-label="Your letter"></span>
         <div class="field"><label class="visually-hidden" for="yearIn">The year you were born</label>
@@ -1251,15 +1310,46 @@ body.has-replied .rsvp-fab{display:none}
       <button class="btn voice" type="submit">Leave it with him</button>
     </form>
 
-    <div class="cstep" id="sDone" hidden>
-      <p class="cquiet">He did not write it down.</p>
-      <p class="mark" id="markOut"></p>
-      <p class="csign" id="cSign"></p>
-      <p class="cquiet">Keep it to yourself. Telling someone spoils it.</p>
-      <div style="margin-top:var(--s-5)"><button class="btn voice" id="cGo" type="button">Back to the evening</button></div>
+    <div class="cstep" id="sThought" hidden>
+      <p class="thought" style="font-size:var(--fs-h3)">Think of someone you wish could be there on the 21st.</p>
+      <p class="seed" style="margin:var(--s-4) auto var(--s-5);color:#E8CF92">Don&rsquo;t type it. Don&rsquo;t say it aloud.</p>
+      <p class="t-body" style="font-size:var(--fs-ui);margin:0 0 var(--s-6)">There is no box for this one. Nothing is being kept.</p>
+      <button class="btn ghost" id="thoughtGo" type="button" hidden style="border-color:var(--gold);color:#FFE9B8">I have them</button>
+      <p class="breath" id="thoughtWait" aria-hidden="true">hold them a moment</p>
     </div>
 
-    <div><button class="cskip" id="cSkip" type="button">No thank you, let me through</button></div>
+    <div class="cstep" id="sDone" hidden>
+      <p class="thought" style="font-size:var(--fs-h3)">He did not write it down.</p>
+      <div class="cstep" id="sDoneTail" style="margin-top:var(--s-5)">
+        <p class="cquiet" style="margin:0 0 var(--s-6)">Keep it to yourself. Telling someone spoils it.</p>
+        <button class="btn ghost" id="cGo" type="button">Back to the evening</button>
+      </div>
+    </div>
+
+    <div class="cstep" id="sDeclined" hidden>
+      <p class="thought" style="font-size:var(--fs-h3)">Whenever you like.</p>
+      <p class="cquiet" style="margin-top:var(--s-3)">The lamp stays where it is.</p>
+    </div>
+  </div>
+
+  <div class="dl-play" id="sPlay" hidden>
+    <div class="dl-play-top" aria-live="polite">
+      <p class="thought" id="playTitle" style="font-size:var(--fs-h3);min-height:1.3em"></p>
+      <p class="caught-count" id="playSub" style="font-size:var(--fs-sm);min-height:1.3em"></p>
+    </div>
+    <div></div>
+    <div class="dl-play-foot">
+      <button class="dl-help" id="dlHelp" type="button" hidden>Let them come to me</button>
+      <button class="cskip" id="cThrough" type="button">let me through</button>
+    </div>
+  </div>
+
+  <div class="dl-kept cstep" id="sKept" hidden>
+    <p class="thought" style="font-size:var(--fs-h3)">He had kept it.</p>
+    <div class="cstep" id="sKeptTail">
+      <p class="seed" style="margin:var(--s-2) auto var(--s-5)">Of course he had.</p>
+      <button class="btn ghost" id="cGoK" type="button">Back to the evening</button>
+    </div>
   </div>
 </div>
 
@@ -1802,11 +1892,12 @@ function sayWhen(){
   const now=new Date();
   const days=Math.floor((ev - now)/86400000);
   let t='';
+  const since=(now-ev)/3600000;
   if(days>13) t='in '+Math.round(days/7)+' weeks';
-  else if(days>6) t='next Saturday';
-  else if(days>1) t='in '+days+' days';
+  else if(days>6) t='in '+days+' days';
+  else if(days>1) t='this Saturday';
   else if(days===1) t='tomorrow';
-  else if(days===0) t='tonight';
+  else if(days===0 || since<9) t='tonight';
   else t='thank you for coming';
   el.textContent=t;
 }
@@ -1815,10 +1906,11 @@ function initHero(){
   const hero=$('#hero'), gate=$('#page .gate'), dawn=$('.dawn'), lamp=$('.lamp');
 
   // every piece of text in the hero turns as the light reaches it
+  let origin=null;   // once the burst has happened, the light comes from there
   function stageReveal(){
     const f=lamp.getBoundingClientRect(), h=hero.getBoundingClientRect();
-    // the flame sits upper-right inside the lamp drawing
-    const ox=f.left-h.left+f.width*0.90, oy=f.top-h.top+f.height*0.30;
+    // before the burst: the flame, upper-right inside the lamp drawing
+    const ox=origin?origin[0]:f.left-h.left+f.width*0.90, oy=origin?origin[1]:f.top-h.top+f.height*0.30;
     hero.style.setProperty('--dx', ox.toFixed(0)+'px');
     hero.style.setProperty('--dy', oy.toFixed(0)+'px');
     const far=Math.max(
@@ -1828,12 +1920,31 @@ function initHero(){
 
     if(reduceMotion) return;
     const SWEEP=3.1, LEAD=0.15;
-    $$('.hero-name,.hero-rom,.scrollhint,.hold-say', hero).forEach(el=>{
+    $$('.scrollhint', hero).forEach(el=>{
       const r=el.getBoundingClientRect();
       const d=Math.hypot((r.left+r.width/2)-h.left-ox,(r.top+r.height/2)-h.top-oy);
       const t=Math.max(0, Math.min(1, d/far)) * SWEEP * 0.82 + LEAD;
       el.style.transitionDelay=t.toFixed(2)+'s';
     });
+  }
+
+  // cubic-bezier(.45,.05,.55,.95) — the curve the dawn mask runs on
+  function bez(x){ const p1=.45,p2=.55,q1=.05,q2=.95; let lo=0,hi=1,u=.5;
+    for(let i=0;i<22;i++){ u=(lo+hi)/2; const bx=3*p1*u*(1-u)*(1-u)+3*p2*u*u*(1-u)+u*u*u; bx<x?lo=u:hi=u; }
+    return 3*q1*u*(1-u)*(1-u)+3*q2*u*u*(1-u)+u*u*u; }
+  function edgeTime(dist, R, dur){ const want=Math.min(1,(dist+120)/R);
+    let lo=0,hi=1; for(let i=0;i<22;i++){ const m=(lo+hi)/2; bez(m)<want?lo=m:hi=m; } return hi*dur; }
+  function inkTitle(){
+    if(reduceMotion){ hero.classList.add('inked'); return; }
+    const h=hero.getBoundingClientRect(), n=$('.hero-titles',hero).getBoundingClientRect();
+    const ox=origin?origin[0]:h.width/2, oy=origin?origin[1]:h.height/2;
+    const far=Math.max(Math.hypot(n.left-h.left-ox,n.top-h.top-oy),Math.hypot(n.right-h.left-ox,n.top-h.top-oy),
+      Math.hypot(n.left-h.left-ox,n.bottom-h.top-oy),Math.hypot(n.right-h.left-ox,n.bottom-h.top-oy));
+    const R=parseFloat(hero.style.getPropertyValue('--dr'))||Math.hypot(h.width,h.height);
+    const back=Math.max(700, edgeTime(far,R,3100)+120);
+    hero.classList.add('blind');
+    setTimeout(()=>hero.classList.add('inked'), 360);
+    setTimeout(()=>hero.classList.remove('blind'), back);
   }
 
   function open(){
@@ -1847,7 +1958,7 @@ function initHero(){
     if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }
 
     if(reduceMotion){
-      hero.classList.add('assembled');
+      hero.classList.add('assembled','daybreak','inked');
       $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
       gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw'));
       document.dispatchEvent(new CustomEvent('sitarey:lit'));
@@ -1858,9 +1969,9 @@ function initHero(){
     setTimeout(()=>{
       runSparkler(hero,
         (fx,fy)=>{                    // the detonation is what lights the page
-          if(typeof fx==='number') hero.style.setProperty('--dx', Math.round(fx)+'px');
-          if(typeof fy==='number') hero.style.setProperty('--dy', Math.round(fy)+'px');
+          if(typeof fx==='number' && typeof fy==='number'){ origin=[fx,fy]; stageReveal(); }
           hero.classList.add('daybreak');
+          inkTitle();
           $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
           setTimeout(()=>{ gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw')); }, 900);
           document.dispatchEvent(new CustomEvent('sitarey:lit'));
@@ -1955,293 +2066,6 @@ function initDays(){
 
 
 
-/* ================= THE MARK BECOMES A RANGOLI =================
-   The geometry is seeded by the letter and the year, so no two are the same.
-   It arrives as a detonation whose sparks fall into the pattern and hold.
-   It leaves by sparkler: the head runs the path, the line goes dark behind it,
-   and the bindu goes out last.                                               */
-function rangoliFigure(letter, year, R){
-  const L=(letter.charCodeAt(0)-65+26)%26;
-  const d=String(year).split('').map(Number);
-  const fold = 6 + (L % 7);                 // the letter sets the symmetry
-  const petals = 5 + (d[2] % 6);            // the year sets the petal counts
-  const rings = 2 + (d[3] % 3);
-  const dots = 8 + (d[1] % 9);
-  const paths=[];
-  for(let k=0;k<fold;k++){
-    const a=(k/fold)*Math.PI*2;
-    for(let q=0;q<petals;q++){
-      const rr=R*(0.30+0.62*(q+1)/petals);
-      const spread=(0.30+0.22*(q/petals))/fold*Math.PI*2;
-      paths.push({kind:'petal', a, rr, spread, hue:(k*37+q*53)%360});
-    }
-  }
-  for(let r=1;r<=rings;r++) paths.push({kind:'ring', rr:R*(0.26+0.68*r/rings), hue:(L*29+r*61)%360});
-  for(let k=0;k<dots;k++) paths.push({kind:'dot', a:(k/dots)*Math.PI*2, rr:R*0.96, hue:(k*47)%360});
-  return {paths, fold, petals, rings, dots};
-}
-
-function rangoliPoints(fig, cx, cy){
-  // one continuous ordered path, so a sparkler can run it
-  const out=[];
-  for(const p of fig.paths){
-    if(p.kind==='petal'){
-      for(let t=0;t<=18;t++){
-        const u=t/18, w=Math.sin(u*Math.PI)*p.spread;
-        const r2=p.rr*(0.42+0.58*Math.sin(u*Math.PI));
-        out.push([cx+Math.cos(p.a+w)*r2, cy+Math.sin(p.a+w)*r2, p.hue]);
-      }
-    } else if(p.kind==='ring'){
-      for(let t=0;t<=42;t++){ const a=(t/42)*Math.PI*2;
-        out.push([cx+Math.cos(a)*p.rr, cy+Math.sin(a)*p.rr, p.hue]); }
-    } else {
-      out.push([cx+Math.cos(p.a)*p.rr, cy+Math.sin(p.a)*p.rr, p.hue]);
-    }
-  }
-  return out;
-}
-
-function revealMark(letter, year, onFinished){
-  const cv=document.getElementById('rangoliCv');
-  if(!cv){ onFinished&&onFinished(); return; }
-  if(reduceMotion){ onFinished&&onFinished(); return; }
-  const ctx=cv.getContext('2d'), dpr=Math.min(2,devicePixelRatio||1);
-  cv.width=innerWidth*dpr; cv.height=innerHeight*dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  cv.classList.add('up');
-  const W=innerWidth, H=innerHeight, cx=W/2, cy=H/2;
-  const R=Math.min(W,H)*0.40;
-  const fig=rangoliFigure(letter, year, R);
-  const path=rangoliPoints(fig, cx, cy);
-  const N=path.length;
-
-  const sparks=[];
-  for(let k=0;k<340;k++){
-    const a=Math.random()*6.2832, sp=2+Math.random()*13;
-    const target=path[Math.floor(Math.random()*N)];
-    sparks.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
-                 tx:target[0],ty:target[1],hue:target[2],settled:false,a:1});
-  }
-  if(navigator.vibrate){ try{ navigator.vibrate([30,60,40]); }catch(e){} }
-
-  const T_BURST=900, T_HOLD=2400, T_OUT=3600;
-  const t0=performance.now();
-  let phase='burst', drawn=0;
-
-  function paintPath(upto, fade){
-    for(let i=1;i<upto;i++){
-      const a=path[i-1], b=path[i];
-      if(Math.hypot(b[0]-a[0],b[1]-a[1])>R*0.5) continue;   // don't join separate strokes
-      ctx.strokeStyle='hsla('+b[2]+',78%,66%,'+(fade).toFixed(3)+')';
-      ctx.lineWidth=2; ctx.lineCap='round';
-      ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
-    }
-  }
-
-  function frame(t){
-    const e=t-t0;
-    ctx.clearRect(0,0,W,H);
-    ctx.globalCompositeOperation='lighter';
-
-    if(e<T_BURST){
-      for(const s2 of sparks){
-        s2.x+=s2.vx; s2.y+=s2.vy; s2.vx*=0.94; s2.vy*=0.94;
-        const k=Math.min(1,e/T_BURST);
-        s2.x+=(s2.tx-s2.x)*k*0.10; s2.y+=(s2.ty-s2.y)*k*0.10;
-        ctx.fillStyle='hsla('+s2.hue+',85%,70%,.9)';
-        ctx.beginPath(); ctx.arc(s2.x,s2.y,1.8,0,6.2832); ctx.fill();
-      }
-    } else if(e<T_HOLD){
-      const k=Math.min(1,(e-T_BURST)/420);
-      paintPath(N, k);
-      for(const s2 of sparks){
-        s2.x+=(s2.tx-s2.x)*0.14; s2.y+=(s2.ty-s2.y)*0.14; s2.a*=0.965;
-        if(s2.a<0.03) continue;
-        ctx.fillStyle='hsla('+s2.hue+',85%,74%,'+s2.a.toFixed(3)+')';
-        ctx.beginPath(); ctx.arc(s2.x,s2.y,1.6,0,6.2832); ctx.fill();
-      }
-      ctx.fillStyle='rgba(192,57,43,.95)';
-      ctx.beginPath(); ctx.arc(cx,cy,5,0,6.2832); ctx.fill();
-    } else {
-      // the sparkler takes it away, and the bindu goes out last
-      const u=Math.min(1,(e-T_HOLD)/T_OUT);
-      const head=Math.floor(u*(N-1));
-      paintPath(N, 1);
-      ctx.globalCompositeOperation='destination-out';
-      for(let i=1;i<=head;i++){
-        const a=path[i-1], b=path[i];
-        ctx.strokeStyle='rgba(0,0,0,1)'; ctx.lineWidth=9; ctx.lineCap='round';
-        ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
-      }
-      ctx.globalCompositeOperation='lighter';
-      if(head<N-1){
-        const [hx,hy]=path[head];
-        for(let k=0;k<5;k++){
-          const a2=Math.random()*6.2832, sp=0.6+Math.random()*3.4;
-          sparks.push({x:hx,y:hy,vx:Math.cos(a2)*sp,vy:Math.sin(a2)*sp,tx:hx,ty:hy,hue:48,settled:true,a:1,ember:true});
-        }
-        const gr=ctx.createRadialGradient(hx,hy,0,hx,hy,30);
-        gr.addColorStop(0,'rgba(255,255,250,1)'); gr.addColorStop(0.3,'rgba(255,230,170,.85)');
-        gr.addColorStop(1,'rgba(255,160,40,0)');
-        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(hx,hy,30,0,6.2832); ctx.fill();
-      }
-      for(let i=sparks.length-1;i>=0;i--){
-        const s2=sparks[i]; if(!s2.ember) continue;
-        s2.x+=s2.vx; s2.y+=s2.vy; s2.vy+=0.07; s2.a-=0.028;
-        if(s2.a<=0){ sparks.splice(i,1); continue; }
-        ctx.fillStyle='rgba(255,'+(200+Math.round(40*s2.a))+',140,'+s2.a.toFixed(3)+')';
-        ctx.beginPath(); ctx.arc(s2.x,s2.y,1.4,0,6.2832); ctx.fill();
-      }
-      const bindu=Math.max(0,1-Math.max(0,(u-0.88)/0.12));
-      ctx.fillStyle='rgba(192,57,43,'+bindu.toFixed(3)+')';
-      ctx.beginPath(); ctx.arc(cx,cy,5*bindu,0,6.2832); ctx.fill();
-      if(u>=1){
-        ctx.clearRect(0,0,W,H); cv.classList.remove('up');
-        onFinished&&onFinished(); return;
-      }
-    }
-    ctx.globalCompositeOperation='source-over';
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
-/* ================= THE DARK LAMP =================
-   Visit 1 you take his lights. Visit 2 you give them back and he reassembles.
-   It alternates for ever, because the page remembers whose turn it is.        */
-const LAMP_TURN='rk:sitarey-lamp-turn:v7';
-const LETTERS7='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-function initDarkLamp(){
-  const cv=document.getElementById('catchCv'), hit=document.getElementById('catchHit');
-  const say=document.getElementById('catchSay'), count=document.getElementById('caughtCount');
-  if(!cv||!hit) return null;
-  const ctx=cv.getContext('2d');
-  let N=7, lights=[], pts=[], done=0, raf=0, letter='', giving=false, onComplete=null;
-
-  function turnIsGiving(){ return store.get(LAMP_TURN)==='give'; }
-  function flipTurn(){ store.set(LAMP_TURN, turnIsGiving()?'take':'give'); }
-
-  function size(){
-    const r=cv.getBoundingClientRect(), dpr=Math.min(2,devicePixelRatio||1);
-    cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    return r;
-  }
-
-  function samplePortrait(r){
-    // his photograph, as points of light
-    const img=document.getElementById('cFaceImg');
-    pts=[];
-    try{
-      const n=104, off=document.createElement('canvas'); off.width=off.height=n;
-      const oc=off.getContext('2d',{willReadFrequently:true});
-      const w=img.naturalWidth,h=img.naturalHeight,sq=Math.min(w,h);
-      oc.drawImage(img,(w-sq)/2,Math.max(0,(h-sq)*0.10),sq,sq,0,0,n,n);
-      const d=oc.getImageData(0,0,n,n).data;
-      for(let y=0;y<n;y+=2) for(let x=0;x<n;x+=2){
-        const i=(y*n+x)*4;
-        const lum=(0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2])/255;
-        if(lum<0.19) continue;
-        pts.push({tx:(x/n)*r.width, ty:(y/n)*r.height, x:0,y:0,a:0,lum,
-                  r:0.7+lum*1.5, owner:Math.floor(Math.random()*N), free:false});
-      }
-    }catch(e){}
-  }
-
-  function layout(r){
-    lights=[];
-    for(let k=0;k<N;k++){
-      const a=(k/N)*Math.PI*2 + 0.4;
-      const sp=r.width*0.34;
-      lights.push({ i:k, letter:LETTERS7[Math.floor(Math.random()*26)],
-        x:r.width/2+Math.cos(a)*sp, y:r.height/2+Math.sin(a)*sp,
-        vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5,
-        r:12+Math.random()*3, taken:giving, pulse:Math.random()*6.28 });
-    }
-    hit.innerHTML='';
-    lights.forEach(l=>{
-      const b=document.createElement('button');
-      b.type='button';
-      b.setAttribute('aria-label', giving ? 'Give back a light' : 'Take a light');
-      b.addEventListener('click',()=>tap(l));
-      hit.appendChild(b); l.btn=b;
-    });
-  }
-
-  function tap(l){
-    if(giving ? l.taken===false : l.taken===true) return;
-    l.taken=!giving;
-    letter=l.letter;
-    done++;
-    count.textContent=done+' / '+N;
-    if(l.btn){ l.btn.disabled=true; l.btn.style.display='none'; }
-    // his points follow their light
-    pts.forEach(p=>{ if(p.owner===l.i) p.free=giving ? true : false; });
-    if(done>=N){
-      say.textContent = giving ? 'He is whole again.' : 'He has nothing left loose.';
-      setTimeout(()=>{ flipTurn(); onComplete && onComplete(letter); }, 1100);
-    }
-  }
-
-  function draw(){
-    const w=cv.clientWidth, h=cv.clientHeight;
-    ctx.clearRect(0,0,w,h);
-    ctx.globalCompositeOperation='lighter';
-    // the face, as far as it is assembled
-    for(const p of pts){
-      if(p.free){ p.x+=(p.fx-p.x)*0.03; p.y+=(p.fy-p.y)*0.03; p.a=Math.max(0,p.a-0.012); }
-      else { p.x+=(p.tx-p.x)*0.05; p.y+=(p.ty-p.y)*0.05; p.a=Math.min(1,p.a+0.02); }
-      if(p.a<=0.01) continue;
-      const g=190+p.lum*65;
-      ctx.fillStyle='rgba('+Math.round(g)+','+Math.round(g*0.86)+','+Math.round(g*0.58)+','+(p.a*0.8).toFixed(3)+')';
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.2832); ctx.fill();
-    }
-    // the loose lights
-    for(const l of lights){
-      const loose = giving ? l.taken : !l.taken;
-      if(!loose) continue;
-      l.x+=l.vx; l.y+=l.vy; l.pulse+=0.07;
-      if(l.x<30||l.x>w-30) l.vx*=-1;
-      if(l.y<30||l.y>h-30) l.vy*=-1;
-      if(l.btn){ l.btn.style.left=l.x+'px'; l.btn.style.top=l.y+'px'; }
-      const pr=l.r*(1+Math.sin(l.pulse)*0.13);
-      const gr=ctx.createRadialGradient(l.x,l.y,0,l.x,l.y,pr*4.2);
-      gr.addColorStop(0,'rgba(255,246,222,.95)');
-      gr.addColorStop(0.28,'rgba(255,214,130,.58)');
-      gr.addColorStop(1,'rgba(201,168,76,0)');
-      ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(l.x,l.y,pr*4.2,0,6.2832); ctx.fill();
-      ctx.fillStyle='rgba(255,250,238,1)';
-      ctx.beginPath(); ctx.arc(l.x,l.y,pr*0.4,0,6.2832); ctx.fill();
-    }
-    ctx.globalCompositeOperation='source-over';
-    raf=requestAnimationFrame(draw);
-  }
-
-  return {
-    start(cb){
-      onComplete=cb;
-      giving=turnIsGiving();
-      done=0; count.textContent='0 / '+N;
-      say.textContent = giving
-        ? 'His light is yours from last time. Give it back, one at a time.'
-        : 'Seven of his lights are loose. Take them.';
-      const r=size();
-      samplePortrait(r);
-      layout(r);
-      // where a freed point drifts to
-      pts.forEach(p=>{ const a=Math.random()*6.2832, d=r.width*(0.5+Math.random()*0.6);
-        p.fx=r.width/2+Math.cos(a)*d; p.fy=r.height/2+Math.sin(a)*d;
-        if(giving){ p.x=p.tx; p.y=p.ty; p.a=1; } else { p.x=p.fx; p.y=p.fy; p.a=0; p.free=true; }
-      });
-      if(giving) pts.forEach(p=>p.free=false);
-      cancelAnimationFrame(raf); draw();
-    },
-    stop(){ cancelAnimationFrame(raf); raf=0; },
-    letter(){ return letter; }
-  };
-}
-
 /* --- the sky: one ground whose colour follows the walk, and stars over it --- */
 function initSky(){
   const cv=document.getElementById('sky'), ground=document.getElementById('ground');
@@ -2254,12 +2078,12 @@ function initSky(){
 
   // the walk, measured from the sections themselves rather than guessed in CSS
   const stops=[
-    ['#opening','#1B1434'],['#diwali','#241A3A'],['#ages','#0B0818'],
+    ['#descentLine','#14102A'],['#opening','#1B1434'],['#diwali','#241A3A'],['#ages','#0B0818'],
     ['#now','#3D1B2E'],['#ourway','#4A2024'],['#evening','#5C2618']
   ].map(([sel,c])=>({el:document.querySelector(sel),c})).filter(x=>x.el);
   const hero=document.getElementById('hero'), light=document.querySelector('.to-light');
 
-  let stars=[], deep=[], w=0, h=0, raf=0, alpha=0, progress=0, deepA=0;
+  let stars=[], deep=[], w=0, h=0, raf=0, alpha=0, progress=0, deepA=0, lastC='', lastInk='';
   const TAU=Math.PI*2;
   function size(){
     w=cv.width=innerWidth; h=cv.height=innerHeight;
@@ -2287,25 +2111,33 @@ function initSky(){
       c=mix(pts[pts.length-1].c,'#F7F3EC',ease(t));
     } else for(let i=0;i<pts.length-1;i++) if(mid>=pts[i].y&&mid<=pts[i+1].y){
       c=mix(pts[i].c,pts[i+1].c,(mid-pts[i].y)/(pts[i+1].y-pts[i].y)); break; }
-    ground.style.background=c;
+    if(c!==lastC){ ground.style.background=c; lastC=c; }
     const L=lumOf(c);
     const nightInk = L<=0.044 ? 1 : L>=0.064 ? 0 : 1-(L-0.044)/0.02;
-    document.documentElement.style.setProperty('--night-ink', nightInk.toFixed(3));
+    const ni = nightInk.toFixed(2);
+    if(ni!==lastInk){ document.documentElement.style.setProperty('--night-ink', ni); lastInk=ni; }
     const dl=document.querySelector('.dawnline .seed');
     if(dl){ dl.style.color = L>0.2 ? '#1C1712' : '#F4EFE4'; dl.style.textShadow='none';
             dl.style.opacity = legible(L).toFixed(3); }
-    // stars: out through the opening, full from the festival to our way, gone by the ember
-    const a0=pts[0].y, a1=pts[1].y, b0=pts[4].y, b1=pts[5].y;
+    // stars: out through the descent, full from the opening to our way, gone by the ember
+    const a0=pts[0].y, a1=pts[1].y, b0=pts[5].y, b1=pts[6].y;
     if(mid<a0) alpha=0; else if(mid<a1) alpha=(mid-a0)/(a1-a0); else if(mid<b0) alpha=1;
     else if(mid<b1) alpha=1-(mid-b0)/(b1-b0); else alpha=0;
     // densest at amavasya
-    const ages=pts[2]; const d=Math.abs(mid-ages.y)/innerHeight;
+    const ages=pts[3]; const d=Math.abs(mid-ages.y)/innerHeight;
     alpha*= (1 - Math.min(0.45, d*0.35));
     deepA = Math.max(0, 1 - d*0.7) * alpha;   // peaks at amavasya, gone either side
     progress=Math.max(0,Math.min(1,(mid-a0)/Math.max(1,b1-a0)));
     cv.classList.toggle('on', alpha>0.02);
   }
+  let painted=false;
   function draw(){
+    if(alpha<=0.01){
+      // nothing to show: clear once, then stop compositing a full-screen layer every frame
+      if(painted){ ctx.clearRect(0,0,w,h); painted=false; }
+      raf=0; return;
+    }
+    painted=true;
     ctx.clearRect(0,0,w,h);
     if(alpha>0.01){
       ctx.globalCompositeOperation='lighter';
@@ -2323,8 +2155,9 @@ function initSky(){
     }
     raf=requestAnimationFrame(draw);
   }
+  const wake=()=>{ if(!raf && alpha>0.01) raf=requestAnimationFrame(draw); };
   size(); measure(); if(!reduceMotion) draw(); else { alpha&&draw(); }
-  let q=false; addEventListener('scroll',()=>{ if(!q){q=true;requestAnimationFrame(()=>{measure();q=false;});} },{passive:true});
+  let q=false; addEventListener('scroll',()=>{ if(!q){q=true;requestAnimationFrame(()=>{measure();wake();q=false;});} },{passive:true});
   addEventListener('resize',()=>{size();measure();});
   document.addEventListener('sitarey:lit',()=>setTimeout(measure,100));
 }
@@ -2342,6 +2175,13 @@ function initRail(){
   }),{threshold:.3});
   marks.forEach(m=>io.observe(m));
   new IntersectionObserver(([e])=>rail.classList.toggle('show',!e.isIntersecting),{threshold:.3}).observe($('#hero'));
+  const close=$('#close');
+  if(close){ const wio=new IntersectionObserver(([e])=>{
+      if(!e.isIntersecting) return;
+      lamps.forEach(l=>l.classList.add('on'));
+      setTimeout(()=>rail.classList.add('whole'),300);
+      wio.disconnect();
+    },{threshold:.4}); wio.observe(close); }
   // the strip judges what is under it by luminance, so it works over any ground
   const cv=document.createElement('canvas'); cv.width=cv.height=1;
   const cx=cv.getContext('2d',{willReadFrequently:true});
@@ -2391,15 +2231,15 @@ function initFab(){
 /* --- stories --- */
 const STORIES=[
   {t:'The puja',slug:'puja',n:4},
-  {t:'The stage',slug:'stage',n:4},
-  {t:'The little ones',slug:'littleones',n:4},
-  {t:'The couples',slug:'couples',n:3},
-  {t:'The family',slug:'family',n:2},
+  {t:'The stage',slug:'stage',n:5},
+  {t:'The little ones',slug:'littleones',n:5},
+  {t:'The couples',slug:'couples',n:4},
+  {t:'The family',slug:'family',n:3},
   {t:'The fireworks',slug:'fireworks',n:4},
-  {t:'Everyone',slug:'everyone',n:4}
+  {t:'Everyone',slug:'everyone',n:5}
 ];
 // a slot listed here is a video; everything else is a .jpg
-const VIDEOS = [];   // e.g. 'dancing-2'
+const VIDEOS = ['stage-2','stage-3','stage-5','couples-2'];   // e.g. 'dancing-2'
 function initStories(){
   const wrap=$('#story'), bars=$('#storyBars'), stage=$('#storyStage'), title=$('#storyTitle');
   let g=0,i=0,timer=null,paused=false,last=null;
@@ -2488,60 +2328,445 @@ function initGallery(){
   g.addEventListener('scroll',mark,{passive:true}); mark();
 }
 
+/* ================= THE DARK LAMP =================
+   One stage of light behind every step. His face forms from points and breaks
+   into seven; you catch them into a row of seven lamps; the row lifts and
+   bursts into a letter. A year, an un-typed thought, and the letter and year
+   become a rangoli that turns once with his face at its heart, until the
+   sparkler that drew the family at the door runs it out. The bindu goes last.
+   On the way back the row is already his: you set the seven loose, they
+   gather, and the same rangoli forms again. Nothing is printed.           */
+const DL_ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ', DL_N=7, DL_TAU=Math.PI*2;
+const DL_PAL=['#FFD98A','#F2A71B','#FFF6DE','#E8A27A','#E8CF92'];   // the page's golds; the one red stays the bindu
+const dlRgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+Math.max(0,a).toFixed(3)+')';};
+const dlEase=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+
+/* deterministic: the same letter and year always draw the same figure */
+function dlRangoli(letter,year,R){
+  const L=Math.max(0,DL_ALPHA.indexOf(letter));
+  const d=String(year).padStart(4,'0').split('').map(Number);
+  const sum=d.reduce((a,b)=>a+b,0);
+  const fold=6+(L%7), layers=2+(d[3]%3), mids=1+(d[2]%2), sides=5+(sum%4);
+  const off=(L+d[3])%DL_PAL.length, col=k=>DL_PAL[(k+off)%DL_PAL.length];
+  const S=[];
+  const star=[];
+  for(let k=0;k<=sides*2;k++){const a=-Math.PI/2+k*Math.PI/sides, r=k%2?R*.085:R*.17; star.push([Math.cos(a)*r,Math.sin(a)*r]);}
+  S.push({pts:star,col:col(2),w:2});
+  const ring=(r,c)=>{const p=[];for(let k=0;k<=64;k++){const a=k/64*DL_TAU;p.push([Math.cos(a)*r,Math.sin(a)*r]);}S.push({pts:p,col:c,w:1.4});};
+  ring(R*.22,col(4));
+  for(let k=0;k<layers;k++){
+    const r0=R*(.22+.64*k/layers), r1=R*(.22+.64*(k+1)/layers)+R*.05;
+    const half=(Math.PI/fold)*(k%2?.62:.82), a0=(k%2)*Math.PI/fold;
+    for(let f=0;f<fold;f++){
+      const base=a0+f*DL_TAU/fold, p=[];
+      for(let s=0;s<=36;s++){
+        const th=s/36*DL_TAU, t=(1-Math.cos(th))/2, r=r0+(r1-r0)*t;
+        const lat=Math.sin(th)*half*(r0+(r1-r0)*.45)*(1-t*.35);
+        const a=base+lat/r; p.push([Math.cos(a)*r,Math.sin(a)*r]);
+      }
+      S.push({pts:p,col:col(k),w:1.8});
+    }
+    if(k<mids) ring(r1+R*.02,col(k+3));
+  }
+  ring(R*.96,col(1));
+  for(let k=0;k<fold*2;k++){const a=k/(fold*2)*DL_TAU+Math.PI/(fold*2); S.push({pts:[[Math.cos(a)*R*1.05,Math.sin(a)*R*1.05]],col:col(k%2?2:0),dot:2.6});}
+  let n=0; S.forEach(s=>{s.start=n;n+=s.pts.length;s.end=n;});
+  const flat=[]; S.forEach(s=>s.pts.forEach(p=>flat.push(p)));
+  return {S,flat,n};
+}
+
 /* --- the curtain --- */
 function initCurtain(){
-  const c=$('#curtain'), trig=$('#curtainTrigger'), title=$('#cTitle');
-  const sTake=$('#sTake'), sYear=$('#sYear'), sDone=$('#sDone');
-  let shown=false, letter='', last=null;
-  const KEY='rk:sitarey-curtain:v3';
+  const c=$('#curtain'), trig=$('#curtainTrigger'), title=$('#cTitle'), cv=$('#dlCv');
+  if(!c||!cv) return;
+  const ctx=cv.getContext('2d');
+  const KEY='rk:sitarey-curtain:v3', MARK='rk:sitarey-mark:v3';
+  const st={approach:$('#sApproach'),line:$('#sLine'),year:$('#sYear'),thought:$('#sThought'),done:$('#sDone'),
+            declined:$('#sDeclined'),play:$('#sPlay'),kept:$('#sKept')};
+  const face=$('#cFace'), img=$('#cFaceImg'), help=$('#dlHelp'), pTitle=$('#playTitle'), pSub=$('#playSub');
+  let shown=false, last=null, T=[], helpT=0, raf=0, ph='idle', pt0=0, w=0, h=0;
+  let F=[], L=[], S=[], E=[], G=[], F2=[], fig=null, fc=[0,0], RR=0, rot=0, letter='', caught=0;
 
-  function show(el){el.hidden=false; void el.offsetWidth; el.classList.add('in');}
-  function reset(){
-    shown=false; letter='';
-    sDone.hidden=true; sDone.classList.remove('in');
-    sYear.hidden=true; sYear.classList.remove('in');
-    $('#yearIn').value=''; $('#yearErr').textContent='';
-    $('#markOut').classList.remove('in');
-    sTake.hidden=false; sTake.classList.add('in');
-    beginLamp();
+  const after=(ms,f)=>T.push(setTimeout(f,ms));
+  const clearT=()=>{T.forEach(clearTimeout);T=[];clearTimeout(helpT);};
+  const buzz=p=>{if(navigator.vibrate&&!reduceMotion){try{navigator.vibrate(p);}catch(e){}}};
+  const getMark=()=>{try{const m=JSON.parse(store.get(MARK)||'null');return m&&m.letter&&m.year?m:null;}catch(_){return null;}};
+  const hint=$('#heldHint'); if(hint&&getMark()) hint.textContent='he still has yours';
+
+  function showEl(el){ el.hidden=false; void el.offsetWidth; el.classList.add('in'); }
+  function hideEl(el){ el.classList.remove('in'); el.hidden=true; }
+  function only(name){ Object.entries(st).forEach(([k,el])=>{ if(k!=='line' && k!==name) hideEl(el); }); if(name) showEl(st[name]); }
+  function setPlay(a,b){ pTitle.textContent=a||''; pSub.textContent=b||''; }
+
+  function fit(){ const d=Math.min(2,devicePixelRatio||1); w=innerWidth; h=innerHeight;
+    cv.width=Math.round(w*d); cv.height=Math.round(h*d); ctx.setTransform(d,0,0,d,0,0); }
+  const sw=()=>Math.min(w,480);
+  const faceBox=()=>{const s=Math.min(sw()*.64,h*.34,270);return{x:(w-s)/2,y:h*.17,s};};
+  const slot=i=>{const sp=Math.min(48,(sw()-60)/6.4);return{x:w/2+(i-3)*sp,y:h*.73};};
+
+  function sample(box,circle){
+    const pts=[]; if(!img||!img.complete||!img.naturalWidth) return pts;
+    try{
+      const N=110, off=document.createElement('canvas'); off.width=off.height=N;
+      const oc=off.getContext('2d',{willReadFrequently:true});
+      const iw=img.naturalWidth, ih=img.naturalHeight, s=Math.min(iw,ih);
+      oc.drawImage(img,(iw-s)/2,Math.max(0,(ih-s)*.12),s,s,0,0,N,N);
+      const d=oc.getImageData(0,0,N,N).data;
+      for(let y=0;y<N;y+=2) for(let x=0;x<N;x+=2){
+        const i=(y*N+x)*4, lum=(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2])/255;
+        if(lum<.17) continue;
+        const tx=box.x+x/N*box.s, ty=box.y+y/N*box.s;
+        if(circle && Math.hypot(tx-box.x-box.s/2,ty-box.y-box.s/2)>circle) continue;
+        pts.push({tx,ty,x:tx,y:ty,a:0,lum,r:.8+lum*1.5,vx:0,vy:0});
+      }
+    }catch(e){}
+    return pts;
   }
+  function glyph(ch,cx,cy,size){
+    const out=[], N=160, off=document.createElement('canvas'); off.width=off.height=N;
+    const oc=off.getContext('2d',{willReadFrequently:true});
+    oc.fillStyle='#fff'; oc.font='600 138px Lora, Georgia, serif'; oc.textAlign='center'; oc.textBaseline='middle';
+    oc.fillText(ch,N/2,N/2+8);
+    const d=oc.getImageData(0,0,N,N).data;
+    for(let y=0;y<N;y+=3) for(let x=0;x<N;x+=3) if(d[(y*N+x)*4+3]>120) out.push([cx+(x/N-.5)*size,cy+(y/N-.5)*size]);
+    return out;
+  }
+
+  /* ---------------- the walk ---------------- */
   function up(){
     if(shown) return; shown=true; last=document.activeElement;
-    c.classList.add('up'); void c.offsetWidth; c.classList.add('in'); document.body.classList.add('held');
+    clearT(); ph='idle'; S=[]; L=[]; E=[];
+    const m=getMark();
+    title.textContent = m ? 'He still has your lights.' : 'Someone is coming on the 21st who reads minds for a living.';
+    $('#cSub').textContent = m ? 'He would like you to have them back.' : 'He has not asked for anything. Leave him something anyway.';
+    $('#cBegin').textContent = m ? 'Give them back' : 'Go on';
+    c.classList.add('up'); void c.offsetWidth; c.classList.add('in'); c.classList.remove('playing');
+    document.body.classList.add('held');
     $$('.yantra',c).forEach(y=>y.classList.add('on','draw'));
-    setTimeout(()=>title.focus({preventScroll:true}),400);
-    setTimeout(beginLamp, 2000);        // two beats of nothing before he asks
+    face.classList.remove('up'); hideEl(st.line); only('approach');
+    fit(); start();
+    // two beats of nothing, then his face, then the words
+    after(2000,()=>face.classList.add('up'));
+    after(3750,()=>{ showEl(st.line); title.focus({preventScroll:true}); });
   }
   function down(){
-    if(lamp) lamp.stop();
-    c.classList.remove('in'); setTimeout(()=>c.classList.remove('up'),700); document.body.classList.remove('held');
-    store.set(KEY,'1'); if(last) last.focus({preventScroll:true});
+    clearT(); ph='idle'; stop();
+    c.classList.remove('in','playing'); setTimeout(()=>{ if(!c.classList.contains('in')) c.classList.remove('up'); },700);
+    document.body.classList.remove('held');
+    store.set(KEY,'1'); shown=false; if(last) last.focus({preventScroll:true});
   }
-  function check(){
-    if(shown||store.get(KEY)) return;
-    if(document.body.classList.contains('held')) return;       // page still gated by the lamp
-    // while the gate is closed the trigger has no box, and an empty rect reads as "at the top"
-    const gate=document.querySelector('#page .gate');
-    if(!gate || gate.hidden || trig.offsetParent===null) return;
-    if(trig.getBoundingClientRect().top < innerHeight*0.9){ up(); removeEventListener('scroll',check); }
+  function decline(){
+    clearT(); ph='idle'; S=[]; L=[]; E=[]; c.classList.remove('playing'); help.hidden=true;
+    only('declined'); after(2400,down);
   }
-  addEventListener('scroll',check,{passive:true});
+  function armHelp(){ clearTimeout(helpT); help.hidden=true; helpT=setTimeout(()=>{ help.hidden=false; },9000); }
 
-  const lamp=initDarkLamp();
-  const noop=()=>{};
-  $('#__never__')&&noop;
-  // the lights replace the wheel: the last one taken gives the letter
-  function beginLamp(){
-    if(!lamp) return;
-    lamp.start(l=>{
-      letter=l;
-      $('#letterOut').textContent=letter;
-      sTake.classList.remove('in');
-      setTimeout(()=>{ sTake.hidden=true; show(sYear); $('#yearIn').focus({preventScroll:true}); },420);
-    });
+  function begin(){
+    clearT(); fit(); c.classList.add('playing'); only('play');
+    if(getMark()) beginGive(); else beginGather();
   }
 
-  sYear.addEventListener('submit',e=>{
+  /* take: he comes apart into seven, you catch them into a row of lamps */
+  function beginGather(){
+    const b=faceBox(); F=sample(b);
+    if(!F.length) for(let k=0;k<700;k++){ const a=Math.random()*DL_TAU, r=b.s*(.25+Math.random()*.2);
+      F.push({tx:b.x+b.s/2+Math.cos(a)*r,ty:b.y+b.s/2+Math.sin(a)*r*1.1,a:0,lum:.6,r:1.3}); }
+    F.forEach(p=>{ const a=Math.random()*DL_TAU, d=w*(.5+Math.random()*.5); p.x=w/2+Math.cos(a)*d; p.y=b.y+b.s/2+Math.sin(a)*d; p.a=0; });
+    L=[]; S=[]; caught=0; ph='form'; pt0=performance.now(); setPlay('',''); help.hidden=true;
+  }
+  function toScatter(t){
+    const b=faceBox(), cx=b.x+b.s/2, cy=b.y+b.s/2;
+    F.forEach(p=>{ const a=Math.atan2(p.ty-cy,p.tx-cx)+(Math.random()-.5)*1.1, sp=.8+Math.random()*2.2; p.vx=Math.cos(a)*sp; p.vy=Math.sin(a)*sp-.6; });
+    L=[];
+    for(let k=0;k<DL_N;k++){
+      const src=F[Math.floor(Math.random()*F.length)]||{tx:cx,ty:cy};
+      const a=Math.random()*DL_TAU, sp=.7+Math.random()*.5;
+      L.push({x:src.tx,y:src.ty,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:12+Math.random()*3,pulse:Math.random()*DL_TAU,caught:false,home:false,prog:0,al:0});
+    }
+    ph='scatter'; pt0=t; setPlay('He came apart.','');
+  }
+  function catchAt(px,py){
+    let best=-1, bd=56;
+    L.forEach((l,i)=>{ if(l.caught) return; const d=Math.hypot(l.x-px,l.y-py); if(d<bd){bd=d;best=i;} });
+    if(best<0) return;
+    const l=L[best], n=L.filter(q=>q.caught).length, s=slot(n);
+    l.caught=true; l.prog=0; l.sx=l.x; l.sy=l.y; l.hx=s.x; l.hy=s.y; l.slot=n;
+    spark(l.x,l.y,22,5);
+    L.forEach(q=>{ if(!q.caught){ q.vx*=.9; q.vy*=.9; } });   // the rest grow calmer as you go
+    buzz(12); armHelp();
+    caught=n+1; setPlay(caught>=DL_N?'All seven.':'Catch his seven lights.', caught+' of '+DL_N);
+    if(caught>=DL_N){ clearTimeout(helpT); help.hidden=true; after(900,()=>{ ph='rise'; pt0=performance.now(); setPlay('',''); }); }
+  }
+  function fireGlyph(t){
+    const cx=w/2, cy=h*.4;
+    letter=DL_ALPHA[Math.floor(Math.random()*26)];
+    G=glyph(letter,cx,cy,Math.min(sw()*.56,230));
+    S=[];
+    for(let k=0;k<340;k++){ const a=Math.random()*DL_TAU, sp=2+Math.random()*11, g=G[Math.floor(Math.random()*G.length)]||[cx,cy];
+      S.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,tx:g[0],ty:g[1],home:true,life:1,r:1.3+Math.random()*1.4,gold:Math.random()>.4}); }
+    buzz([18,60,28]); ph='glyph'; pt0=t;
+  }
+  function toYear(){
+    c.classList.remove('playing'); help.hidden=true;
+    $('#letterOut').textContent=letter; $('#yearIn').value=''; $('#yearErr').textContent='';
+    only('year'); setTimeout(()=>$('#yearIn').focus({preventScroll:true}),500);
+  }
+
+  /* give back: on the return the row is already his; each light is set loose */
+  function beginGive(){
+    S=[]; L=[]; caught=0;
+    for(let k=0;k<DL_N;k++){ const s=slot(k); L.push({x:s.x,y:s.y,vx:0,vy:0,r:12+Math.random()*3,pulse:Math.random()*DL_TAU,caught:true,home:true,prog:1,slot:k,al:1}); }
+    ph='give'; pt0=performance.now(); armHelp();
+    help.textContent='Let them go for me';
+    setPlay('He kept your lights. Give them back.','0 of '+DL_N);
+  }
+  function freeAt(px,py){
+    let best=-1, bd=40;
+    L.forEach((l,i)=>{ if(!l.home) return; const d=Math.hypot(l.x-px,l.y-py); if(d<bd){bd=d;best=i;} });
+    if(best<0) return;
+    const l=L[best]; l.home=false; l.caught=false; l.loose=false;
+    l.vx=(Math.random()-.5)*1.4; l.vy=-2.2-Math.random()*1.4;
+    spark(l.x,l.y,26,4.5); buzz(12); armHelp();
+    caught=L.filter(q=>!q.home).length;
+    setPlay(caught>=DL_N?'Let them go.':'He kept your lights. Give them back.', caught+' of '+DL_N);
+    if(caught>=DL_N){ clearTimeout(helpT); help.hidden=true;
+      after(2000,()=>{ L.forEach(q=>{q.sx=q.x;q.sy=q.y;}); ph='regather'; pt0=performance.now(); setPlay('',''); }); }
+  }
+  function autoPlay(){
+    help.hidden=true;
+    const step=()=>{
+      if(ph==='catch'){ const l=L.find(q=>!q.caught); if(!l) return; catchAt(l.x,l.y); if(L.some(q=>!q.caught)) after(450,step); }
+      else if(ph==='give'){ const l=L.find(q=>q.home); if(!l) return; freeAt(l.x,l.y); if(L.some(q=>q.home)) after(450,step); }
+    };
+    step();
+  }
+
+  /* the seal: the rangoli is the mark */
+  function beginFigure(lt,yr,cyK,kind){
+    fit();
+    RR=Math.min(sw()*.42,h*.26); const cx=w/2, cy=h*cyK;
+    fig=dlRangoli(lt,yr,RR); fc=[cx,cy];
+    F2=sample({x:cx-RR*.32,y:cy-RR*.36,s:RR*.64},RR*.2);
+    S=[]; const fl=fig.flat;
+    for(let k=0;k<380;k++){ const a=Math.random()*DL_TAU, sp=2+Math.random()*13, g=fl[Math.floor(Math.random()*fl.length)];
+      S.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,tx:cx+g[0],ty:cy+g[1],home:true,life:1,r:1.2+Math.random()*1.3,gold:Math.random()>.4}); }
+    E=[]; ph=kind; pt0=performance.now(); buzz([30,60,40]);
+  }
+  function toSeal(){
+    clearT();
+    const y=$('#yearIn').value.trim();
+    store.set(MARK, JSON.stringify({letter,year:+y,mark:letter+y}));
+    document.dispatchEvent(new CustomEvent('sitarey:mark'));
+    if(hint) hint.textContent='he still has yours';
+    c.classList.add('playing'); only(null);
+    if(reduceMotion){ beginFigure(letter,y,.44,'shold'); pt0-=1000; after(2600,finishSeal); return; }
+    beginFigure(letter,y,.44,'sburst');
+  }
+  function finishSeal(){
+    ph='idle'; S=[]; E=[]; c.classList.remove('playing');
+    hideEl($('#sDoneTail')); only('done');
+    after(2600,()=>showEl($('#sDoneTail')));
+    $('#cGo').focus({preventScroll:true});
+  }
+
+  /* ---------------- drawing ---------------- */
+  function spark(x,y,n,sp0){ for(let k=0;k<n;k++){ const a=Math.random()*DL_TAU, sp=1.4+Math.random()*sp0;
+    S.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-.4,life:1,r:1+Math.random()*1.8,g:.06}); } }
+  function light(x,y,r,a){
+    const g=ctx.createRadialGradient(x,y,0,x,y,r*4.3);
+    g.addColorStop(0,'rgba(255,246,222,'+(.95*a)+')'); g.addColorStop(.28,'rgba(255,214,130,'+(.58*a)+')'); g.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r*4.3,0,DL_TAU); ctx.fill();
+    ctx.fillStyle='rgba(255,250,238,'+a+')'; ctx.beginPath(); ctx.arc(x,y,r*.42,0,DL_TAU); ctx.fill();
+  }
+  function row(t,lit){
+    for(let i=0;i<DL_N;i++){
+      const s=slot(i);
+      ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle='#6E3A1C';
+      ctx.beginPath(); ctx.moveTo(s.x-13,s.y); ctx.quadraticCurveTo(s.x-12,s.y+11,s.x,s.y+11); ctx.quadraticCurveTo(s.x+12,s.y+11,s.x+15,s.y-2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#2E1206'; ctx.beginPath(); ctx.ellipse(s.x,s.y,13,2.6,0,0,DL_TAU); ctx.fill();
+      if(lit.has(i)){
+        ctx.globalCompositeOperation='lighter';
+        const fx=s.x+11, fy=s.y-3, fl=1+Math.sin(t/180+i)*.06;
+        const g=ctx.createRadialGradient(fx,fy-8,0,fx,fy-8,30);
+        g.addColorStop(0,'rgba(255,217,138,.55)'); g.addColorStop(1,'rgba(242,167,27,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(fx,fy-8,30,0,DL_TAU); ctx.fill();
+        ctx.fillStyle='#FFE2A0';
+        ctx.beginPath(); ctx.moveTo(fx,fy); ctx.bezierCurveTo(fx-5*fl,fy-6,fx-2,fy-12*fl,fx,fy-17*fl); ctx.bezierCurveTo(fx+2,fy-12*fl,fx+5*fl,fy-6,fx,fy); ctx.fill();
+      }
+    }
+    ctx.globalCompositeOperation='lighter';
+  }
+  function figure(alpha,r,head){
+    const [cx,cy]=fc;
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(r);
+    for(const s of fig.S){
+      if(s.end<=head) continue;
+      const from=Math.max(0,head-s.start);
+      if(s.dot){ ctx.fillStyle=dlRgba(s.col,alpha); ctx.beginPath(); ctx.arc(s.pts[0][0],s.pts[0][1],s.dot,0,DL_TAU); ctx.fill(); continue; }
+      ctx.beginPath(); ctx.moveTo(s.pts[from][0],s.pts[from][1]);
+      for(let i=from+1;i<s.pts.length;i++) ctx.lineTo(s.pts[i][0],s.pts[i][1]);
+      ctx.lineJoin='round'; ctx.lineCap='round';
+      ctx.strokeStyle=dlRgba(s.col,alpha*.16); ctx.lineWidth=7; ctx.stroke();
+      ctx.strokeStyle=dlRgba(s.col,alpha*.95); ctx.lineWidth=s.w; ctx.stroke();
+    }
+    ctx.restore();
+  }
+  const toScreen=(p,r)=>{const [cx,cy]=fc,co=Math.cos(r),si=Math.sin(r);return[cx+p[0]*co-p[1]*si,cy+p[0]*si+p[1]*co];};
+  function bindu(a){ if(a<=.01) return; const [cx,cy]=fc; ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(192,57,43,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(cx,cy,5*Math.min(1,a+.2),0,DL_TAU); ctx.fill(); ctx.globalCompositeOperation='lighter'; }
+  function homeSparks(el,settle){
+    for(const s of S){
+      if(!s.home) continue;
+      const k=Math.min(1,el/settle);
+      s.vx*=.92; s.vy*=.92; s.x+=s.vx+(s.tx-s.x)*k*.12; s.y+=s.vy+(s.ty-s.y)*k*.12;
+      if(el>settle) s.life*=.95;
+      if(s.life<.03) continue;
+      ctx.fillStyle=(s.gold?'rgba(255,205,110,':'rgba(255,246,222,')+(.9*s.life).toFixed(3)+')';
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,DL_TAU); ctx.fill();
+    }
+  }
+
+  function tick(t){
+    raf=requestAnimationFrame(tick);
+    ctx.clearRect(0,0,w,h);
+    ctx.globalCompositeOperation='lighter';
+    const el=(t-pt0)/1000;
+
+    if(ph==='form' && el>2.4) toScatter(t);
+    else if(ph==='scatter' && el>1.3){ ph='catch'; setPlay('Catch his seven lights.','0 of '+DL_N); help.textContent='Let them come to me'; armHelp(); if(reduceMotion) after(400,autoPlay); }
+    else if(ph==='rise' && el>1.5) fireGlyph(t);
+    else if(ph==='glyph' && el>2.9){ ph='glyphout'; pt0=t; toYear(); }
+    else if(ph==='glyphout' && el>.8){ ph='idle'; S=[]; }
+    else if(ph==='sburst' && el>1.0) ph='shold';
+    else if(ph==='shold' && el>3.9 && !reduceMotion){ ph='sout'; pt0=t; }
+    else if(ph==='regather' && el>1.6){ const m=getMark(); beginFigure(m.letter,m.year,.36,'kburst'); }
+    else if(ph==='kburst' && el>1.0){ ph='khold'; pt0=t;
+      after(900,()=>{ hideEl($('#sKeptTail')); c.classList.remove('playing'); only('kept'); });
+      after(3000,()=>{ showEl($('#sKeptTail')); $('#cGoK').focus({preventScroll:true}); }); }
+    const e2=(t-pt0)/1000;
+
+    if(ph==='form'||ph==='scatter'){
+      for(const p of F){
+        if(ph==='form'){ p.x+=(p.tx-p.x)*.055; p.y+=(p.ty-p.y)*.055; p.a=Math.min(1,p.a+.02); }
+        else { p.x+=p.vx; p.y+=p.vy; p.vy+=.012; p.vx*=.995; p.vy*=.995; p.a=Math.max(0,p.a-.014); }
+        if(p.a<=.01) continue;
+        const g=190+p.lum*65;
+        ctx.fillStyle='rgba('+Math.round(g)+','+Math.round(g*.86)+','+Math.round(g*.58)+','+(p.a*.85).toFixed(3)+')';
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,DL_TAU); ctx.fill();
+      }
+    }
+
+    if(ph==='scatter'||ph==='catch'||ph==='rise'||ph==='give'||ph==='regather'){
+      const lit=new Set();
+      if(ph==='give') L.forEach(l=>{ if(l.home) lit.add(l.slot); });
+      else if(ph!=='rise') L.forEach(l=>{ if(l.caught&&l.prog>=1) lit.add(l.slot); });
+      row(t,lit);
+      const top=h*.14, bot=h*.62, x0=(w-sw())/2+34, x1=(w+sw())/2-34;
+      L.forEach((l,i)=>{
+        l.pulse+=.07;
+        if(ph==='rise'){
+          const k=Math.max(0,Math.min(1,(e2-i*.06)/1.1)), e=dlEase(k), s=slot(l.slot);
+          l.x=s.x+(w/2-s.x)*e; l.y=s.y+(h*.4-s.y)*e-Math.sin(e*Math.PI)*70;
+          light(l.x,l.y,l.r*(1-e*.3),1); return;
+        }
+        if(ph==='regather'){
+          const e=dlEase(Math.min(1,e2/1.5));
+          l.x=l.sx+(w/2-l.sx)*e; l.y=l.sy+(h*.36-l.sy)*e;
+          light(l.x,l.y,l.r,1); return;
+        }
+        if(ph==='give'&&l.home) return;
+        if(l.caught){
+          if(l.prog<1){ l.prog=Math.min(1,l.prog+.05); const e=1-Math.pow(1-l.prog,3);
+            l.x=l.sx+(l.hx-l.sx)*e; l.y=l.sy+(l.hy-l.sy)*e-Math.sin(e*Math.PI)*90; light(l.x,l.y,l.r*.8,1); }
+          return;
+        }
+        l.al=Math.min(1,l.al+.03);
+        l.x+=l.vx; l.y+=l.vy;
+        if(ph==='give'&&!l.loose&&l.y<bot){ l.loose=true; const a=Math.random()*DL_TAU, sp=.8+Math.random()*.6; l.vx=Math.cos(a)*sp; l.vy=Math.sin(a)*sp; }
+        if(ph!=='give'||l.loose){
+          if(l.x<x0||l.x>x1) l.vx*=-1;
+          if(l.y<top||l.y>bot) l.vy*=-1;
+        }
+        light(l.x,l.y,l.r*(1+Math.sin(l.pulse)*.13),l.al);
+      });
+    }
+
+    if(ph==='glyph'||ph==='glyphout'){
+      const out=ph==='glyphout'?Math.max(0,1-e2/.7):1;
+      if(ph==='glyph'){
+        const gl=Math.min(1,e2/1.2)*.5, g=ctx.createRadialGradient(w/2,h*.4,0,w/2,h*.4,sw()*.45);
+        g.addColorStop(0,'rgba(201,168,76,'+(gl*.5)+')'); g.addColorStop(1,'rgba(201,168,76,0)');
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      }
+      for(const s of S){
+        const k=Math.min(1,e2/.9);
+        if(ph==='glyph'){ s.vx*=.92; s.vy*=.92; s.x+=s.vx+(s.tx-s.x)*k*.12; s.y+=s.vy+(s.ty-s.y)*k*.12; }
+        ctx.fillStyle=(s.gold?'rgba(255,214,130,':'rgba(255,248,230,')+(.95*out).toFixed(3)+')';
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,DL_TAU); ctx.fill();
+      }
+    }
+
+    if(ph==='sburst'||ph==='kburst'){
+      homeSparks(e2,.85);
+      if(e2>.6) figure((e2-.6)/.4*.6,0,0);
+      bindu(Math.min(1,e2));
+    }
+    if(ph==='shold'||ph==='khold'){
+      homeSparks(e2+1,.85);
+      const a=Math.min(1,.6+e2/.5*.4); rot=e2*.1;
+      if(ph==='shold'&&F2.length){
+        // he surfaces at the heart of it, once, and goes out along the petals
+        const fin=e2<.3?0:e2<.9?(e2-.3)/.6:e2<1.8?1:Math.max(0,1-(e2-1.8)/.7);
+        if(fin>.01){
+          const flee=e2<1.8?0:Math.min(1,(e2-1.8)/.7), [cx,cy]=fc;
+          for(const p of F2){
+            const dx=p.tx-cx, dy=p.ty-cy, ang=Math.atan2(dy,dx), push=flee*flee*RR*.5, g=200+p.lum*55;
+            ctx.fillStyle='rgba('+Math.round(g)+','+Math.round(g*.85)+','+Math.round(g*.56)+','+(fin*.85).toFixed(3)+')';
+            ctx.beginPath(); ctx.arc(cx+dx+Math.cos(ang)*push,cy+dy+Math.sin(ang)*push,.9+p.lum,0,DL_TAU); ctx.fill();
+          }
+        }
+      }
+      figure(ph==='khold'?Math.max(.7,a-Math.max(0,e2-2)*.05):a,rot,0);
+      bindu(1);
+    }
+    if(ph==='sout'){
+      // the sparkler takes it away, as it drew the family at the door; the bindu goes last
+      const DUR=3.6, u=Math.min(1,e2/DUR), n=fig.n, head=Math.floor(dlEase(u)*(n-1)), r=(rot||.39)+e2*.1;
+      figure(1,r,head);
+      if(head<n-1){
+        const [hx,hy]=toScreen(fig.flat[head],r);
+        for(let k=0;k<6;k++){ const a=Math.random()*DL_TAU, sp=.6+Math.random()*3.6; E.push({x:hx,y:hy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,a:1}); }
+        const g=ctx.createRadialGradient(hx,hy,0,hx,hy,30);
+        g.addColorStop(0,'rgba(255,255,250,1)'); g.addColorStop(.3,'rgba(255,230,170,.85)'); g.addColorStop(1,'rgba(255,160,40,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(hx,hy,30,0,DL_TAU); ctx.fill();
+      }
+      for(let i=E.length-1;i>=0;i--){ const s=E[i]; s.x+=s.vx; s.y+=s.vy; s.vy+=.07; s.a-=.028; if(s.a<=0){E.splice(i,1);continue;}
+        ctx.fillStyle='rgba(255,'+(200+Math.round(40*s.a))+',140,'+s.a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(s.x,s.y,1.4,0,DL_TAU); ctx.fill(); }
+      bindu(Math.max(0,1-Math.max(0,(u-.9)/.1)));
+      if(u>=1&&!E.length) finishSeal();
+    }
+
+    for(let i=S.length-1;i>=0;i--){
+      const s=S[i]; if(s.home) continue;
+      s.x+=s.vx; s.y+=s.vy; s.vy+=s.g; s.vx*=.985; s.vy*=.985; s.life-=.018;
+      if(s.life<=0){ S.splice(i,1); continue; }
+      ctx.fillStyle='rgba(255,240,205,'+s.life.toFixed(3)+')'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,DL_TAU); ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+  function start(){ if(!raf) raf=requestAnimationFrame(tick); }
+  function stop(){ cancelAnimationFrame(raf); raf=0; ctx.clearRect(0,0,w,h); }
+
+  /* ---------------- wiring ---------------- */
+  cv.addEventListener('pointerdown',e=>{ if(ph==='catch') catchAt(e.clientX,e.clientY); else if(ph==='give') freeAt(e.clientX,e.clientY); });
+  $('#cBegin').addEventListener('click',begin);
+  $('#cNot').addEventListener('click',decline);
+  $('#cThrough').addEventListener('click',decline);
+  help.addEventListener('click',autoPlay);
+  $('#cGo').addEventListener('click',down);
+  $('#cGoK').addEventListener('click',down);
+  $('#sYear').addEventListener('submit',e=>{
     e.preventDefault();
     const raw=$('#yearIn').value.trim(), err=$('#yearErr'), now=new Date().getFullYear();
     if(!/^\d{4}$/.test(raw)){err.textContent='Four digits. The year only.';return;}
@@ -2550,29 +2775,28 @@ function initCurtain(){
     if(y>now-3){err.textContent='Your own birth year, not this one.';return;}
     if(y<1900){err.textContent='Somewhere after 1900, please.';return;}
     err.textContent='';
-    const mark=letter+y;
-    $('#markOut').textContent=mark;
-    const inner=document.querySelector('.curtain-in');
-    if(inner) inner.classList.add('ceding');
-    revealMark(letter, y, ()=>{ if(inner) inner.classList.remove('ceding'); });
-    store.set('rk:sitarey-mark:v3', JSON.stringify({letter:letter,year:y,mark:mark}));
-    const hint=document.getElementById('heldHint'); if(hint) hint.textContent='tap to change it';
-    document.dispatchEvent(new CustomEvent('sitarey:mark'));
-    $('#cSign').innerHTML='&ldquo;I have it. I will not look at it again until the 21st.<br>You will know when it comes back to you.&rdquo;';
-    sYear.classList.remove('in');
-    setTimeout(()=>{sYear.hidden=true; show(sDone); const m=$('#markOut'); void m.offsetWidth; m.classList.add('in');},400);
+    const tg=$('#thoughtGo'), tw=$('#thoughtWait'); tg.hidden=true; tw.hidden=false;
+    only('thought');
+    after(4200,()=>{ tg.hidden=false; tw.hidden=true; tg.focus({preventScroll:true}); });
   });
+  $('#thoughtGo').addEventListener('click',toSeal);
+  addEventListener('resize',()=>{ if(c.classList.contains('up')) fit(); });
 
-  const tap=$('#heldTap');
-  if(tap) tap.addEventListener('click',()=>{ reset(); up(); });
-  $('#cGo').addEventListener('click',down);
-  $('#cSkip').addEventListener('click',down);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&c.classList.contains('up'))down();});
+  function check(){
+    if(shown||store.get(KEY)) return;
+    if(document.body.classList.contains('held')) return;       // page still gated by the lamp
+    const gate=document.querySelector('#page .gate');
+    if(!gate || gate.hidden || trig.offsetParent===null) return;
+    if(trig.getBoundingClientRect().top < innerHeight*0.9){ up(); removeEventListener('scroll',check); }
+  }
+  addEventListener('scroll',check,{passive:true});
+  const tap=$('#heldTap'); if(tap) tap.addEventListener('click',up);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&c.classList.contains('up')) down(); });
   c.addEventListener('keydown',e=>{
-    if(e.key!=='Tab')return;
-    const f=$$('button,input,[href],[tabindex]:not([tabindex="-1"])',c).filter(el=>el.offsetParent!==null);
-    if(!f.length)return;
-    const a=f[0],z=f[f.length-1];
+    if(e.key!=='Tab') return;
+    const f=$$('button,input,[href],[tabindex]:not([tabindex="-1"])',c).filter(el=>el.offsetParent!==null&&!el.closest('[hidden]'));
+    if(!f.length) return;
+    const a=f[0], z=f[f.length-1];
     if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}
     else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}
   });
@@ -2623,7 +2847,8 @@ function initRsvp(){
       <div class="field"><label for="p${i}-name">Full name</label>
         <input id="p${i}-name" type="text" placeholder="First and last"></div>
       <div class="field"><label for="p${i}-phone">Phone${first?'':' (optional)'}</label>
-        <input id="p${i}-phone" type="tel" placeholder="(555) 555-5555"></div>
+        ${first?'<p class="hint">This is how you change your reply later, from any phone.</p>':''}
+        <input id="p${i}-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555"></div>
       <div class="field"><label for="p${i}-dob">Date of birth</label>
         <input id="p${i}-dob" type="date" max="2026-12-31"></div>
     </div>`;
@@ -2641,6 +2866,7 @@ function initRsvp(){
   }
   function paintAnswer(){
     const isYes=yes.checked;
+    const sb=$('#rsvpSend'); if(sb) sb.textContent = no.checked ? 'Send our reply' : 'Send our RSVP';
     coming.hidden=!isYes; sorry.hidden=!no.checked;
     if(isYes) paintPeople();
   }
@@ -3003,6 +3229,90 @@ function post(path, payload){
 
 const val = id => { const el=document.getElementById(id); return el ? String(el.value||'').trim() : ''; };
 
+
+/* --- find a reply before changing it: nothing is overwritten unseen --- */
+function initLookup(){
+  const box=$('#lookup'), found=$('#lkFound'), body=$('#formBody');
+  const inp=$('#lk-phone'), go=$('#lkGo'), st=$('#lkStatus');
+  if(!box) return;
+  let current=null;
+
+  const pretty=p=>{const d=String(p||'').replace(/\D/g,'');
+    return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : p||''; };
+
+  function fill(r){
+    // put their own answers back into the form so they edit rather than retype
+    $('#r-name').value=r.name||'';
+    (r.coming==='yes' ? $('#att-yes') : $('#att-no')).checked=true;
+    $('#att-yes').dispatchEvent(new Event('change'));
+    $('#att-no').dispatchEvent(new Event('change'));
+    if(r.coming==='yes'){
+      $('#r-count').value=Math.max(1,Math.min(12, r.count || (r.people||[]).length || 1));
+      $('#r-count').dispatchEvent(new Event('input'));
+      if(r.family) $('#r-family').value=r.family;
+      (r.people||[]).forEach((p,i)=>{
+        const n=document.getElementById(`p${i}-name`), ph=document.getElementById(`p${i}-phone`), db=document.getElementById(`p${i}-dob`);
+        if(n) n.value=p.name||''; if(ph&&p.phone) ph.value=pretty(p.phone); if(db&&p.dob) db.value=p.dob;
+      });
+      if(r.song) $('#r-song').value=r.song;
+      if(r.performance) $('#r-perf').value=r.performance;
+    } else {
+      const me=(r.people||[])[0]||{};
+      if($('#n-phone')) $('#n-phone').value=pretty(me.phone||inp.value);
+      if($('#n-dob')&&me.dob) $('#n-dob').value=me.dob;
+    }
+  }
+
+  function showFound(r){
+    current=r;
+    const when=r.submitted ? new Date(r.submitted).toLocaleDateString('en-US',{day:'numeric',month:'long'}) : '';
+    $('#lkHead').textContent = r.coming==='yes'
+      ? `You said yes${r.count>1?` for ${r.count}`:''}${when?`, on ${when}`:''}.`
+      : `You said you could not make it${when?`, on ${when}`:''}.`;
+    const rows=[];
+    if(r.family) rows.push(['Family', r.family]);
+    if(r.coming==='yes'){
+      if((r.people||[]).length) rows.push(['Who', r.people.map(p=>p.name).filter(Boolean).join(', ')]);
+      if(r.song) rows.push(['Entry song', r.song]);
+      if(r.performance) rows.push(['Also performing', r.performance]);
+    }
+    $('#lkRows').innerHTML = rows.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    box.hidden=true; body.hidden=true; found.hidden=false;
+    const sr=$('#sendRow'); if(sr) sr.hidden=true;
+    found.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
+  }
+
+  async function look(){
+    const d=String(inp.value||'').replace(/\D/g,'');
+    st.className='formstatus';
+    if(d.length<7){ st.textContent='A full phone number, please.'; st.classList.add('bad'); return; }
+    go.disabled=true; const label=go.textContent; go.textContent='Looking';
+    st.textContent='';
+    try{
+      const r=await post('/lookup',{ phone:inp.value, event:EVENT.eventName });
+      if(r.found) showFound(r);
+      else { st.textContent='Nothing on that number yet — fill it in below.'; box.hidden=false;
+             $('#r-name').focus({preventScroll:true}); }
+    }catch(e){
+      st.textContent = EVENT.endpoint ? 'Could not look that up. Fill it in below instead.' : 'The form is not live yet. It opens here shortly.';
+      st.classList.add('bad');
+    }
+    go.disabled=false; go.textContent=label;
+  }
+
+  go.addEventListener('click',look);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); look(); } });
+  $('#lkKeep').addEventListener('click',()=>{
+    found.innerHTML='<p class="found-head" style="margin:0">Good — nothing has changed. See you on the 21st.</p>';
+  });
+  $('#lkEdit').addEventListener('click',()=>{
+    fill(current);
+    found.hidden=true; body.hidden=false;
+    const sr=$('#sendRow'); if(sr) sr.hidden=false;
+    body.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+  });
+}
+
 function initForms(){
   const rsvp=$('#rsvpPreview'), sp=$('#cosponsorPreview');
 
@@ -3023,10 +3333,21 @@ function initForms(){
       dob:   (blk.querySelector(`#p${i}-dob`)||{}).value || ''
     })).filter(p=>p.name.trim());
     if(yes && !people.length){ status.textContent='Please give at least one name.'; status.classList.add('bad'); return; }
+    // one number from anyone in the party is enough — a child has none, and that is fine
+    const idx = yes ? people.findIndex(p=>String(p.phone||'').replace(/\D/g,'').length>=7) : -1;
+    const keyPhone = yes ? (idx>=0 ? people[idx].phone : '') : val('n-phone');
+    if(String(keyPhone||'').replace(/\D/g,'').length < 7){
+      status.textContent = yes
+        ? 'One phone number for the family, so you can change this later.'
+        : 'A phone number, so you can change this later.';
+      status.classList.add('bad');
+      const f=document.getElementById(yes?'p0-phone':'n-phone'); if(f){ f.focus(); f.scrollIntoView({block:'center'}); }
+      return;
+    }
 
     const payload={
       event:EVENT.eventName, name, attending: yes?'yes':'no',
-      family:val('r-family'), count:val('r-count'),
+      family:val('r-family'), count:val('r-count'), phone:keyPhone,
       song:val('r-song'), performance:val('r-perf'),
       mark:val('mk-mark'), people,
       website:(rsvp.querySelector('[name=website]')||{}).value||''
@@ -3099,7 +3420,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
   embedForm('cosponsorSlot',EVENT.cosponsorFormUrl,EVENT.cosponsorFormHeight,'Co-sponsor form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initReplied(); initCalendar(); initShare();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initCalendar(); initShare();
 });
 </script>
 </body>
