@@ -4,9 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Diwali with the Sitare &middot; 21 November 2026</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sitaron Ki Mehfil">
+<meta property="og:title" content="हम सितारे · Diwali with the Sitare">
+<meta property="og:description" content="The Sharma family invites you and your family. Saturday 21 November 2026, from 5pm, 1370 Adams Road, Bensalem PA.">
+<meta property="og:url" content="https://humsitare.com/">
+<meta property="og:image" content="https://humsitare.com/images/share.jpg">
+<meta property="og:image:secure_url" content="https://humsitare.com/images/share.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Sharma family, with a lit diya and the words Hum Sitare">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="हम सितारे · Diwali with the Sitare">
+<meta name="twitter:description" content="Saturday 21 November 2026, from 5pm. 1370 Adams Road, Bensalem PA.">
+<meta name="twitter:image" content="https://humsitare.com/images/share.jpg">
+
 <meta name="description" content="Sitaron Ki Mehfil invites you and your family to celebrate Diwali. Saturday 21 November 2026, from 5pm, Bensalem PA.">
-<meta property="og:title" content="Diwali with the Sitare — you are invited">
-<meta property="og:description" content="Saturday 21 November 2026, from 5pm. 1370 Adams Road, Bensalem PA.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500;700&family=Cinzel:wght@400;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -877,6 +891,43 @@ main.threshold{position:relative;z-index:1}
 .snd.light{background:rgba(247,243,236,.8);color:#1C1712}
 .snd.nudge{animation:sndnudge 1.6s ease-in-out 2}
 .snd.replay{right:calc(env(safe-area-inset-right) + 56px)}
+
+/* ---- asking once, where the eyes already are, then going home to the corner ---- */
+.snd-ask{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);z-index:30;
+  display:flex;align-items:center;gap:4px;padding:6px 6px 6px 8px;border-radius:999px;
+  width:max-content;max-width:calc(100vw - 24px);
+  background:#1C1712;color:#F4EFE4;box-shadow:0 14px 40px rgba(0,0,0,.42),0 0 0 1px rgba(242,193,78,.35);
+  transform:translate(-50%,24px);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.15),opacity .4s}
+.snd-ask.in{transform:translate(-50%,0);opacity:1}
+body.has-replied .snd-ask{bottom:calc(env(safe-area-inset-bottom) + 92px)}
+.snd-ask.home{transition:transform .7s cubic-bezier(.6,0,.2,1),opacity .7s .2s}
+.snd-ask-go{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 14px 0 4px;border:0;background:none;color:inherit;
+  cursor:pointer;text-align:left;font:inherit}
+.snd-ask-ic{position:relative;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#F2C14E;color:#1C1712;flex:0 0 auto}
+.snd-ask-ic::after{content:"";position:absolute;inset:-2px;border-radius:50%;box-shadow:0 0 0 0 rgba(242,193,78,.55);
+  animation:askring 2.2s ease-out infinite}
+@keyframes askring{0%{box-shadow:0 0 0 0 rgba(242,193,78,.55)}100%{box-shadow:0 0 0 14px rgba(242,193,78,0)}}
+.snd-ask-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.snd-ask-ic .spk{fill:currentColor;stroke:none}
+.snd-ask-t{display:grid;gap:1px;line-height:1.2;white-space:nowrap}
+.snd-ask-t b{font-size:1rem;font-weight:700}
+.snd-ask-t span{font-size:.84rem;color:#D9CFC0}
+@media(max-width:340px){.snd-ask-t span{display:none}}
+.snd-ask-x{width:44px;height:44px;border-radius:50%;border:0;background:none;color:#D9CFC0;display:grid;place-items:center;cursor:pointer}
+.snd-ask-x:hover{background:rgba(255,255,255,.08);color:#fff}
+.snd-ask-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.snd-ask button:focus-visible,.snd-tip button:focus-visible{outline:2px solid #F2C14E;outline-offset:2px}
+/* the corner switch, while it is still off, breathes gently so the eye finds it */
+.snd.waiting{box-shadow:0 0 0 0 rgba(242,193,78,.5);animation:sndbreathe 2.6s ease-in-out 4}
+@keyframes sndbreathe{0%,100%{box-shadow:0 0 0 0 rgba(242,193,78,0)}50%{box-shadow:0 0 0 6px rgba(242,193,78,.42)}}
+.snd-tip{position:fixed;top:calc(env(safe-area-inset-top) + 54px);right:calc(env(safe-area-inset-right) + 8px);z-index:26;
+  opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s}
+.snd-tip.in{opacity:1;transform:none}
+.snd-tip button{position:relative;min-height:44px;padding:10px 14px;border:0;border-radius:14px;background:#1C1712;color:#F4EFE4;
+  font:500 .9rem/1.3 var(--font-ui);text-align:left;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.4);max-width:240px}
+.snd-tip button b{color:#F2C14E;font-weight:700}
+.snd-tip button::before{content:"";position:absolute;top:-6px;right:16px;border:6px solid transparent;border-top:0;border-bottom-color:#1C1712}
+@media (prefers-reduced-motion:reduce){.snd-ask,.snd-ask.home,.snd-tip{transition:opacity .2s}.snd-ask-ic::after,.snd.waiting{animation:none}}
 .snd.replay .dot{fill:currentColor;stroke:none}
 .snd.replay.arrive{animation:sndnudge 1.6s ease-in-out 2}
 body.has-replay .diyarail{padding-inline:108px}
@@ -1540,6 +1591,14 @@ body.has-replied .rsvp-fab{display:none}
 <button class="snd replay" id="replayBtn" type="button" aria-label="Replay your fireworks" hidden>
   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21M5.6 5.6l2.3 2.3M16.1 16.1l2.3 2.3M5.6 18.4l2.3-2.3M16.1 7.9l2.3-2.3"/></svg>
 </button>
+<div class="snd-ask" id="sndAsk" hidden>
+  <button class="snd-ask-go" id="sndAskGo" type="button">
+    <span class="snd-ask-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></span>
+    <span class="snd-ask-t"><b>Turn on sound</b><span>A bell, a tanpura, and fireworks.</span></span>
+  </button>
+  <button class="snd-ask-x" id="sndAskX" type="button" aria-label="No sound, thank you"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+</div>
+<div class="snd-tip" id="sndTip" role="status" hidden><button type="button" id="sndTipGo">A tanpura plays here. <b>Tap to hear it.</b></button></div>
 <button class="snd" id="sndBtn" type="button" aria-label="Turn sound on" aria-pressed="false" hidden>
   <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="off" d="M16 9l5 6M21 9l-5 6"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
 </button>
@@ -2446,10 +2505,10 @@ const STORIES=[
   {t:'The puja',slug:'puja',n:4},
   {t:'The stage',slug:'stage',n:5},
   {t:'The little ones',slug:'littleones',n:5},
-  {t:'The couples',slug:'couples',n:4},
-  {t:'The family',slug:'family',n:3},
+  {t:'The couples',slug:'couples',n:5},
+  {t:'The family',slug:'family',n:4},
   {t:'The fireworks',slug:'fireworks',n:4},
-  {t:'Everyone',slug:'everyone',n:5}
+  {t:'Everyone',slug:'everyone',n:6}
 ];
 // a slot listed here is a video; everything else is a .jpg
 const VIDEOS = ['stage-2','stage-3','stage-5','couples-2'];   // e.g. 'dancing-2'
@@ -3467,7 +3526,7 @@ function initSound(){
   SND.paint();
   b.addEventListener('click',()=>SND.set(!SND.on()));
   // the switch appears with the lamp strip, and invites once, quietly
-  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; if(!SND.on()){ b.classList.add('nudge'); } });
+  document.addEventListener('sitarey:lit',()=>{ b.hidden=false; });
   // it reads against whatever is under it
   const paintGround=()=>{ const r=document.getElementById('diyarail'), on=!!(r && r.classList.contains('onlight'));
     b.classList.toggle('light', on); const rp=document.getElementById('replayBtn'); if(rp) rp.classList.toggle('light', on); };
@@ -3494,6 +3553,67 @@ function initSound(){
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) SND.stopAll(); });
 }
 
+
+
+/* --- inviting sound: once, after the family has arrived, then never nagging --- */
+function initSoundAsk(){
+  const ask=$('#sndAsk'), go=$('#sndAskGo'), x=$('#sndAskX'), btn=$('#sndBtn'), tip=$('#sndTip');
+  if(!ask||!btn) return;
+  const KEY='rk:sound-asked:v1';
+  // asked already this visit, or sound chosen either way before: say nothing
+  const chosen=()=>{ try{ return localStorage.getItem('rk:sound:v1'); }catch(_){ return null; } };
+  const asked=()=>{ try{ return sessionStorage.getItem(KEY)==='1'; }catch(_){ return false; } };
+  const markAsked=()=>{ try{ sessionStorage.setItem(KEY,'1'); }catch(_){} };
+  let shown=false, gone=false, t1=0;
+
+  function turnOn(){
+    SND.set(true);
+    SND.moment('swell',{gain:0.55});              // a warm answer, so they know it worked
+    away(false);
+  }
+  // the pill flies up into the switch it stands for, so they learn where sound lives
+  function away(declined){
+    if(gone) return; gone=true; clearTimeout(t1); markAsked();
+    window.removeEventListener('scroll',onScroll);
+    const a=ask.getBoundingClientRect(), b=btn.getBoundingClientRect();
+    const dx=(b.left+b.width/2)-(a.left+a.width/2), dy=(b.top+b.height/2)-(a.top+a.height/2);
+    ask.classList.add('home');
+    ask.style.transform=`translate(calc(-50% + ${dx}px), ${dy}px) scale(.16)`;
+    ask.style.opacity='0';
+    setTimeout(()=>{ ask.hidden=true; if(!SND.on() && !declined){ btn.classList.add('waiting'); } },760);
+  }
+  function onScroll(){ if(shown && scrollY>window.innerHeight*0.55) away(false); }
+
+  function show(){
+    if(shown || SND.on() || chosen()==='off' || asked() || reduceSound()) return;
+    shown=true;
+    ask.hidden=false; void ask.offsetWidth; ask.classList.add('in');
+    window.addEventListener('scroll',onScroll,{passive:true});
+    t1=setTimeout(()=>away(false),9000);          // it does not wait for ever
+  }
+  function reduceSound(){ return false; }
+
+  go.addEventListener('click',turnOn);
+  x.addEventListener('click',()=>{ away(true); });
+  // the moment: the family has assembled, the page has light
+  const hero=document.getElementById('hero');
+  const watch=()=>{ if(hero && hero.classList.contains('assembled')) setTimeout(show,1400); };
+  if(hero){ new MutationObserver(watch).observe(hero,{attributes:true,attributeFilter:['class']}); watch(); }
+
+  // one word at the three ages, where the sound actually is — once per visit
+  const ages=document.getElementById('ages'); let tipDone=false;
+  if(ages && tip){
+    new IntersectionObserver(es=>es.forEach(e=>{
+      if(!e.isIntersecting || tipDone || SND.on() || chosen()==='off') return;
+      tipDone=true; tip.hidden=false; void tip.offsetWidth; tip.classList.add('in');
+      setTimeout(()=>{ tip.classList.remove('in'); setTimeout(()=>tip.hidden=true,320); },5200);
+    }),{threshold:0.25}).observe(ages);   // the same moment the tanpura itself begins
+    $('#sndTipGo').addEventListener('click',()=>{ SND.set(true); tip.classList.remove('in'); setTimeout(()=>tip.hidden=true,320); });
+  }
+  // the moment sound is on, every invitation stops
+  document.addEventListener('sitarey:sound',e=>{ if(e.detail){ btn.classList.remove('waiting'); if(!gone) away(false);
+    tip.classList.remove('in'); setTimeout(()=>tip.hidden=true,320); } });
+}
 
 /* ================= FIREWORKS: a show, not a spray =================
    One rocket for each person in the family. Gold, warm white, saffron and a
@@ -4026,7 +4146,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   paintGuest(); sayWhen(); initHero(); initSky(); initDays(); initAges(); initYantra(); initEvening(); initRail(); initFab(); initStories(); initCurtain();
   embedForm('rsvpSlot',EVENT.rsvpFormUrl,EVENT.rsvpFormHeight,'RSVP form');
   embedForm('cosponsorSlot',EVENT.cosponsorFormUrl,EVENT.cosponsorFormHeight,'Co-sponsor form');
-  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initCalendar();
+  initLinks(); initRsvp(); attachMark(); initLightbox(); initForms(); initLookup(); initReplied(); initSound(); initSoundAsk(); initCalendar();
 });
 </script>
 </body>
