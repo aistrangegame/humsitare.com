@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#15112B">
+<title>Sitaron Ki Mehfil · the hosts' register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ============ the register: the same night as the invitation, seen from behind the curtain ============ */
+:root{
+  --night:#15112B; --night-2:#1E1838; --night-3:#2A2249; --line:#3A3160;
+  --paper:#F4EEDF; --paper-2:#D9D1E6; --mist:#BDB5CF;
+  --gold:#F2C14E; --gold-2:#F7D88A; --ember:#F07A5E; --ember-ink:#FFB4A2;
+  --r:14px; --r-sm:10px;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --serif:"Lora",Georgia,serif; --sans:"DM Sans",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;color-scheme:dark}
+body{margin:0;background:var(--night);color:var(--paper);font:400 16px/1.5 var(--sans);
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+a{color:var(--gold-2)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.wrap{width:min(100%,1080px);margin:0 auto;padding:0 max(var(--s4),env(safe-area-inset-left))}
+.muted{color:var(--mist)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- the door ---------- */
+.gate{min-height:100svh;display:grid;place-items:center;padding:var(--s6) var(--s4)}
+.gate-card{width:min(100%,380px);text-align:center}
+.gate h1{font:500 1.9rem/1.2 var(--serif);margin:var(--s4) 0 var(--s2)}
+.gate p{margin:0 0 var(--s5);color:var(--mist)}
+.gate form{display:grid;gap:var(--s3)}
+.gate input{width:100%;min-height:54px;padding:0 var(--s4);border-radius:var(--r-sm);border:1.5px solid var(--line);
+  background:var(--night-2);font-size:1.15rem;text-align:center;letter-spacing:.06em}
+.gate input:focus{border-color:var(--gold);outline:none}
+.gate .err{min-height:1.4em;margin:0;color:var(--ember-ink);font-size:.95rem}
+.btn{min-height:46px;padding:0 var(--s5);border-radius:999px;border:0;background:var(--gold);color:#1B1530;
+  font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);text-decoration:none}
+.btn:hover{background:var(--gold-2)}
+.btn.quiet{background:transparent;color:var(--paper);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:600}
+.btn.quiet:hover{box-shadow:inset 0 0 0 1.5px var(--gold);background:rgba(242,193,78,.06)}
+.btn.small{min-height:44px;padding:0 var(--s4);font-size:.92rem}
+.btn[disabled]{opacity:.55;cursor:default}
+
+/* ---------- the diya: lit for yes ---------- */
+.diya{width:26px;height:auto;flex:0 0 auto;overflow:visible}
+.diya .flame{transform-origin:50% 100%;animation:flick 3.2s ease-in-out infinite}
+.diya.dark .flame,.diya.dark .glow{display:none}
+.diya.dark .bowl{fill:#4A3F6E}
+@keyframes flick{0%,100%{transform:scale(1)}50%{transform:scale(.92,1.05)}}
+@media (prefers-reduced-motion:reduce){.diya .flame{animation:none}}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:20;background:rgba(21,17,43,.94);backdrop-filter:saturate(1.2) blur(6px);
+  -webkit-backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.top .wrap{display:flex;align-items:center;gap:var(--s3);min-height:60px}
+.top h1{font:500 1.15rem/1.2 var(--serif);margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .when{font-size:.88rem;color:var(--mist);white-space:nowrap}
+.iconbtn{width:44px;height:44px;border-radius:50%;border:0;background:transparent;color:var(--paper);display:grid;place-items:center;cursor:pointer}
+.iconbtn:hover{background:var(--night-3)}
+.iconbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn.spin svg{animation:rot .9s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- the opening: lamps and a sentence ---------- */
+.hero{padding:var(--s6) 0 var(--s5)}
+.lamps{display:flex;flex-wrap:wrap;gap:6px 4px;margin-bottom:var(--s5);min-height:30px}
+.lamps .diya{width:24px}
+.say{font:500 clamp(1.6rem,6.4vw,2.5rem)/1.2 var(--serif);margin:0;max-width:22ch;letter-spacing:-.005em}
+.say b{color:var(--gold);font-weight:600}
+.sub{margin:var(--s3) 0 0;color:var(--paper-2);font-size:1.02rem;max-width:56ch}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;margin-top:var(--s5);
+  background:var(--line);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.fig{background:var(--night-2);padding:var(--s4)}
+.fig .n{font:600 1.75rem/1 var(--sans);display:block}
+.fig .l{display:block;margin-top:6px;color:var(--mist);font-size:.92rem}
+.fig.attn .n{color:var(--ember-ink)}
+
+/* ---------- tabs ---------- */
+.tabs{position:sticky;top:calc(60px + env(safe-area-inset-top));z-index:15;background:var(--night);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs .wrap::-webkit-scrollbar{display:none}
+@media(min-width:900px){.tabs .wrap{flex-wrap:wrap;overflow:visible}}
+.tab{flex:0 0 auto;min-height:48px;padding:0 var(--s4);border:0;background:none;color:var(--mist);cursor:pointer;
+  font-weight:600;font-size:.96rem;border-bottom:2.5px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--paper)}
+.tab[aria-selected="true"]{color:var(--paper);border-bottom-color:var(--gold)}
+.tab .c{display:inline-block;min-width:1.6em;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--night-3);
+  color:var(--paper-2);font-size:.8rem;font-weight:600}
+.tab .c.attn{background:rgba(240,122,94,.18);color:var(--ember-ink)}
+
+/* ---------- panels ---------- */
+main{padding:var(--s5) 0 calc(var(--s7) + env(safe-area-inset-bottom))}
+.panel h2{font:500 1.45rem/1.25 var(--serif);margin:0 0 var(--s2)}
+.panel .intro{margin:0 0 var(--s5);color:var(--paper-2);max-width:62ch}
+.bar{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin-bottom:var(--s4)}
+.bar .grow{flex:1 1 220px}
+.search{width:100%;min-height:46px;padding:0 var(--s4) 0 42px;border-radius:999px;border:1.5px solid var(--line);
+  background:var(--night-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23BDB5CF' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") 14px 50%/18px no-repeat}
+.search:focus{border-color:var(--gold);outline:none}
+.seg{display:inline-flex;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--line);padding:3px}
+.seg button{min-height:40px;padding:0 var(--s4);border:0;border-radius:999px;background:none;color:var(--mist);font-weight:600;cursor:pointer;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--night-3);color:var(--paper)}
+.empty{padding:var(--s6) var(--s4);text-align:center;color:var(--mist);border:1.5px dashed var(--line);border-radius:var(--r)}
+
+/* ---------- a family ---------- */
+.fams{display:grid;gap:var(--s3)}
+@media(min-width:820px){.fams{grid-template-columns:1fr 1fr}}
+.fam{background:var(--night-2);border-radius:var(--r);padding:var(--s4);border:1px solid var(--line)}
+.fam.no{background:transparent}
+.fam-head{display:flex;align-items:flex-start;gap:var(--s3)}
+.fam-head .diya{width:26px;margin-top:4px}
+.fam-name{font:600 1.15rem/1.3 var(--serif);margin:0}
+.fam-meta{margin:2px 0 0;color:var(--mist);font-size:.9rem}
+.fam-meta .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:.8rem;font-weight:600;margin-right:6px}
+.pill.yes{background:rgba(242,193,78,.16);color:var(--gold-2)}
+.pill.no{background:rgba(240,122,94,.14);color:var(--ember-ink)}
+.ppl{list-style:none;margin:var(--s4) 0 0;padding:0;display:grid;gap:var(--s3)}
+.ppl li{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center}
+.av{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--night-3);display:grid;place-items:center;
+  font:600 .82rem/1 var(--sans);color:var(--paper-2);position:relative;box-shadow:0 0 0 1.5px var(--line)}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pname{font-weight:600;line-height:1.25}
+.pinfo{color:var(--mist);font-size:.88rem}
+.acts{display:flex;gap:2px}
+.acts a{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--paper-2)}
+.acts a:hover{background:var(--night-3);color:var(--gold-2)}
+.acts svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.fam-perf{margin:var(--s4) 0 0;padding-top:var(--s3);border-top:1px solid var(--line);display:grid;gap:6px;font-size:.95rem}
+.fam-perf div{display:grid;grid-template-columns:7.5em 1fr;gap:var(--s3)}
+.fam-perf dt{color:var(--mist)} .fam-perf dd{margin:0}
+
+/* ---------- lists and tables ---------- */
+.table{width:100%;border-collapse:collapse;font-size:.98rem}
+.table th{text-align:left;font-weight:600;color:var(--mist);font-size:.88rem;padding:0 var(--s3) var(--s2)}
+.table td{padding:var(--s3);border-top:1px solid var(--line);vertical-align:top}
+.table td.num,.table th.num{text-align:right}
+.tablewrap{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s2);overflow-x:auto}
+.lineup{list-style:none;margin:0;padding:0;counter-reset:act;display:grid;gap:var(--s2)}
+.lineup li{counter-increment:act;display:grid;grid-template-columns:2.4em 1fr;gap:var(--s3);padding:var(--s3) var(--s4);
+  background:var(--night-2);border:1px solid var(--line);border-radius:var(--r-sm)}
+.lineup li::before{content:counter(act);font:600 1.15rem/1.4 var(--serif);color:var(--gold)}
+.lineup .song{font-weight:600}
+.lineup .by{color:var(--mist);font-size:.9rem}
+.twocol{display:grid;gap:var(--s5)}
+@media(min-width:820px){.twocol{grid-template-columns:1fr 1fr}}
+h3{font:600 1.08rem/1.3 var(--sans);margin:0 0 var(--s3)}
+.note{margin:var(--s3) 0 0;color:var(--mist);font-size:.9rem}
+.near{color:var(--gold-2);font-weight:600}
+.mark{font:600 1.1rem/1 var(--serif);color:var(--gold-2);letter-spacing:.02em}
+.nw{white-space:nowrap}
+
+/* ---------- the overview ---------- */
+.chart{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4)}
+.chart svg{width:100%;height:auto;display:block}
+.feed{list-style:none;margin:0;padding:0;display:grid}
+.feed li{display:grid;grid-template-columns:30px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) 0;border-top:1px solid var(--line)}
+.feed li:first-child{border-top:0}
+.feed .t{color:var(--mist);font-size:.88rem;white-space:nowrap}
+
+/* ---------- needs a nudge ---------- */
+.nudges{display:grid;gap:var(--s3)}
+.nudge{background:var(--night-2);border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:var(--r-sm);padding:var(--s3) var(--s4)}
+.nudge b{display:block;margin-bottom:4px}
+.nudge span{color:var(--paper-2);font-size:.95rem}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--s5) + env(safe-area-inset-bottom));transform:translate(-50%,12px);z-index:50;
+  background:var(--paper);color:#1B1530;padding:var(--s3) var(--s5);border-radius:999px;font-weight:600;opacity:0;
+  transition:opacity .2s,transform .2s;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.footer{margin-top:var(--s7);color:var(--mist);font-size:.88rem;display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;justify-content:space-between}
+
+@media print{
+  body{background:#fff;color:#000} .top,.tabs,.bar,.footer,.acts,.btn{display:none!important}
+  .panel{display:block!important;page-break-after:always} .fam,.tablewrap,.lineup li,.nudge,.chart{background:#fff;border-color:#ccc}
+  .muted,.pinfo,.fam-meta,.note,.by{color:#444}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="dglow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFD98A" stop-opacity=".7"/><stop offset="1" stop-color="#F2A71B" stop-opacity="0"/></radialGradient>
+    <linearGradient id="dflame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#F2A71B"/><stop offset=".6" stop-color="#FFD98A"/><stop offset="1" stop-color="#FFF6DE"/></linearGradient>
+    <symbol id="diya" viewBox="0 0 40 40">
+      <circle class="glow" cx="20" cy="15" r="13" fill="url(#dglow)"/>
+      <path class="bowl" d="M4 25 Q6 36 20 36 Q31 36 35 29 L39 24 Q34 25.5 31 25 Z" fill="#C8743A"/>
+      <ellipse cx="18.5" cy="25" rx="14" ry="2.6" fill="#3A170C"/>
+      <path class="flame" d="M37 23 C33.5 19 34.5 13.5 37 6 C39.5 13.5 40.5 19 37 23 Z" fill="url(#dflame)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ================= the door ================= -->
+<section class="gate" id="gate">
+  <div class="gate-card">
+    <svg class="diya" style="width:56px" viewBox="0 0 40 40" aria-hidden="true"><use href="#diya"/></svg>
+    <h1>The hosts' register</h1>
+    <p>Everyone who has replied, and everything they told us. For the hosts only.</p>
+    <form id="gateForm" autocomplete="off">
+      <label class="sr" for="pass">Passcode</label>
+      <input id="pass" type="password" inputmode="text" autocomplete="current-password" placeholder="Passcode" required>
+      <button class="btn" type="submit" id="gateBtn">Open the register</button>
+      <p class="err" id="gateErr" role="alert" aria-live="assertive"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= the register ================= -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <svg class="diya" viewBox="0 0 40 40" aria-hidden="true"><use href="#diya"/></svg>
+      <h1 id="evTitle">Sitaron Ki Mehfil</h1>
+      <span class="when" id="updated"></span>
+      <button class="iconbtn" id="refresh" type="button" aria-label="Refresh">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button>
+      <button class="iconbtn" id="out" type="button" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg></button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero" aria-live="polite">
+      <div class="lamps" id="lamps" aria-hidden="true"></div>
+      <p class="say" id="say"></p>
+      <p class="sub" id="sub"></p>
+      <div class="figs" id="figs"></div>
+    </section>
+  </div>
+
+  <nav class="tabs" aria-label="Sections">
+    <div class="wrap" role="tablist" id="tabs"></div>
+  </nav>
+
+  <main class="wrap" id="panels">
+    <section class="panel" id="p-overview" role="tabpanel"></section>
+    <section class="panel" id="p-guests" role="tabpanel" hidden></section>
+    <section class="panel" id="p-stage" role="tabpanel" hidden></section>
+    <section class="panel" id="p-food" role="tabpanel" hidden></section>
+    <section class="panel" id="p-birthdays" role="tabpanel" hidden></section>
+    <section class="panel" id="p-nitin" role="tabpanel" hidden></section>
+    <section class="panel" id="p-notcoming" role="tabpanel" hidden></section>
+    <section class="panel" id="p-sponsors" role="tabpanel" hidden></section>
+    <section class="panel" id="p-nudge" role="tabpanel" hidden></section>
+    <div class="footer">
+      <span id="foot"></span>
+      <span style="display:flex;gap:var(--s2);flex-wrap:wrap">
+        <button class="btn quiet small" id="csv" type="button">Download everyone as a spreadsheet</button>
+        <button class="btn quiet small" id="print" type="button">Print</button>
+      </span>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   The hosts' register. Nothing private is in this file: it arrives
+   empty and asks the Worker, which answers only to the passcode.
+   ============================================================ */
+const EP = 'https://sitaron-forms.ashreys.workers.dev';
+const EVENT = 'Diwali 2026';
+const NIGHT = new Date('2026-11-21T17:00:00-05:00');
+const TOKEN_KEY = 'sitare:dash-token';
+const $ = s => document.querySelector(s);
+let DATA = null, TOKEN = null, timer = 0;
+let view = { tab: 'overview', q: '', show: 'yes' };
+
+/* ---------- small, careful helpers ---------- */
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const digits = p => String(p||'').replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
+const prettyPhone = p => { const d=digits(p); return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : (p||''); };
+const initials = n => String(n||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,3).toUpperCase() || '·';
+const first = n => String(n||'').trim().split(/\s+/)[0] || '';
+const plural = (n, one, many) => `${n} ${n===1 ? one : (many || one+'s')}`;
+function ageAt(dob, when = NIGHT){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dob||'')) return null;
+  const [y,m,d] = dob.split('-').map(Number);
+  let a = when.getFullYear() - y;
+  if (when.getMonth()+1 < m || (when.getMonth()+1 === m && when.getDate() < d)) a--;
+  return a >= 0 && a < 120 ? a : null;
+}
+function band(a){ if(a===null) return 'unknown'; if(a<13) return 'child'; if(a<18) return 'teen'; return 'adult'; }
+function ago(iso){
+  if(!iso) return '';
+  const s = (Date.now() - Date.parse(iso)) / 1000;
+  if (s < 90) return 'just now';
+  if (s < 3600) return `${Math.round(s/60)} min ago`;
+  if (s < 86400) return `${Math.round(s/3600)} h ago`;
+  const d = Math.round(s/86400); return d === 1 ? 'yesterday' : `${d} days ago`;
+}
+const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-US',{day:'numeric',month:'short'}) : '';
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),2200); }
+async function copy(text, done){
+  try{ await navigator.clipboard.writeText(text); toast(done||'Copied'); }
+  catch(_){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast(done||'Copied'); }catch(e){ toast('Could not copy'); } ta.remove(); }
+}
+const diyaSVG = (lit=true, cls='') => `<svg class="diya ${lit?'':'dark'} ${cls}" viewBox="0 0 40 40" aria-hidden="true"><use href="#diya"/></svg>`;
+const ICON = {
+  wa: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.8z"/><path d="M9 9.5c.3 2.3 2.2 4.4 4.6 5"/></svg>',
+  call: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/></svg>'
+};
+
+/* ---------- the shape of the data, worked out once per load ---------- */
+function derive(d){
+  const fams = d.replies.map(r => {
+    const people = r.people.map(p => { const a = ageAt(p.dob); return { ...p, age:a, band:band(a) }; });
+    const named = people.length;
+    const count = r.coming==='yes' ? Math.max(r.headcount||0, named) : 0;
+    const phone = (people.find(p=>digits(p.phone).length>=10)||{}).phone || '';
+    return { ...r, people, named, count, phone, name: r.family || (people[0] && people[0].name) || 'A family' };
+  });
+  const yes = fams.filter(f=>f.coming==='yes'), no = fams.filter(f=>f.coming==='no');
+  const ppl = yes.flatMap(f => f.people.map(p => ({...p, family:f.name, famId:f.id})));
+  const bands = { adult:0, teen:0, child:0, unknown:0 };
+  ppl.forEach(p => bands[p.band]++);
+  const unnamed = yes.reduce((s,f)=>s+Math.max(0, f.count - f.named), 0);
+  bands.unknown += unnamed;
+  const total = yes.reduce((s,f)=>s+f.count, 0);
+  const songs = yes.filter(f=>f.song.trim());
+  const perfs = yes.filter(f=>f.performance.trim());
+  const marks = fams.filter(f=>f.mark);
+  // birthdays: everyone who has replied, either way — a birthday is worth knowing regardless
+  const everyone = fams.flatMap(f => f.people.map(p => ({...p, family:f.name, coming:f.coming})));
+  const today = new Date(); today.setHours(0,0,0,0);
+  const bdays = everyone.filter(p=>/^\d{4}-\d{2}-\d{2}$/.test(p.dob||'')).map(p => {
+    const [y,m,dd] = p.dob.split('-').map(Number);
+    let next = new Date(today.getFullYear(), m-1, dd); if (next < today) next = new Date(today.getFullYear()+1, m-1, dd);
+    const days = Math.round((next - today) / 86400000);
+    const turning = next.getFullYear() - y;
+    const nightGap = Math.round((new Date(NIGHT.getFullYear(), m-1, dd) - new Date(NIGHT.getFullYear(), NIGHT.getMonth(), NIGHT.getDate())) / 86400000);
+    return { ...p, next, days, turning, nearNight: Math.abs(nightGap) <= 14, nightGap };
+  }).sort((a,b)=>a.days-b.days);
+  // what still needs a nudge
+  const nudges = [];
+  yes.filter(f=>!f.song.trim()).forEach(f=>nudges.push({f, what:'No entry song yet', why:'They are coming, but have not said what they will dance in to.'}));
+  yes.filter(f=>f.people.some(p=>!p.dob)).forEach(f=>{ const miss=f.people.filter(p=>!p.dob).map(p=>first(p.name)).join(', ');
+    nudges.push({f, what:'Birthdays missing', why:`No date of birth for ${miss}.`}); });
+  yes.filter(f=>f.count>f.named).forEach(f=>nudges.push({f, what:'Not everyone is named', why:`Said ${f.count} are coming, named ${f.named}. The rest are counted but not known.`}));
+  const noPhoto = ppl.filter(p=>!p.photo);
+  return { fams, yes, no, ppl, bands, total, songs, perfs, marks, bdays, nudges, noPhoto, sponsors:d.sponsors||[] };
+}
+
+/* ---------- drawing ---------- */
+const TABS = [
+  ['overview','Overview'], ['guests','Guests'], ['stage','Stage'], ['food','Food'], ['birthdays','Birthdays'],
+  ['nitin','For Nitin'], ['notcoming','Not coming'], ['sponsors','Co-sponsors'], ['nudge','Needs a nudge']
+];
+function drawTabs(D){
+  const counts = { guests:D.yes.length, stage:D.songs.length+D.perfs.length, birthdays:D.bdays.filter(b=>b.nearNight).length,
+    nitin:D.marks.length, notcoming:D.no.length, sponsors:D.sponsors.length, nudge:D.nudges.length };
+  $('#tabs').innerHTML = TABS.map(([k,l]) => {
+    const c = counts[k]; const attn = k==='nudge' && c>0;
+    return `<button class="tab" role="tab" id="t-${k}" aria-controls="p-${k}" aria-selected="${view.tab===k}" data-tab="${k}">${l}${
+      c!==undefined && c>0 ? `<span class="c ${attn?'attn':''}">${c}</span>` : ''}</button>`;
+  }).join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => go(b.dataset.tab)));
+}
+function go(k){
+  view.tab = k;
+  TABS.forEach(([t]) => { $('#p-'+t).hidden = t!==k; const b=$('#t-'+t); if(b) b.setAttribute('aria-selected', t===k); });
+  history.replaceState(null,'','#'+k);
+  const b=$('#t-'+k); if(b) b.scrollIntoView({block:'nearest',inline:'center'});
+  window.scrollTo({top: Math.min(scrollY, $('.hero').offsetTop + $('.hero').offsetHeight - 10)});
+}
+
+function drawHero(D){
+  const ev = DATA.event || {};
+  $('#evTitle').textContent = ev.name ? `${ev.name} · the register` : 'The register';
+  const days = Math.ceil((NIGHT - Date.now())/86400000);
+  $('#lamps').innerHTML = D.yes.map(()=>diyaSVG(true)).join('') + D.no.map(()=>diyaSVG(false)).join('');
+  if (!D.fams.length){
+    $('#say').innerHTML = 'No replies yet.';
+    $('#sub').textContent = days > 0 ? `The night is in ${plural(days,'day')}. The first lamp lights when the first family says yes.` : '';
+  } else {
+    $('#say').innerHTML = `<b>${D.total}</b> ${D.total===1?'person':'people'} from <b>${D.yes.length}</b> ${D.yes.length===1?'family is':'families are'} coming.`;
+    const bits = [];
+    if (days > 1) bits.push(`The night is in ${days} days.`); else if (days === 1) bits.push('The night is tomorrow.'); else if (days === 0) bits.push('The night is tonight.');
+    if (D.no.length) bits.push(`${plural(D.no.length,'family')} cannot make it.`);
+    $('#sub').textContent = bits.join(' ');
+  }
+  const f = [
+    [D.bands.adult, D.bands.adult===1?'adult':'adults'], [D.bands.teen, D.bands.teen===1?'teenager':'teenagers'],
+    [D.bands.child, D.bands.child===1?'child':'children'], [D.bands.unknown, 'age not given', D.bands.unknown>0],
+    [D.songs.length, D.songs.length===1?'entry song':'entry songs'], [D.sponsors.length, D.sponsors.length===1?'co-sponsor':'co-sponsors']
+  ];
+  $('#figs').innerHTML = f.map(([n,l,attn]) => `<div class="fig ${attn?'attn':''}"><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
+}
+
+function personRow(p){
+  const ph = digits(p.phone);
+  const av = `<span class="av">${esc(initials(p.name))}${p.photo ? `<img src="${EP}/dash-photo/${p.id}?t=${encodeURIComponent(TOKEN)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`;
+  const ageTxt = p.age!==null ? (p.age<1 ? 'under 1' : `${p.age} on the night`) : 'no birthday given';
+  const info = esc(ageTxt) + (ph ? `, <span class="nw">${esc(prettyPhone(p.phone))}</span>` : '');
+  const acts = ph.length===10 ? `<span class="acts">
+      <a href="https://wa.me/1${ph}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(p.name)}">${ICON.wa}</a>
+      <a href="tel:+1${ph}" aria-label="Call ${esc(p.name)}">${ICON.call}</a></span>` : '<span></span>';
+  return `<li>${av}<div><div class="pname">${esc(p.name)}</div><div class="pinfo">${info}</div></div>${acts}</li>`;
+}
+function famCard(f){
+  const yes = f.coming==='yes';
+  const meta = `<span class="pill ${yes?'yes':'no'}">${yes?'Coming':'Not coming'}</span>${yes ? esc(plural(f.count,'person','people'))+', ' : ''}replied ${esc(fmtDate(f.submitted))}`;
+  const perf = yes && (f.song || f.performance) ? `<dl class="fam-perf">
+      ${f.song ? `<div><dt>Entry song</dt><dd>${esc(f.song)}</dd></div>` : ''}
+      ${f.performance ? `<div><dt>Also</dt><dd>${esc(f.performance)}</dd></div>` : ''}</dl>` : '';
+  return `<article class="fam ${yes?'':'no'}">
+    <div class="fam-head">${diyaSVG(yes)}<div><h3 class="fam-name">${esc(f.name)}</h3><p class="fam-meta">${meta}</p></div></div>
+    <ul class="ppl">${f.people.map(personRow).join('')}</ul>${perf}</article>`;
+}
+
+function drawOverview(D){
+  const feed = D.fams.slice(0,10).map(f => `<li>${diyaSVG(f.coming==='yes')}
+      <div><b>${esc(f.name)}</b> <span class="muted">${f.coming==='yes' ? `said yes for ${esc(plural(f.count,'person','people'))}` : 'cannot make it'}</span></div>
+      <span class="t">${esc(ago(f.submitted))}</span></li>`).join('');
+  $('#p-overview').innerHTML = `
+    <h2>How it is going</h2>
+    <p class="intro">The replies as they have come in, and who answered most recently.</p>
+    <div class="twocol">
+      <div><h3>Replies over time</h3><div class="chart">${paceChart(D)}</div></div>
+      <div><h3>Most recent</h3>${feed ? `<ul class="feed">${feed}</ul>` : '<p class="empty">Replies will appear here as they arrive.</p>'}</div>
+    </div>
+    ${D.nudges.length ? `<p class="note" style="margin-top:var(--s5)">${esc(plural(D.nudges.length,'thing'))} could use a follow-up. <a href="#nudge" data-go="nudge">See them</a>.</p>` : ''}`;
+  $('#p-overview').querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();go(a.dataset.go);}));
+}
+function paceChart(D){
+  const pts = [...D.fams].filter(f=>f.submitted).sort((a,b)=>a.submitted.localeCompare(b.submitted));
+  if (pts.length < 2) return '<p class="muted" style="margin:0">The line appears once a couple of families have replied.</p>';
+  const t0 = Date.parse(pts[0].submitted), t1 = Math.max(Date.parse(pts[pts.length-1].submitted), t0+86400000);
+  let people = 0; const series = pts.map(f => { people += f.coming==='yes' ? f.count : 0; return [Date.parse(f.submitted), people]; });
+  const W=560, H=180, pad=28, max=Math.max(...series.map(s=>s[1]),1);
+  const x = t => pad + (t-t0)/(t1-t0)*(W-pad*2), y = v => H-pad - v/max*(H-pad*2);
+  let d = `M${x(series[0][0]).toFixed(1)},${y(0).toFixed(1)}`;
+  series.forEach(([t,v],i) => { const prev = i? series[i-1][1] : 0; d += ` L${x(t).toFixed(1)},${y(prev).toFixed(1)} L${x(t).toFixed(1)},${y(v).toFixed(1)}`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="People coming over time, now ${max}">
+    <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#3A3160"/>
+    <path d="${d} L${x(t1).toFixed(1)},${y(series[series.length-1][1]).toFixed(1)}" fill="none" stroke="#F2C14E" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="${pad}" y="${H-8}" fill="#BDB5CF" font-size="12">${esc(fmtDate(pts[0].submitted))}</text>
+    <text x="${W-pad}" y="${H-8}" fill="#BDB5CF" font-size="12" text-anchor="end">${esc(fmtDate(new Date(t1).toISOString()))}</text>
+    <text x="${W-pad}" y="${y(series[series.length-1][1])-8}" fill="#F7D88A" font-size="14" font-weight="600" text-anchor="end">${series[series.length-1][1]} people</text>
+  </svg>`;
+}
+
+function drawGuests(D){
+  const q = view.q.trim().toLowerCase();
+  const pool = view.show==='yes' ? D.yes : view.show==='no' ? D.no : D.fams;
+  const list = pool.filter(f => !q || [f.name, f.song, f.performance, ...f.people.map(p=>p.name)].join(' ').toLowerCase().includes(q));
+  const body = list.length ? `<div class="fams">${list.map(famCard).join('')}</div>`
+    : `<p class="empty">${q ? `Nobody matches “${esc(view.q)}”.` : 'No families here yet.'}</p>`;
+  $('#p-guests').innerHTML = `
+    <h2>Guests</h2>
+    <p class="intro">Every family that has replied, with everyone they named. Tap the green bubble to WhatsApp them, or the phone to call.</p>
+    <div class="bar">
+      <div class="grow"><label class="sr" for="q">Search guests</label><input class="search" id="q" type="search" placeholder="Search a name, family or song" value="${esc(view.q)}"></div>
+      <div class="seg" role="group" aria-label="Show">
+        <button type="button" data-show="yes" aria-pressed="${view.show==='yes'}">Coming</button>
+        <button type="button" data-show="no" aria-pressed="${view.show==='no'}">Not coming</button>
+        <button type="button" data-show="all" aria-pressed="${view.show==='all'}">Everyone</button>
+      </div>
+    </div>
+    <div id="glist">${body}</div>`;
+  const qi = $('#q');
+  qi.addEventListener('input', () => { view.q = qi.value; const pos=qi.selectionStart; drawGuests(D); const n=$('#q'); n.focus(); n.setSelectionRange(pos,pos); });
+  $('#p-guests').querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { view.show=b.dataset.show; drawGuests(D); }));
+}
+
+function drawStage(D){
+  const songs = D.songs.map(f => `<li><div><div class="song">${esc(f.song)}</div><div class="by">${esc(f.name)}, ${esc(plural(f.count,'person','people'))}</div></div></li>`).join('');
+  const perfs = D.perfs.map(f => `<li><div><div class="song">${esc(f.performance)}</div><div class="by">${esc(f.name)}</div></div></li>`).join('');
+  $('#p-stage').innerHTML = `
+    <h2>The stage</h2>
+    <p class="intro">Every entry song and every performance offered, in the order the families replied. A first draft of the running order, ready to reshape.</p>
+    <div class="twocol">
+      <div><div class="bar"><h3 style="margin:0;flex:1">Entry dances</h3>${songs ? '<button class="btn quiet small" id="cpSongs" type="button">Copy the list</button>' : ''}</div>
+        ${songs ? `<ol class="lineup">${songs}</ol>` : '<p class="empty">No entry songs yet.</p>'}</div>
+      <div><div class="bar"><h3 style="margin:0;flex:1">Other performances</h3>${perfs ? '<button class="btn quiet small" id="cpPerfs" type="button">Copy the list</button>' : ''}</div>
+        ${perfs ? `<ol class="lineup">${perfs}</ol>` : '<p class="empty">Nobody has offered a performance yet.</p>'}</div>
+    </div>`;
+  const c1=$('#cpSongs'); if(c1) c1.addEventListener('click',()=>copy('Entry dances\n'+D.songs.map((f,i)=>`${i+1}. ${f.song} — ${f.name}`).join('\n'),'Entry dances copied'));
+  const c2=$('#cpPerfs'); if(c2) c2.addEventListener('click',()=>copy('Other performances\n'+D.perfs.map((f,i)=>`${i+1}. ${f.performance} — ${f.name}`).join('\n'),'Performances copied'));
+}
+
+function drawFood(D){
+  const b = D.bands, rows = [['Adults, 18 and over', b.adult], ['Teenagers, 13 to 17', b.teen], ['Children, under 13', b.child], ['Age not given', b.unknown]];
+  const kids = D.ppl.filter(p=>p.band==='child'), small = kids.filter(p=>p.age!==null && p.age<5).length;
+  const summary = `Diwali ${NIGHT.getFullYear()} — ${D.total} coming: ${b.adult} adults, ${b.teen} teenagers, ${b.child} children${b.unknown?`, ${b.unknown} age not given`:''}.`;
+  $('#p-food').innerHTML = `
+    <h2>Food</h2>
+    <p class="intro">What a caterer asks first. Ages are counted as of the night itself, from the dates of birth families gave.</p>
+    <div class="tablewrap"><table class="table">
+      <thead><tr><th>Who</th><th class="num">How many</th></tr></thead>
+      <tbody>${rows.map(([l,n])=>`<tr><td>${l}</td><td class="num">${n}</td></tr>`).join('')}
+        <tr><td><b>Everyone coming</b></td><td class="num"><b>${D.total}</b></td></tr></tbody></table></div>
+    ${small ? `<p class="note">${esc(plural(small,'child is','children are'))} under five — worth knowing for portions and seating.</p>` : ''}
+    ${b.unknown ? `<p class="note">${b.unknown} without an age: some families did not give every date of birth, or said more were coming than they named.</p>` : ''}
+    <div class="bar" style="margin-top:var(--s5)"><button class="btn quiet small" id="cpFood" type="button">Copy for the caterer</button></div>`;
+  $('#cpFood').addEventListener('click', () => copy(summary, 'Copied for the caterer'));
+}
+
+function drawBirthdays(D){
+  const near = D.bdays.filter(b=>b.nearNight), rest = D.bdays.filter(b=>!b.nearNight).slice(0, 60);
+  const row = b => `<tr><td><b>${esc(b.name)}</b><div class="pinfo">${esc(b.family)}${b.coming==='no'?', not coming':''}</div></td>
+     <td>${esc(b.next.toLocaleDateString('en-US',{day:'numeric',month:'long'}))}</td>
+     <td class="num">${b.turning}</td><td class="num ${b.days<=14?'near':''}">${b.days===0?'today':b.days===1?'tomorrow':`${b.days} days`}</td></tr>`;
+  const table = list => `<div class="tablewrap"><table class="table"><thead><tr><th>Who</th><th>Birthday</th><th class="num">Turning</th><th class="num">In</th></tr></thead>
+     <tbody>${list.map(row).join('')}</tbody></table></div>`;
+  $('#p-birthdays').innerHTML = `
+    <h2>Birthdays</h2>
+    <p class="intro">The reason we ask for dates of birth. Anyone whose birthday falls within two weeks of the night is worth a moment on the stage.</p>
+    <h3>Around the night</h3>
+    ${near.length ? table(near) : '<p class="empty">Nobody has a birthday within two weeks of the 21st.</p>'}
+    <h3 style="margin-top:var(--s6)">The year ahead</h3>
+    ${rest.length ? table(rest) : '<p class="empty">No other birthdays given yet.</p>'}`;
+}
+
+function drawNitin(D){
+  const rows = D.marks.map(f => `<tr><td><b>${esc(f.name)}</b><div class="pinfo">${esc(f.people.map(p=>first(p.name)).filter(Boolean).join(', '))}</div></td>
+      <td class="num"><span class="mark">${esc(f.mark)}</span></td><td>${f.coming==='yes'?'Coming':'Not coming'}</td></tr>`).join('');
+  $('#p-nitin').innerHTML = `
+    <h2>For Nitin</h2>
+    <p class="intro">The mark each family left him on the page: a letter the light chose and the year they were born. This is his list before the night. Guests were told nothing is kept — keep this between the three of you and him.</p>
+    ${rows ? `<div class="tablewrap"><table class="table"><thead><tr><th>Family</th><th class="num">Mark</th><th>Reply</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="bar" style="margin-top:var(--s4)"><button class="btn quiet small" id="cpMarks" type="button">Copy for Nitin</button></div>`
+      : '<p class="empty">No marks yet. They appear when a family plays the dark lamp and then replies.</p>'}`;
+  const c=$('#cpMarks'); if(c) c.addEventListener('click',()=>copy(D.marks.map(f=>`${f.mark}  ${f.name} (${f.people.map(p=>first(p.name)).join(', ')})`).join('\n'),'Copied for Nitin'));
+}
+
+function drawNotComing(D){
+  $('#p-notcoming').innerHTML = `
+    <h2>Not coming</h2>
+    <p class="intro">Families who cannot make it this time. They are still on the Sitare list — send them the photographs after.</p>
+    ${D.no.length ? `<div class="fams">${D.no.map(famCard).join('')}</div>` : '<p class="empty">Nobody has said no.</p>'}`;
+}
+
+function drawSponsors(D){
+  const s = D.sponsors;
+  $('#p-sponsors').innerHTML = `
+    <h2>Co-sponsors</h2>
+    <p class="intro">People who offered to help carry the light.</p>
+    ${s.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Who</th><th>What they have in mind</th><th>Contact</th><th>Status</th></tr></thead>
+      <tbody>${s.map(x=>{ const d=digits(x.contact); const link = d.length===10 ? `<a href="https://wa.me/1${d}" target="_blank" rel="noopener">${esc(prettyPhone(x.contact))}</a>`
+        : /@/.test(x.contact) ? `<a href="mailto:${esc(x.contact)}">${esc(x.contact)}</a>` : esc(x.contact);
+        return `<tr><td><b>${esc(x.name)}</b><div class="pinfo">${esc(x.org)}</div></td><td>${esc(x.idea)}</td><td>${link}</td><td>${esc(x.status||'New')}</td></tr>`; }).join('')}
+      </tbody></table></div>` : '<p class="empty">No co-sponsor offers yet.</p>'}`;
+}
+
+function drawNudge(D){
+  const items = D.nudges.map(n => { const ph=digits(n.f.phone);
+    return `<div class="nudge"><b>${esc(n.what)}</b><span>${esc(n.f.name)}. ${esc(n.why)}</span>
+      ${ph.length===10 ? `<div style="margin-top:var(--s2)"><a class="btn quiet small" href="https://wa.me/1${ph}" target="_blank" rel="noopener">WhatsApp them</a></div>`:''}</div>`; }).join('');
+  const photos = D.noPhoto.length ? `<h3 style="margin-top:var(--s6)">Portraits still to add</h3>
+    <p class="note" style="margin-top:0">Add a photograph to their row in the People table, in the field called Photo.</p>
+    <div class="tablewrap" style="margin-top:var(--s3)"><table class="table"><tbody>${D.noPhoto.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td class="pinfo">${esc(p.family)}</td></tr>`).join('')}</tbody></table></div>` : '';
+  $('#p-nudge').innerHTML = `
+    <h2>Needs a nudge</h2>
+    <p class="intro">Small gaps worth a quick message before the night. Nothing here is urgent.</p>
+    ${items ? `<div class="nudges">${items}</div>` : '<p class="empty">Everything that could be filled in has been.</p>'}${photos}`;
+}
+
+function drawAll(){
+  const D = derive(DATA);
+  drawHero(D); drawTabs(D);
+  drawOverview(D); drawGuests(D); drawStage(D); drawFood(D); drawBirthdays(D); drawNitin(D); drawNotComing(D); drawSponsors(D); drawNudge(D);
+  go(view.tab);
+  $('#updated').textContent = 'Updated ' + ago(DATA.generated);
+  $('#foot').textContent = `${plural(D.fams.length,'reply','replies')} in the base. Refreshes on its own every few minutes.`;
+  window.__D = D;
+}
+
+/* ---------- the spreadsheet ---------- */
+function csv(){
+  const D = derive(DATA);
+  const rows = [['Family','Coming','Name','Phone','Date of birth','Age on the night','Entry song','Other performance','Mark','Replied']];
+  D.fams.forEach(f => (f.people.length ? f.people : [{name:'',phone:'',dob:'',age:null}]).forEach(p =>
+    rows.push([f.name, f.coming, p.name, prettyPhone(p.phone), p.dob, p.age ?? '', f.song, f.performance, f.mark, f.submitted ? f.submitted.slice(0,10) : ''])));
+  const text = rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff'+text], {type:'text/csv;charset=utf-8'}));
+  a.download = `sitare-diwali-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+  toast('Spreadsheet downloaded');
+}
+
+/* ---------- talking to the Worker ---------- */
+async function load(body){
+  const r = await fetch(EP + '/dash', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ...body, event: EVENT }) });
+  let d = {}; try { d = await r.json(); } catch(_){}
+  if (!r.ok) { const e = new Error(d.error || 'Could not open the register.'); e.status = r.status; throw e; }
+  return d;
+}
+function open(d){
+  DATA = d; TOKEN = d.token;
+  try { localStorage.setItem(TOKEN_KEY, TOKEN); } catch(_){}
+  $('#gate').hidden = true; $('#app').hidden = false;
+  drawAll();
+  clearInterval(timer);
+  timer = setInterval(() => { if (!document.hidden) refresh(true); }, 180000);
+}
+async function refresh(quiet){
+  const b = $('#refresh'); b.classList.add('spin'); b.disabled = true;
+  try { open(await load({ token: TOKEN })); if(!quiet) toast('Up to date'); }
+  catch (e) { if (e.status === 401) signOut('Signed out — enter the passcode again.'); else if(!quiet) toast(e.message); }
+  b.classList.remove('spin'); b.disabled = false;
+}
+function signOut(msg){
+  try { localStorage.removeItem(TOKEN_KEY); } catch(_){}
+  TOKEN = null; DATA = null; clearInterval(timer);
+  $('#app').hidden = true; $('#gate').hidden = false; $('#pass').value = '';
+  $('#gateErr').textContent = msg || '';
+  $('#pass').focus();
+}
+
+$('#gateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('#gateBtn'), err = $('#gateErr'), pass = $('#pass').value.trim();
+  if (!pass) return;
+  btn.disabled = true; btn.textContent = 'Opening'; err.textContent = '';
+  try { open(await load({ passcode: pass })); }
+  catch (x) { err.textContent = x.message; $('#pass').select(); }
+  btn.disabled = false; btn.textContent = 'Open the register';
+});
+$('#refresh').addEventListener('click', () => refresh(false));
+$('#out').addEventListener('click', () => signOut('Signed out.'));
+$('#csv').addEventListener('click', csv);
+$('#print').addEventListener('click', () => { TABS.forEach(([t])=>$('#p-'+t).hidden=false); window.print(); go(view.tab); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && DATA) refresh(true); });
+
+// a phone that signed in earlier today goes straight in
+(async () => {
+  const h = location.hash.slice(1); if (TABS.some(([t])=>t===h)) view.tab = h;
+  let t = null; try { t = localStorage.getItem(TOKEN_KEY); } catch(_){}
+  if (t && +t.split('.')[0] > Date.now()) {
+    TOKEN = t;
+    try { open(await load({ token: t })); return; } catch(_){ }
+  }
+  signOut('');
+})();
+</script>
+</body>
+</html>
