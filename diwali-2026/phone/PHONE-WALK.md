@@ -183,3 +183,12 @@ Lesson for the shelf: a set has its own arc above each piece's palette. Before c
 
 ### Ruling (Ashrey, 4 Nov, 14:05): this round is accepted as it stands.
 Forward edge: next session starts with the Worker routes for the room (POST /lamp, room read, Lamps table), then the five hidden views on the same engine, then a family member's look at the Bandi Chhor cloak and a real-phone test. The phone files are not yet in GitHub (phone/lamps/ in this workspace only).
+
+## The close (4 Nov 2026, 14:25)
+- Kept: the working files in GitHub (humsitare.com `diwali-2026/`, commit 5ecfc85, listed in .assetsignore, so not served).
+- Kept: 14 ASG To-Dos under Goal recwDovAMRgAQNsDf, one marked Completed (recgLx5LGUWYy9Jx2).
+- Kept: the library inbox `asg-library/inbox/2026-11-04-five-lamps/` (NEW-PIECES, LEARNED, BENDS; commit f863720).
+- Kept: the hum-sitare skill card, shown to Ashrey to save.
+- Skipped, with reasons:
+  - No front-end changes on aistrangegame.com or humsitare.com: the stories are not live yet, and the Works pages update after the evening.
+  - No atlas row: the close was kept proportionate at Ashrey's request to wrap up.
