@@ -1,0 +1,268 @@
+<title>The Son Who Forgot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mukta:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="engine.css">
+<style>
+/* Narakasura · Sanjhi: dark cut paper, pierced patterns, ember light from below. */
+:root{
+  --bg:#060408; --paper:#0E0607; --ember:#C24A1C; --gold:#E2A85A; --heart:#FFD27A;
+  --cream:#F5EADB; --muted:#B9AB97; --line:rgba(226,168,90,.32);
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Mukta','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+</style>
+<script src="engine.js"></script>
+<script>
+(() => {
+  const { HEAD, path, rnd, flat, op, drawn, on, setBg, B } = FL;
+  const C = { cream: "#F5EADB", gold: "#E2A85A", dim: "rgba(226,168,90,.5)", ember: "#C24A1C", heart: "#FFD27A", paper: "#0E0607" };
+  const BACK = "M-1080 0 C-1000 -60 -900 -170 -820 -250 C-806 -264 -796 -280 -790 -296";
+  const FRONT = "M-740 -298 C-722 -250 -712 -200 -700 -150 C-690 -110 -680 -60 -640 0";
+  const HILL = BACK + " L-740 -298 C-722 -250 -712 -200 -700 -150 C-690 -110 -680 -60 -640 0 Z";
+  const CITY = "M160 0 L160 -150 L200 -150 L200 -200 Q230 -280 260 -200 L260 -150 L320 -150 L320 -250 L340 -250 L340 -290 Q380 -380 420 -290 L420 -250 L440 -250 L440 -150 L500 -150 L500 -210 Q530 -270 560 -210 L560 -150 L620 -150 L620 -230 L640 -230 L640 -260 L660 -260 L660 -230 L680 -230 L680 -150 L720 -150 L720 0";
+
+  FL.story({
+    slug: "narakasura", code: "qrcode-1", title: "The Son Who Forgot",
+    kicker: "The first lamp on the wall · Narakasura",
+    lede: "We come into this life with a forgetting. Diwali is the night we help each other remember.",
+    question: "When did you last lose sight of yourself, and who reminded you?",
+    turn: "Forgetting is not where the story ends. Sometimes it is where the way back begins.",
+    samples: [
+      "After my father died I stopped singing for two years. My daughter asked me to sing at her wedding.",
+      "Burnout. A friend called every Sunday until I finally picked up.",
+      "When I moved here I lost my language for a while. My grandmother's letters brought it back.",
+      "I forgot I loved to draw. My son left his crayons on my desk.",
+    ],
+    defs: `<pattern id="sanjhi" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M13 4 Q18 13 13 22 Q8 13 13 4 Z" fill="#C24A1C" opacity=".3"/><circle cx="0" cy="0" r="1.8" fill="#C24A1C" opacity=".55"/><circle cx="26" cy="0" r="1.8" fill="#C24A1C" opacity=".55"/><circle cx="0" cy="26" r="1.8" fill="#C24A1C" opacity=".55"/><circle cx="26" cy="26" r="1.8" fill="#C24A1C" opacity=".55"/></pattern>`,
+    chapters: [
+      /* I · Born of the Earth. The flame draws the horizon, then the Earth rising into a mother, a child in the crook of
+         her arm. It becomes the gift: it circles the child once and leaves a ring of light. The cut-paper hill blooms. */
+      {
+        k: "I · Born of the Earth", cam: { cx: -810, w: 620, top: -420 }, bg: "#060408", mood: "warm",
+        text: "He was born of the Earth herself. Bhudevi, the goddess of the ground beneath every foot, was his mother, and he was given a gift: no one could end him but her.",
+        build(ctx) {
+          const r = rnd(7), b = {};
+          b.stars = flat(ctx.el("sky", Array.from({ length: 70 }, () => `<circle class="star" cx="${(-1500 + r() * 2600).toFixed(0)}" cy="${(-1250 + r() * 1150).toFixed(0)}" r="${(1 + r() * 2.2).toFixed(1)}" fill="#F5EADB" style="animation-delay:${(r() * 6).toFixed(2)}s"/>`).join("")));
+          b.far = ctx.el("far", `<g class="fill"><path d="M-1500 0 C-1400 -60 -1300 -84 -1200 -40 C-1150 -16 -1110 -6 -1080 0 Z M-640 0 C-600 -46 -540 -64 -490 -30 L-450 0 Z" fill="${C.paper}"/><path class="st" d="M-1500 0 C-1400 -60 -1300 -84 -1200 -40 C-1150 -16 -1110 -6 -1080 0" fill="none" stroke="${C.ember}" style="--b:2.6" stroke-linecap="round" stroke-dasharray="0 11" opacity=".7"/></g>`);
+          b.hill = ctx.el("fills", `<g class="fill"><path d="${HILL}" fill="${C.paper}"/><path d="${HILL}" fill="url(#sanjhi)"/>
+            <path class="st" d="${BACK}" transform="translate(22 8)" fill="none" stroke="${C.ember}" style="--b:2.8" stroke-linecap="round" stroke-dasharray="0 12" opacity=".85"/>
+            <path class="st" d="${FRONT}" transform="translate(-16 6)" fill="none" stroke="${C.ember}" style="--b:2.8" stroke-linecap="round" stroke-dasharray="0 12" opacity=".85"/>
+            ${Array.from({ length: 12 }, () => `<circle class="mote" cx="${(-1060 + r() * 640).toFixed(0)}" cy="${(-6 - r() * 40).toFixed(0)}" r="${(1.6 + r() * 1.8).toFixed(1)}" fill="#FF9A3C" style="animation-delay:${(r() * 7).toFixed(2)}s"/>`).join("")}</g>`);
+          b.horizon = ctx.el("scene", path("M-440 0 L-1360 0", C.dim, 1.6));
+          b.back = ctx.el("scene", path(BACK, C.cream, 3.2));
+          b.head = ctx.el("scene", path(HEAD(-764, -334, 36), C.cream, 3.2));
+          b.veil = ctx.el("scene", path("M-776 -368 C-840 -352 -888 -290 -916 -196", C.cream, 2.6));
+          b.front = ctx.el("scene", path(FRONT, C.cream, 3.2));
+          b.arm = ctx.el("scene", path("M-786 -276 C-756 -224 -716 -186 -664 -176 C-626 -170 -600 -180 -592 -200", C.cream, 3.2));
+          b.chead = ctx.el("hero", path(HEAD(-632, -226, 13), C.cream, 2.8));
+          b.cbody = ctx.el("hero", path("M-634 -213 C-638 -200 -638 -190 -634 -180 C-622 -178 -610 -180 -600 -186 M-634 -204 C-626 -198 -620 -196 -612 -197", C.cream, 2.8));
+          b.ring = ctx.el("hero", path("M-624 -252 a48 48 0 1 1 -0.1 0", C.heart, 2.4, "glow"));
+          b.mother = [b.back, b.head, b.veil, b.front, b.arm, b.hill];
+          b.child = [b.chead, b.cbody];
+          return b;
+        },
+        async play(ctx, b, from) {
+          ctx.phrases(1600, 8600);
+          if (from) ctx.at(from.x, from.y); else ctx.at(-440, 120);
+          ctx.size(5, 0); ctx.show(true);
+          await ctx.glide(-440, 0, 1500, true);
+          on(b.stars);
+          await ctx.draw(b.horizon, 1.5, { noGlide: true });
+          on(b.far);
+          await ctx.draw(b.back, 2.0, { glide: 500 });
+          await ctx.draw(b.head, .8, { glide: 300 });
+          await ctx.draw(b.veil, 1.0, { glide: 200 });
+          await ctx.draw(b.front, 1.4, { glide: 300 });
+          on(b.hill);
+          await ctx.draw(b.arm, 1.4, { glide: 300 });
+          await ctx.draw(b.chead, .5, { glide: 300 });
+          await ctx.draw(b.cbody, .8, { glide: 120 });
+          await ctx.draw(b.ring, 1.9, { glide: 400 });
+          ctx.chord([220, 277.18, 329.63, 440]); ctx.sparks(-624, -204, 12, C.heart, true); ctx.ripple(-624, -204, 120);
+          await ctx.glide(-624, -296, 900);
+        },
+        settle(ctx, b) { drawn([b.horizon, b.back, b.head, b.veil, b.front, b.arm, b.chead, b.cbody, b.ring]); on([b.stars, b.far, b.hill]); ctx.show(true); ctx.size(5, 0); ctx.at(-624, -296); },
+      },
+      /* II · The city of taking. The child, grown and crowned; his city in one line; Aditi's earrings fetched out of the
+         sky into his hand; a barred wall with many small lights; then the forgetting: mother and ring fade, the windows go
+         out one by one, the flame shrinks. Ends dark, on a low chord. */
+      {
+        k: "II · The city of taking", cam: { cx: 380, w: 700, top: -420 }, bg: "#050306", mood: "dark",
+        text: "Somewhere along the way he forgot whose son he was. He built a kingdom out of taking. He took the earrings of Aditi, mother of the gods. He took sixteen thousand women and locked them away. The more he took, the less he remembered, and the darker his city grew.",
+        build(ctx) {
+          const r = rnd(31), b = {};
+          b.ground = ctx.el("scene", path("M-440 0 L840 0", C.dim, 1.6));
+          b.head = ctx.el("scene", path(HEAD(80, -196, 17), C.cream, 3));
+          b.crown = ctx.el("scene", path("M66 -214 L70 -228 L76 -217 L80 -232 L84 -217 L90 -228 L94 -214", C.gold, 2.4));
+          b.body = ctx.el("scene", path("M74 -180 C68 -140 66 -90 68 -40 C69 -24 68 -10 66 0 M86 -180 C92 -140 94 -90 92 -40 C91 -24 92 -10 94 0", C.cream, 3));
+          b.armD = ctx.el("scene", path("M80 -166 C60 -140 50 -116 46 -92", C.cream, 3));
+          b.armU = ctx.el("scene", path("M80 -166 C100 -190 108 -214 112 -236", C.cream, 3));
+          b.him = [b.head, b.crown, b.body, b.armD, b.armU];
+          b.cityFill = ctx.el("fills", `<g class="fill"><path d="${CITY} Z" fill="${C.paper}"/><path d="${CITY} Z" fill="url(#sanjhi)" opacity=".7"/></g>`);
+          b.city = ctx.el("scene", path(CITY, C.gold, 2.2));
+          const wins = [[180, -100], [230, -100], [280, -100], [350, -100], [400, -100], [460, -100], [520, -100], [580, -100], [650, -100], [180, -40], [230, -40], [280, -40], [600, -40], [660, -40], [370, -240], [226, -178], [526, -186], [646, -206]];
+          b.wins = flat(ctx.el("fills", wins.map(([x, y]) => `<path d="M${x} ${y} v-18 q9 -13 18 0 v18 z" fill="#FFB04A" style="opacity:0"/>`).join("")));
+          let bars = "M380 0 L380 -80 L560 -80 L560 0"; for (let x = 400; x < 560; x += 20) bars += ` M${x} -80 L${x} 0`;
+          b.lights = flat(ctx.el("fills", Array.from({ length: 34 }, () => `<circle cx="${(388 + r() * 164).toFixed(0)}" cy="${(-70 + r() * 62).toFixed(0)}" r="2.4" fill="#FFD9A0" style="opacity:0"/>`).join("")));
+          b.bars = ctx.el("scene", path(bars, C.gold, 2));
+          b.ear = ctx.el("hero", `<g style="opacity:0"><circle class="st" cx="-7" cy="0" r="7" fill="none" stroke="${C.heart}" style="--b:2.2"/><circle class="st" cx="9" cy="4" r="7" fill="none" stroke="${C.heart}" style="--b:2.2"/></g>`);
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 11500);
+          ctx.size(5, 0); ctx.show(true);
+          await ctx.glide(-440, 0, 1500, true);
+          await ctx.draw(b.ground, 1.4, { noGlide: true });
+          await ctx.draw(b.head, .5, { glide: 300 });
+          await ctx.draw(b.crown, .5, { glide: 100 });
+          await ctx.draw(b.body, 1.0, { glide: 150 });
+          await ctx.draw(b.armD, .5, { glide: 150 });
+          await ctx.draw(b.armU, .5, { glide: 150 });
+          await ctx.draw(b.city, 3.2, { glide: 400 });
+          on(b.cityFill);
+          b.wins.forEach((w, i) => ctx.later(i * 70, () => op(w, 1, 500)));
+          await ctx.wait(700);
+          await ctx.glide(-180, -640, 1200, true);
+          b.ear.setAttribute("transform", "translate(-180 -640)"); op(b.ear, 1, 400); ctx.sparks(-180, -640, 8, C.heart);
+          await ctx.tween(1800, (e) => { const x = (1 - e) * (1 - e) * -180 + 2 * (1 - e) * e * -20 + e * e * 112, y = (1 - e) * (1 - e) * -640 + 2 * (1 - e) * e * -600 + e * e * -246; FL.place(x, y); b.ear.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`); });
+          await ctx.draw(b.bars, 1.6, { glide: 400 });
+          b.lights.forEach((l, i) => ctx.later(i * 30, () => op(l, .9, 400)));
+          await ctx.wait(900);
+          op(B[1].mother.concat(B[1].child, B[1].ring, B[1].far), .16, 3200);
+          ctx.size(2.6, 2400); ctx.dim(.5);
+          setBg("#030204");
+          const order = b.wins.map((w, i) => [w, ((i * 7) % 18)]).sort((a, c) => a[1] - c[1]).map((a) => a[0]);
+          for (const w of order) { op(w, 0, 500); await ctx.wait(230); }
+          op(b.lights, .25, 2000);
+          await ctx.wait(900);
+        },
+        settle(ctx, b) {
+          drawn([b.ground, b.him, b.city, b.bars]); on(b.cityFill);
+          op(b.wins, 0, 0); op(b.lights, .25, 0); b.ear.setAttribute("transform", "translate(112 -246)"); op(b.ear, 1, 0);
+          op(B[1].mother.concat(B[1].child, B[1].ring, B[1].far), .16, 0);
+          setBg("#030204"); ctx.show(true); ctx.size(2.6, 0); ctx.dim(.5); ctx.at(112, -246);
+        },
+      },
+      /* III · The mother came again. A chariot; Krishna with a feather at the reins; Satyabhama in the Earth-mother's
+         veil, drawing a bow. The Earth-mother relights; a line joins her to Satyabhama; the gold thread runs to him. */
+      {
+        k: "III · The mother came again", cam: { cx: -470, w: 1300, top: -420 }, bg: "#070407", mood: "held",
+        text: "When Krishna came against him, Satyabhama rode beside him in the chariot, and Satyabhama was Bhudevi, born again. So it was his mother, in the end, who undid him. The gift that kept him safe was the same thread that brought him home.",
+        build(ctx) {
+          const b = {};
+          const P = (d, c = C.cream, w = 2.6) => ctx.el("scene", path(d, c, w));
+          b.wheel = P("M-400 -92 a46 46 0 1 1 -0.1 0");
+          b.spokes = P("M-400 -92 L-400 0 M-446 -46 L-354 -46 M-432 -78 L-368 -14 M-368 -78 L-432 -14", C.cream, 1.8);
+          b.deck = P("M-490 -60 L-300 -60 C-292 -90 -294 -120 -310 -140");
+          b.pole = P("M-470 -60 L-470 -300", C.cream, 2);
+          b.flag = P("M-470 -300 C-440 -292 -420 -300 -400 -290 C-420 -282 -440 -276 -470 -270", C.gold, 2.2);
+          b.horse = [P("M-290 -110 C-260 -120 -230 -116 -204 -104"), P("M-290 -70 C-260 -62 -230 -64 -206 -72"),
+            P("M-204 -104 C-190 -130 -180 -160 -166 -186 C-156 -194 -144 -192 -136 -180 C-144 -176 -154 -172 -160 -164 C-168 -150 -180 -120 -206 -72"),
+            P("M-280 -70 L-286 0 M-260 -66 L-252 0 M-222 -68 L-228 0 M-210 -72 L-198 0", C.cream, 2.2),
+            P("M-290 -108 C-306 -100 -312 -84 -310 -64", C.cream, 2.2), P("M-170 -190 L-166 -204 L-160 -190", C.cream, 2), P("M-310 -80 L-288 -94", C.cream, 2)];
+          b.k = [P(HEAD(-430, -198, 15), C.cream, 2.8), P("M-428 -213 C-424 -236 -412 -248 -398 -252 C-404 -244 -410 -236 -414 -226", C.gold, 2.2),
+            P("M-435 -183 C-440 -150 -442 -100 -440 -60 M-425 -183 C-420 -150 -418 -100 -420 -60", C.cream, 2.8), P("M-430 -168 C-390 -150 -340 -128 -290 -112", C.cream, 2)];
+          b.s = [P(HEAD(-350, -196, 15), C.cream, 2.8), P("M-358 -210 C-378 -202 -390 -182 -396 -150", C.cream, 2.4),
+            P("M-355 -181 C-360 -150 -362 -100 -360 -60 M-345 -181 C-340 -150 -338 -100 -340 -60", C.cream, 2.8),
+            P("M-350 -170 C-320 -178 -296 -184 -268 -190", C.cream, 2.6), P("M-350 -170 C-364 -168 -372 -166 -378 -164", C.cream, 2.6),
+            P("M-284 -250 Q-246 -190 -284 -130", C.gold, 2.6), P("M-284 -250 L-378 -164 L-284 -130", C.gold, 1.2)];
+          b.remember = ctx.el("hero", path("M-736 -342 C-620 -390 -470 -330 -368 -214", C.heart, 1.4, "", `opacity=".55"`));
+          b.thread = ctx.el("hero", path("M-268 -190 C-150 -232 -40 -214 30 -168", C.heart, 2.6, "glow"));
+          b.all = [b.wheel, b.spokes, b.deck, b.pole, b.flag, b.horse, b.k, b.s];
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 11000);
+          ctx.dim(1); ctx.size(5, 900);
+          await ctx.glide(-400, -92, 1300, true);
+          ctx.cascade(b.horse, 900, 160);
+          await ctx.draw(b.wheel, 1.0, { noGlide: true });
+          await ctx.draw(b.spokes, .7, { glide: 100 });
+          await ctx.draw(b.deck, .8, { glide: 150 });
+          await ctx.draw(b.pole, .5, { glide: 150 });
+          await ctx.draw(b.flag, .5, { glide: 80 });
+          for (const [i, p] of b.k.entries()) await ctx.draw(p, [.4, .4, .7, .6][i], { glide: 160 });
+          for (const [i, p] of b.s.entries()) await ctx.draw(p, [.4, .5, .7, .5, .3, .6, .5][i], { glide: 140 });
+          op(B[1].mother.concat(B[1].far), 1, 2200);
+          await ctx.wait(600);
+          await ctx.draw(b.remember, 2.2, { glide: 1000 });
+          await ctx.draw(b.thread, 2.6, { glide: 700 });
+          ctx.ripple(30, -168, 90, "rgba(255,214,140,.7)");
+          await ctx.wait(600);
+        },
+        settle(ctx, b) { drawn([b.all, b.remember, b.thread]); op(B[1].mother.concat(B[1].far), 1, 0); ctx.show(true); ctx.dim(1); ctx.size(5, 0); ctx.at(30, -168); },
+      },
+      /* IV · He knew her (the pivot: slower). The standing king fades with the earrings; he is drawn kneeling, crown on
+         the ground, one open hand; the flame comes along her thread into his palm and becomes a lamp. */
+      {
+        k: "IV · He knew her", cam: { cx: 40, w: 440, top: -250 }, bg: "#050304", mood: "warm",
+        text: "As he fell, Narakasura knew her. His last wish was not for his kingdom. He asked that his ending be kept with lamps, so the day would be remembered for its light, not mourned.",
+        build(ctx) {
+          const b = {};
+          b.head = ctx.el("scene", path(HEAD(92, -122, 17), C.cream, 3));
+          b.body = ctx.el("scene", path("M88 -105 C82 -82 86 -62 98 -46 C80 -40 64 -28 58 -4 M98 -46 C112 -36 122 -20 130 0 L150 0", C.cream, 3));
+          b.arm = ctx.el("scene", path("M88 -96 C66 -110 44 -128 30 -144", C.cream, 3));
+          b.fingers = ctx.el("scene", path("M30 -144 L20 -154 M30 -144 L24 -159 M30 -144 L33 -160 M30 -144 L40 -155", C.cream, 2.2));
+          b.crown = ctx.el("scene", path("M156 0 L160 -12 L166 -2 L170 -16 L174 -2 L180 -12 L184 0", C.gold, 2.2, "", `opacity=".6"`));
+          b.diya = ctx.el("hero", path("M10 -150 Q30 -132 50 -150 Q42 -146 40 -154 L20 -154 Q18 -146 10 -150 Z", C.gold, 2.2));
+          b.lamp = ctx.el("hero", `<g class="fill"><circle cx="30" cy="-170" r="38" fill="url(#warm)"/><path d="M10 -150 Q30 -132 50 -150 Q42 -146 40 -154 L20 -154 Q18 -146 10 -150 Z" fill="#3a2418"/><path class="flame" d="M30 -182 C35.5 -173 35.5 -165 30 -160 C24.5 -165 24.5 -173 30 -182 Z" fill="url(#flameG)"/></g>`);
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(1400, 11500);
+          op(B[2].him.concat(B[2].ear), .04, 2600);
+          await ctx.wait(1000);
+          await ctx.draw(b.head, .7, { glide: 600, slow: 1.4 });
+          await ctx.draw(b.body, 1.6, { glide: 200, slow: 1.4 });
+          await ctx.draw(b.crown, .8, { glide: 400 });
+          await ctx.draw(b.arm, 1.4, { glide: 400, slow: 1.4 });
+          await ctx.draw(b.fingers, .6, { glide: 100 });
+          ctx.dim(0); const th = B[3].thread, s0 = th.getPointAtLength(0); ctx.at(s0.x, s0.y); ctx.dim(1);
+          await ctx.follow(th, 3800);
+          await ctx.draw(b.diya, 1.2, { glide: 300 });
+          on(b.lamp);
+          ctx.chord([196, 246.94, 293.66, 392], 5); ctx.sparks(30, -170, 14, C.heart, true); ctx.ripple(30, -170, 140);
+          ctx.show(false);
+          await ctx.wait(1400);
+        },
+        settle(ctx, b) { drawn([b.head, b.body, b.arm, b.fingers, b.crown, b.diya]); on(b.lamp); op(B[2].him.concat(B[2].ear), .04, 0); ctx.show(false); ctx.size(5, 0); ctx.at(30, -170); },
+      },
+      /* V · Kept with lamps. A flame lifts from his lamp (his stays lit); windows relight; lamps on every roof and along
+         the ground; the child and his ring return; the flame rises to the wall's thread and lights the first lamp. */
+      {
+        k: "V · Kept with lamps", cam: { cx: -210, w: 1560, top: -830 }, bg: "#120906", mood: "bright",
+        text: "So one of Diwali's lamps is lit for the one who had been darkest. Across much of the South, Naraka Chaturdashi is Deepavali itself.",
+        build(ctx) {
+          const b = {};
+          const roofs = [[230, -280], [380, -380], [530, -270], [650, -260], [170, -150], [330, -250], [430, -250], [480, -150], [610, -230], [700, -150], [250, -150], [560, -150]];
+          b.roof = flat(ctx.el("fills", roofs.map(([x, y]) => FL.lamp(x, y, 1.1)).join("")));
+          b.ground = []; for (let x = -1040; x <= 820; x += 64) if (x < 150 || x > 730) b.ground.push(x);
+          b.groundL = flat(ctx.el("fills", b.ground.map((x) => FL.lamp(x, -1, 1)).join("")));
+          b.wall = FL.wall(ctx, { x0: -1000, x1: 700, y: -760, n: 1 });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 7600);
+          ctx.at(30, -176); ctx.size(4, 0); ctx.show(true);
+          await ctx.glide(330, -170, 1500, true);
+          setBg("#120906");
+          B[2].wins.forEach((w, i) => ctx.later(((i * 5) % 18) * 90, () => op(w, 1, 600)));
+          b.roof.forEach((l, i) => ctx.later(300 + i * 150, () => l.classList.add("on")));
+          op(B[2].lights, 1, 2400);
+          await ctx.wait(1500);
+          b.groundL.forEach((l, i) => ctx.later(Math.abs(b.ground[i] - 80) * 1.2, () => l.classList.add("on")));
+          op(B[1].child.concat(B[1].ring), 1, 2800);
+          await ctx.wait(1800);
+          await FL.wallPlay(ctx, b.wall);
+        },
+        settle(ctx, b) {
+          on([b.roof, b.groundL]); op(B[2].wins, 1, 0); op(B[2].lights, 1, 0); op(B[1].child.concat(B[1].ring), 1, 0);
+          setBg("#120906"); FL.wallSettle(ctx, b.wall);
+        },
+      },
+    ],
+  });
+})();
+</script>

@@ -1,0 +1,207 @@
+<title>Fifty-Two Threads</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mukta:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="engine.css">
+<style>
+/* Bandi Chhor · zari: gold thread on dark velvet, each line stitched with a shadow beneath it. The Guru is never drawn;
+   he is present only as the cloak and its threads. */
+:root{
+  --bg:#2E1222; --paper:#2A0B16; --ember:#B8862E; --gold:#E8C26A; --heart:#FFD27A;
+  --cream:#F3E7D3; --muted:#C4B09F; --line:rgba(232,194,106,.32);
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Mukta','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+.canvas .ln{filter:drop-shadow(0 1.6px 0 rgba(12,2,6,.95)) drop-shadow(0 0 3px rgba(232,194,106,.28))}
+</style>
+<script src="engine.js"></script>
+<script>
+/* Shot list (what the flame draws · what it becomes · what stays)
+   I    The flame comes in through where the gate will be and draws the fort of Gwalior in one line: bastions,
+        battlements, the gate. Fifty-two crowned heads appear inside, dim. The flame finds the cloak among them and it
+        glows: the Guru is there only as the cloak.
+   II   Outside, the emperor under a canopy. A decree unrolls from him to the gate. Fine threads run out from the cloak
+        to every king: he would not leave alone.
+   III  The cloak's hem is stitched; fifty-two tassels fall from it, one to each king. The flame draws one more, the
+        longest, reaching down out of the picture toward whoever is reading. The walls dim; the cloak and the kings walk
+        out together, threads in hand.
+   IV   Amritsar: the Harmandir Sahib in one line on its pool, with its causeway and gate, and its reflection. The lamps
+        come on around it, the pool's edge, the causeway, until it is all light. The camera pulls back; the flame rises
+        to the wall's thread and lights the fourth lamp.
+   Turn The flame comes down into the guest's lamp: "A light you carry out for others becomes a city." */
+(() => {
+  const { HEAD, path, rnd, flat, op, drawn, on, setBg, B } = FL;
+  const C = { gold: "#E8C26A", cream: "#F3E7D3", dim: "rgba(232,194,106,.5)", heart: "#FFD27A", water: "#5E86C4" };
+  let FORT = "M-420 0 L-420 -280 L-432 -280 L-432 -330 Q-400 -366 -368 -330 L-368 -280 L-380 -280 L-380 -250";
+  for (let x = -380; x < 380; x += 40) FORT += ` L${x + 20} -250 L${x + 20} -264 L${x + 40} -264 L${x + 40} -250`;
+  FORT += " L380 -280 L368 -280 L368 -330 Q400 -366 432 -330 L432 -280 L420 -280 L420 0";
+  const KINGS = []; [-40, -85, -130, -175].forEach((y) => { for (let x = -340; x <= -100; x += 40) KINGS.push([x, y]); for (let x = 100; x <= 300; x += 40) KINGS.push([x, y]); });
+  const king = (x, y) => `${HEAD(x, y - 30, 8)} M${x - 7} ${y - 40} L${x - 5} ${y - 47} L${x} ${y - 42} L${x + 5} ${y - 47} L${x + 7} ${y - 40} M${x - 13} ${y - 12} C${x - 10} ${y - 22} ${x + 10} ${y - 22} ${x + 13} ${y - 12}`;
+  const CLOAK = "M-56 -268 C-58 -220 -66 -150 -76 -92 L76 -92 C66 -150 58 -220 56 -268 Z M-56 -268 C-30 -250 -14 -230 -8 -200 M56 -268 C30 -250 14 -230 8 -200";
+  const AMR = { cx: 1500, w: 940, top: -560 }, WIDE = { cx: 1500, w: 1180, top: -840 };
+
+  FL.story({
+    slug: "bandi-chhor", code: "qrcode-4", title: "Fifty-Two Threads",
+    kicker: "The fourth lamp on the wall · Bandi Chhor",
+    lede: "We come into this life with a forgetting. Diwali is the night we help each other remember.",
+    question: "Who did you bring out of the dark with you?",
+    turn: "A light kept for yourself is a lamp. A light you carry out for others becomes a city.",
+    turnCam: WIDE,
+    samples: [
+      "My younger brother, the year our parents split.",
+      "A coworker who was drowning. We both made it.",
+      "My mother, after my father passed. We learned to laugh again together.",
+      "My best friend from school. We still call each other every Diwali.",
+    ],
+    binduHue: 38,
+    defs: `<clipPath id="poolClip"><rect x="1000" y="-110" width="1000" height="110"/></clipPath>`,
+    chapters: [
+      {
+        k: "I · The fort at Gwalior", cam: { cx: 0, w: 900, top: -400 }, bg: "#2E1222", mood: "dark",
+        text: "Guru Hargobind, the sixth Sikh Guru, was held in the fort at Gwalior. Inside its walls he found fifty-two kings, prisoners too, some held so long they had stopped expecting to leave.",
+        build(ctx) {
+          const b = {};
+          b.fortFill = ctx.el("far", `<g class="fill"><path d="${FORT} Z" fill="#240A13"/></g>`);
+          b.fort = ctx.el("scene", path(FORT, C.gold, 2.6));
+          b.proc = ctx.el("hero", `<g class="proc"></g>`);
+          const into = (html) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "g"); t.innerHTML = html; const out = [...t.childNodes]; out.forEach((n) => b.proc.append(n)); return out; };
+          b.cloakFill = into(`<g class="fill"><path d="${CLOAK}" fill="#3A1020" fill-rule="evenodd"/><path d="${CLOAK}" fill="url(#warm)" opacity=".5"/></g>`)[0];
+          b.cloak = into(path(CLOAK, C.gold, 2.6))[0];
+          b.peg = into(path("M-62 -270 L62 -270 M0 -270 L0 -296 M-8 -296 L8 -296", C.gold, 2.2))[0];
+          b.kings = into(KINGS.map(([x, y]) => path(king(x, y), C.cream, 1.7)).join(""));
+          b.kingsG = b.kings;
+          b.gate = ctx.el("top", `<g><path d="M-52 0 L-52 -112 Q0 -170 52 -112 L52 0 Z" fill="#160509"/>${path("M-52 0 L-52 -112 Q0 -170 52 -112 L52 0 M-26 0 L-26 -136 M0 0 L0 -144 M26 0 L26 -136", C.gold, 2.2)}</g>`);
+          b.gateLine = b.gate.querySelector(".ln");
+          return b;
+        },
+        async play(ctx, b, from) {
+          ctx.phrases(1400, 10000);
+          if (from) ctx.at(from.x, from.y); else ctx.at(0, 100);
+          ctx.size(5, 0); ctx.show(true);
+          op(b.kings, .4, 0);
+          await ctx.glide(-420, 0, 1500, true);
+          await ctx.draw(b.fort, 4.2, { noGlide: true });
+          on(b.fortFill);
+          await ctx.draw(b.gateLine, 1.2, { glide: 300 });
+          ctx.cascade(b.kings, 700, 40);
+          await ctx.wait(1600);
+          // the flame finds him among them: the cloak
+          await ctx.draw(b.peg, .6, { glide: 600 });
+          await ctx.draw(b.cloak, 1.6, { glide: 200 });
+          on(b.cloakFill); ctx.ripple(0, -180, 120);
+          await ctx.glide(200, -320, 900);
+        },
+        settle(ctx, b) { drawn([b.fort, b.gateLine, b.kings, b.cloak, b.peg]); op(b.kings, .4, 0); on([b.fortFill, b.cloakFill]); ctx.show(true); ctx.size(5, 0); ctx.at(200, -320); },
+      },
+      {
+        k: "II · The condition", cam: { cx: 230, w: 960, top: -420 }, bg: "#331628", mood: "held",
+        text: "When the emperor Jahangir agreed to release the Guru, the Guru said he would not leave alone. The emperor set a condition he thought would end the matter: whoever could hold on to the Guru's cloak as he walked out could go with him.",
+        build(ctx) {
+          const b = {};
+          b.canopy = ctx.el("scene", path("M490 0 L490 -170 M650 0 L650 -170 M478 -170 L662 -170 M490 -170 Q570 -276 650 -170 M570 -248 L570 -276 M562 -270 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0", C.gold, 2.4));
+          b.emp = [path(HEAD(570, -118, 11), C.cream, 2.4), path("M562 -106 C558 -86 556 -64 560 -42 C574 -38 590 -38 602 -44", C.cream, 2.4), path("M566 -96 C552 -86 540 -80 528 -78", C.cream, 2.2)].map((d) => ctx.el("scene", d));
+          b.scroll = ctx.el("scene", path("M524 -84 L120 -84 M120 -96 L120 -72 M524 -96 L524 -72", C.gold, 2));
+          b.script = ctx.el("scene", path("M480 -80 c6 -6 12 6 18 0 c6 -6 12 6 18 0 M420 -80 c6 -6 12 6 18 0 c6 -6 12 6 18 0 c6 -6 12 6 18 0 M340 -80 c6 -6 12 6 18 0 c6 -6 12 6 18 0 M260 -80 c6 -6 12 6 18 0 c6 -6 12 6 18 0 c6 -6 12 6 18 0 M180 -80 c6 -6 12 6 18 0", C.dim, 1.4));
+          b.web = KINGS.map(([x, y]) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "g"); t.innerHTML = path(`M0 -200 L${x} ${y - 30}`, "rgba(255,214,140,.35)", .9); const el = t.firstChild; B[1].proc.insertBefore(el, B[1].proc.firstChild); return el; });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 12500);
+          ctx.show(true); ctx.size(5, 0);
+          await ctx.draw(b.canopy, 2.0, { glide: 1200 });
+          for (const p of b.emp) await ctx.draw(p, .5, { glide: 140 });
+          await ctx.draw(b.scroll, 1.8, { glide: 300 });
+          ctx.cascade(b.script, 1600);
+          await ctx.wait(900);
+          // he would not leave alone: a fine thread from the cloak to every king
+          await ctx.glide(0, -200, 1200, true);
+          ctx.cascade(b.web, 700, 35);
+          op(B[1].kings, .7, 2400);
+          await ctx.wait(2600);
+          ctx.ripple(0, -60, 70);
+          await ctx.glide(0, -60, 900);
+        },
+        settle(ctx, b) { drawn([b.canopy, b.emp, b.scroll, b.script, b.web]); op(B[1].kings, .7, 0); ctx.show(true); ctx.size(5, 0); ctx.at(0, -60); },
+      },
+      {
+        k: "III · Fifty-two tassels", cam: { cx: 0, w: 900, top: -420 }, bg: "#3A1A2E", mood: "bright",
+        text: "So the Guru had a cloak made with fifty-two tassels. One for every king. They walked out together, each one holding a thread.",
+        build(ctx) {
+          const b = {};
+          const into = (html) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "g"); t.innerHTML = html; const out = [...t.childNodes]; out.forEach((n) => B[1].proc.append(n)); return out; };
+          b.hem = into(path("M-72 -92 C-40 -86 40 -86 72 -92 M-70 -98 C-40 -92 40 -92 70 -98", C.heart, 2))[0];
+          b.tassels = into(KINGS.map(([x, y], i) => { const hx = -66 + (i / 51) * 132; return path(`M${hx.toFixed(1)} -90 C${hx.toFixed(1)} -70 ${((hx + x) / 2).toFixed(1)} ${(y - 10).toFixed(1)} ${x} ${y - 16}`, C.gold, 1.3); }).join(""));
+          b.last = into(path("M0 -90 C10 -60 -14 -30 4 -4 C14 10 -6 30 2 60", C.heart, 3, "glow"))[0];
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 7500);
+          ctx.show(true); ctx.size(5, 0);
+          await ctx.draw(b.hem, 1.0, { glide: 900 });
+          op(B[2].web, 0, 1200);
+          ctx.cascade(b.tassels, 800, 45);
+          await ctx.wait(3000);
+          op(B[1].kings, 1, 1600);
+          // one more, the longest, reaching out of the picture
+          await ctx.draw(b.last, 1.6, { glide: 300, slow: 1.3 });
+          ctx.ripple(0, 30, 60);
+          await ctx.wait(500);
+          // they walk out together; the walls let them go
+          op([B[1].fort, B[1].fortFill, B[1].gate], .3, 2400); op([B[2].canopy, B[2].emp, B[2].scroll, B[2].script], .08, 2000);
+          ctx.show(false);
+          const proc = B[1].proc;
+          ctx.camera({ cx: 560, w: 1100, top: -420 }, 4200);
+          await ctx.tween(4200, (e) => proc.setAttribute("transform", `translate(${(e * 760).toFixed(1)} 0)`), (f) => f * f * (3 - 2 * f));
+          ctx.chord([293.66, 369.99, 440]);
+        },
+        settle(ctx, b) {
+          drawn([b.hem, b.tassels, b.last]); op(B[2].web, 0, 0); op(B[1].kings, 1, 0); op([B[1].fort, B[1].fortFill, B[1].gate], .3, 0); op([B[2].canopy, B[2].emp, B[2].scroll, B[2].script], .08, 0);
+          B[1].proc.setAttribute("transform", "translate(760 0)"); ctx.show(false); ctx.at(760, -90);
+        },
+      },
+      {
+        k: "IV · Amritsar", cam: AMR, bg: "#3E2240", mood: "bright",
+        text: "Sikh tradition remembers that he reached Amritsar at Diwali, and the Harmandir Sahib was lit with lamps to welcome him. Sikhs keep the day as Bandi Chhor Divas: the day of release.",
+        build(ctx) {
+          const b = {};
+          const TEMPLE = "M1380 -110 L1380 -132 L1620 -132 L1620 -110 Z M1400 -132 L1400 -270 L1600 -270 L1600 -132 M1430 -270 L1430 -330 L1570 -330 L1570 -270 M1458 -330 C1458 -380 1498 -410 1500 -446 C1502 -410 1542 -380 1542 -330 M1500 -446 L1500 -470 M1404 -270 Q1416 -296 1428 -270 M1572 -270 Q1584 -296 1596 -270 M1432 -330 Q1444 -356 1456 -330 M1544 -330 Q1556 -356 1568 -330";
+          const WIN = "M1420 -150 L1420 -186 Q1430 -200 1440 -186 L1440 -150 M1460 -150 L1460 -186 Q1470 -200 1480 -186 L1480 -150 M1520 -150 L1520 -186 Q1530 -200 1540 -186 L1540 -150 M1560 -150 L1560 -186 Q1570 -200 1580 -186 L1580 -150 M1488 -132 L1488 -200 Q1500 -222 1512 -200 L1512 -132 M1420 -210 L1580 -210 M1450 -290 L1550 -290";
+          b.pool = ctx.el("scene", path("M1060 -110 L1940 -110 M1080 -84 C1200 -78 1300 -90 1420 -84 C1540 -78 1700 -90 1920 -84 M1100 -58 C1240 -52 1360 -64 1500 -58 C1640 -52 1760 -64 1900 -58", C.water, 1.6));
+          b.temple = ctx.el("scene", path(TEMPLE, C.gold, 2.4));
+          b.win = ctx.el("scene", path(WIN, C.gold, 1.6));
+          b.causeway = ctx.el("scene", path("M1380 -118 L1180 -118 M1380 -126 L1180 -126 M1150 -110 L1150 -230 Q1180 -270 1210 -230 L1210 -110", C.gold, 2));
+          b.mirror = ctx.el("far", `<g class="fill" clip-path="url(#poolClip)"><g transform="translate(0 -220) scale(1 -1)" opacity=".22"><path d="${TEMPLE}" fill="none" stroke="${C.gold}" stroke-width="2"/></g></g>`);
+          b.glow = ctx.el("far", `<g class="fill"><ellipse cx="1500" cy="-260" rx="360" ry="260" fill="url(#warm)" opacity=".55"/></g>`);
+          const L = []; for (let x = 1390; x <= 1610; x += 22) L.push([x, -270]); for (let x = 1440; x <= 1560; x += 20) L.push([x, -330]); for (let x = 1080; x <= 1920; x += 42) L.push([x, -110]); for (let x = 1200; x <= 1370; x += 34) L.push([x, -126]);
+          b.lamps = flat(ctx.el("fills", L.map(([x, y]) => FL.lamp(x, y, .62)).join("")));
+          b.order = L.map((p, i) => i).sort((i, j) => Math.hypot(L[i][0] - 1500, L[i][1] + 300) - Math.hypot(L[j][0] - 1500, L[j][1] + 300));
+          b.wall = FL.wall(ctx, { x0: 1000, x1: 2000, y: -780, n: 4, sag: 40, color: "rgba(232,194,106,.55)" });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 9000);
+          ctx.at(1100, -90); ctx.size(5, 0); ctx.show(true);
+          // they arrive along the causeway
+          const proc = B[1].proc; proc.style.opacity = 1;
+          await ctx.draw(b.pool, 2.0, { glide: 600 });
+          await ctx.draw(b.causeway, 1.4, { glide: 300 });
+          await ctx.draw(b.temple, 3.6, { glide: 300 });
+          await ctx.draw(b.win, 1.4, { glide: 200 });
+          on(b.mirror);
+          // lit with lamps to welcome him
+          setBg("#5A3448");
+          b.order.forEach((i, k) => ctx.later(k * 45, () => b.lamps[i].classList.add("on")));
+          ctx.later(400, () => on(b.glow));
+          await ctx.glide(1500, -470, 1400);
+          ctx.chord([261.63, 329.63, 392, 523.25], 5); ctx.sparks(1500, -470, 16, C.heart, true);
+          await ctx.wait(2200);
+          await ctx.camera(WIDE, 2000);
+          await FL.wallPlay(ctx, b.wall);
+        },
+        settle(ctx, b) { drawn([b.pool, b.causeway, b.temple, b.win]); on([b.mirror, b.lamps, b.glow]); setBg("#5A3448"); FL.wallSettle(ctx, b.wall); },
+      },
+    ],
+  });
+})();
+</script>

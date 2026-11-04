@@ -1,0 +1,235 @@
+<title>Coming Home</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mukta:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="engine.css">
+<style>
+/* Rama · shadow puppets (tholu bommalata): the flame draws each figure in line, then the coloured, pierced leather
+   blooms behind it as if a lamp stood behind the screen. The screen grows warmer every scene until the city is light. */
+:root{
+  --bg:#E9D2A6; --paper:#F3E2BE; --ember:#9A3A1E; --gold:#A8740E; --heart:#A8620A;
+  --cream:#2B160A; --muted:#5A4430; --line:rgba(90,55,20,.35);
+  --note:#6E5A44; --field:#FFF6E4; --surface:rgba(255,246,228,.82); --kept:#F2D7A0; --tdoff:#E6CFA4; --chosen:#F6DDB0; --holdbg:#F7E3BC; --onGold:#FFF6E4;
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Mukta','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+</style>
+<script src="engine.js"></script>
+<script>
+/* Shot list (what the flame draws · what it becomes · what stays)
+   I    A lamp-lit screen. Puppet trees; Rama with crown and bow; Sita with her braid. A dark sweep carries Sita away
+        across the sea to Lanka's towers. A bridge of stones goes down across the water; Rama crosses; arrows fly; Sita
+        comes back to his side. The camera follows them to the far shore.
+   II   Three radiant lights come down: the gods. The flame draws a great faint wheel around him: you are Vishnu.
+   III  Close. His bow lowers; one hand opens upward: tell me who I am. The flame settles at his chest, the wheel's hub,
+        and the wheel stays faint: even he had forgotten.
+   IV   The road home. A dark new-moon disc. Ayodhya drawn in one line. Rama and Sita walk; lamps come on, on every roof
+        and wall and road, until the screen is all light.
+   V    Pulled back: the gods above, the people with lamps at the gate, Rama between. The flame rises to the wall's
+        thread and lights the fifth lamp.
+   Turn The flame comes down into the guest's lamp. On the last page, the wall's closing line. */
+(() => {
+  const { HEAD, path, rnd, flat, op, drawn, on, setBg, B } = FL;
+  const C = { cream: "#3A1E0E", gold: "#A8740E", red: "#C8402A", green: "#3E8F5A", indigo: "#3A4FA0", dim: "rgba(90,55,20,.55)", sea: "#4C73A9", heart: "#C27A0A" };
+  const NSV = "http://www.w3.org/2000/svg";
+  const into = (g, html) => { const t = document.createElementNS(NSV, "g"); t.innerHTML = html; const out = [...t.childNodes]; out.forEach((n) => g.append(n)); return out.length === 1 ? out[0] : out; };
+  const leather = (d, color) => `<g class="fill"><path d="${d}" fill="${color}" opacity=".5"/><path d="${d}" fill="url(#perf)"/></g>`;
+  const at = (g, x, y = 0) => g.setAttribute("transform", `translate(${x} ${y})`);
+  const slide = (ctx, g, from, to, ms) => ctx.tween(ms, (e) => at(g, from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e));
+  const RAMA_AT = { lanka: 880, home: 1240 }, SITA_AT = { taken: 640, back: 700, home: 1070 };
+  const WIDE = { cx: 800, w: 1260, top: -740 };
+
+  FL.story({
+    slug: "rama", code: "qrcode-5", title: "Coming Home",
+    kicker: "The fifth lamp on the wall · Rama",
+    lede: "We come into this life with a forgetting. Diwali is the night we help each other remember.",
+    question: "What did you forget that you already were, and what brought you back?",
+    turn: ["That is the story every lamp tonight is telling. We are not becoming something new. We are finding our way back to what we already were, and the people who love us light the road."],
+    turnCam: WIDE,
+    closing: "Every lamp in this room was lit from another. Thank you for bringing yours.",
+    samples: [
+      "That I was a musician. My kids asked me to play again.",
+      "Kind. I had grown sharp at work, and my wife said so, gently.",
+      "A daughter. I called my mother after three years.",
+      "Brave. A stranger's small kindness reminded me.",
+    ],
+    binduHue: 40,
+    light: true,
+    defs: `<pattern id="perf" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.5" fill="rgba(20,8,4,.6)"/></pattern>
+      <radialGradient id="screenG" cx="50%" cy="60%" r="60%"><stop offset="0" stop-color="#FFFBEF" stop-opacity=".9"/><stop offset=".6" stop-color="#FFF1D2" stop-opacity=".45"/><stop offset="1" stop-color="#FFF1D2" stop-opacity="0"/></radialGradient>`,
+    chapters: [
+      {
+        k: "I · The forest years", cam: { cx: -300, w: 900, top: -480 }, bg: "#E9D2A6", mood: "held",
+        text: "For fourteen years Rama lived in the forest, a prince without a palace. Sita was taken from him. He crossed the sea to Lanka, fought, and brought her back.",
+        build(ctx) {
+          const b = {};
+          b.screen = ctx.el("sky", `<rect x="-1400" y="-1100" width="3400" height="1100" fill="url(#screenG)" style="opacity:.18"/>`);
+          b.ground = ctx.el("scene", path("M-900 0 L-60 0 M360 0 L1500 0", C.dim, 1.6));
+          b.trees = [-680, -540, -140].map((x) => { const cd = `M${x} -90 C${x - 70} -100 ${x - 90} -180 ${x - 50} -230 C${x - 40} -290 ${x + 40} -300 ${x + 54} -240 C${x + 96} -190 ${x + 70} -100 ${x} -90 Z`; return { fill: ctx.el("fills", leather(cd, C.green)), line: ctx.el("scene", path(`M${x} 0 L${x} -90 ${cd.replace(/^M[^C]+/, `M${x} -90 `)}`, C.cream, 2.2)) }; });
+          b.gR = ctx.el("hero", `<g class="rama"></g>`);
+          const RAMA_BODY = "M-392 -312 L-368 -312 L-364 -170 L-350 -60 L-410 -60 L-396 -170 Z";
+          b.rFill = into(b.gR, leather(RAMA_BODY, C.green));
+          b.rama = [HEAD(-380, -330, 18), "M-394 -348 L-390 -382 L-380 -368 L-370 -382 L-366 -348",
+            "M-392 -312 C-396 -270 -398 -220 -394 -170 L-410 -60 L-398 0 M-368 -312 C-364 -270 -362 -220 -366 -170 L-350 -60 L-362 0", "M-410 -60 L-350 -60"].map((d, i) => into(b.gR, path(d, i === 1 ? C.gold : C.cream, 2.8)));
+          b.bowArm = into(b.gR, path("M-380 -290 C-352 -286 -332 -282 -316 -280", C.cream, 2.6));
+          b.bow = into(b.gR, path("M-312 -386 Q-272 -280 -312 -174 L-312 -386", C.gold, 2.4));
+          b.ask = into(b.gR, path("M-380 -292 C-360 -276 -344 -270 -326 -272 M-326 -272 C-318 -284 -310 -288 -300 -286 M-326 -272 C-316 -278 -306 -278 -298 -274 M-326 -272 C-318 -270 -310 -266 -302 -262", C.cream, 2.6));
+          b.gS = ctx.el("hero", `<g class="sita"></g>`);
+          const SARI = "M-258 -296 L-242 -296 L-212 -60 L-290 -60 Z";
+          b.sFill = into(b.gS, leather(SARI, C.red));
+          b.sita = [HEAD(-250, -312, 16), "M-262 -320 C-282 -300 -286 -260 -278 -222", "M-258 -296 C-266 -250 -272 -180 -290 -60 L-284 0 M-242 -296 C-236 -250 -228 -180 -212 -60 L-218 0 M-290 -60 L-212 -60"].map((d) => into(b.gS, path(d, C.cream, 2.6)));
+          b.sweep = ctx.el("scene", path("M-240 -300 C-120 -480 160 -480 360 -300", "#5A1A12", 3.4, "", `opacity=".9"`));
+          b.sea = ctx.el("scene", path("M-60 -2 c20 -14 40 -14 60 0 c20 14 40 14 60 0 c20 -14 40 -14 60 0 c20 14 40 14 60 0 c20 -14 40 -14 60 0 c20 14 40 14 60 0 c20 -14 40 -14 60 0", C.sea, 2));
+          b.lanka = ctx.el("scene", path("M380 0 L380 -160 L400 -200 L420 -160 L420 -120 L450 -120 L450 -230 L470 -270 L490 -230 L490 -120 L520 -120 L520 -180 L540 -210 L560 -180 L560 0", C.dim, 2));
+          b.stones = flat(ctx.el("fills", Array.from({ length: 11 }, (_, i) => `<g class="fill"><ellipse cx="${-40 + i * 38}" cy="-8" rx="15" ry="7" fill="#8A7A66" stroke="${C.cream}" stroke-width="1"/></g>`).join("")));
+          b.arrows = [0, 1, 2, 3].map((i) => ctx.el("top", path(`M${420 + i * 10} ${-260 + i * 30} L${560 + i * 20} ${-300 + i * 26}`, C.heart, 1.8)));
+          b.screen2 = b.screen;
+          return b;
+        },
+        async play(ctx, b, from) {
+          ctx.phrases(1400, 10500);
+          if (from) ctx.at(from.x, from.y); else ctx.at(-700, 100);
+          ctx.size(5, 0); ctx.show(true);
+          await ctx.glide(-860, 0, 1300, true);
+          await ctx.draw(b.ground, 1.6, { noGlide: true });
+          for (const t of b.trees) { await ctx.draw(t.line, .9, { glide: 200 }); on(t.fill); }
+          for (const p of b.rama.concat([b.bowArm, b.bow])) await ctx.draw(p, .4, { glide: 130 });
+          on(b.rFill);
+          for (const p of b.sita) await ctx.draw(p, .4, { glide: 130 });
+          on(b.sFill);
+          // taken: a dark sweep carries her away over the sea
+          await ctx.camera({ cx: 120, w: 1200, top: -480 }, 1600);
+          ctx.cascade(b.sweep, 1600);
+          await ctx.draw(b.sea, 1.4, { glide: 600 });
+          await ctx.draw(b.lanka, 1.4, { glide: 300 });
+          await slide(ctx, b.gS, [0, 0], [SITA_AT.taken, 0], 2400);
+          op(b.sweep, .25, 1200);
+          // he crosses on a bridge of stones, fights, and brings her back
+          b.stones.forEach((s, i) => ctx.later(i * 120, () => s.classList.add("on")));
+          await ctx.wait(1300);
+          await slide(ctx, b.gR, [0, 0], [RAMA_AT.lanka, 0], 2600);
+          ctx.cascade(b.arrows, 500, 160); ctx.sparks(480, -240, 14, C.heart);
+          await ctx.wait(900);
+          op(b.arrows, 0, 900);
+          await slide(ctx, b.gS, [SITA_AT.taken, 0], [SITA_AT.back, 0], 1200);
+          ctx.ripple(470, -240, 120);
+          await ctx.glide(470, -420, 800);
+        },
+        settle(ctx, b) {
+          drawn([b.ground, b.trees.map((t) => t.line), b.rama, b.bowArm, b.bow, b.sita, b.sweep, b.sea, b.lanka]); on([b.trees.map((t) => t.fill), b.rFill, b.sFill, b.stones]);
+          op(b.sweep, .25, 0); op(b.arrows, 0, 0); at(b.gR, RAMA_AT.lanka); at(b.gS, SITA_AT.back); ctx.show(true); ctx.size(5, 0); ctx.at(470, -420);
+        },
+      },
+      {
+        k: "II · The gods came", cam: { cx: 500, w: 860, top: -640 }, bg: "#F0DCB4", mood: "bright",
+        text: "And there, at the end of the war, the gods came and told him who he was. You are Vishnu, they said. You were never only a prince.",
+        build(ctx) {
+          const b = {};
+          b.gods = [[360, -560], [500, -600], [640, -560]].map(([x, y]) => ctx.el("hero", `<g class="fill" style="transform:translateY(-120px);transition:transform 2.4s cubic-bezier(.16,1,.3,1),opacity 1.8s ease"><circle cx="${x}" cy="${y}" r="44" fill="url(#warm)"/><circle cx="${x}" cy="${y}" r="16" fill="none" stroke="${C.heart}" stroke-width="2"/>${Array.from({ length: 8 }, (_, i) => { const a = i / 8 * Math.PI * 2; return `<path d="M${(x + Math.cos(a) * 22).toFixed(1)} ${(y + Math.sin(a) * 22).toFixed(1)} L${(x + Math.cos(a) * 34).toFixed(1)} ${(y + Math.sin(a) * 34).toFixed(1)}" stroke="${C.heart}" stroke-width="1.6" stroke-linecap="round"/>`; }).join("")}</g>`));
+          let spokes = ""; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; spokes += ` M${(500 + Math.cos(a) * 60).toFixed(1)} ${(-250 + Math.sin(a) * 60).toFixed(1)} L${(500 + Math.cos(a) * 210).toFixed(1)} ${(-250 + Math.sin(a) * 210).toFixed(1)}`; }
+          b.wheel = ctx.el("far", path(`M500 -460 a210 210 0 1 0 0.1 0 M500 -310 a60 60 0 1 0 0.1 0${spokes}`, C.gold, 1.8, "", `opacity=".42"`));
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 8000);
+          ctx.show(true); ctx.size(5, 0);
+          op(B[1].screen, .3, 2000);
+          b.gods.forEach((g, i) => ctx.later(i * 500, () => { g.classList.add("on"); g.style.transform = "translateY(0)"; }));
+          await ctx.glide(500, -560, 2000, true);
+          ctx.chord([293.66, 369.99, 440]);
+          await ctx.wait(800);
+          await ctx.draw(b.wheel, 4.2, { glide: 700, slow: 1.1 });
+          await ctx.glide(500, -480, 800);
+        },
+        settle(ctx, b) { b.gods.forEach((g) => { g.classList.add("on"); g.style.transition = "none"; g.style.transform = "translateY(0)"; }); drawn(b.wheel); op(B[1].screen, .3, 0); ctx.show(true); ctx.size(5, 0); ctx.at(500, -480); },
+      },
+      {
+        k: "III · Tell me who I am", cam: { cx: 500, w: 520, top: -470 }, bg: "#EAD3A8", mood: "held",
+        text: ["In Valmiki's telling, Rama answered: I think of myself as a man, Rama, son of Dasharatha. Tell me who I am.", "Even he had forgotten."],
+        build(ctx) { return { hub: into(B[1].gR, `<g class="fill"><circle cx="-380" cy="-250" r="30" fill="url(#warm)"/><circle cx="-380" cy="-250" r="6" fill="#FFF1C8"/></g>`) }; },
+        async play(ctx, b) {
+          ctx.phrases(1200, 11000);
+          ctx.show(true); ctx.size(5, 0);
+          // the bow lowers; one hand opens upward
+          op([B[1].bow, B[1].bowArm], .15, 1800);
+          await ctx.wait(1200);
+          await ctx.draw(B[1].ask, 1.8, { glide: 600, slow: 1.4 });
+          await ctx.wait(1400);
+          // the flame settles at his chest: the hub of a wheel he does not see
+          await ctx.glide(500, -250, 2400, true);
+          on(b.hub); ctx.chord([146.83, 220, 293.66], 5);
+          ctx.show(false);
+          await ctx.wait(2400);
+        },
+        settle(ctx, b) { op([B[1].bow, B[1].bowArm], .15, 0); drawn(B[1].ask); on(b.hub); ctx.show(false); ctx.at(500, -250); },
+      },
+      {
+        k: "IV · Walking home", cam: { cx: 880, w: 1000, top: -620 }, bg: "#D9BE90", mood: "bright",
+        text: "Then he walked home. Tradition remembers it as the darkest night of the month, the new moon of Kartik, with nothing in the sky to guide anyone. So the people of Ayodhya filled the city with clay lamps, on every roof and wall and road, until the whole city was one light and he could find his way.",
+        build(ctx) {
+          const b = {};
+          b.road = ctx.el("scene", path("M560 -4 C700 -10 800 0 1000 -6 C1150 -10 1300 -2 1500 -6", C.dim, 1.8));
+          b.moon = ctx.el("scene", path("M760 -560 a30 30 0 1 0 0.1 0", "rgba(130,140,200,.6)", 1.6));
+          const CITY = "M900 0 L900 -170 Q930 -230 960 -170 L960 -120 L1000 -120 L1000 -240 Q1050 -320 1100 -240 L1100 -120 L1140 -120 L1140 -190 Q1170 -240 1200 -190 L1200 -120 L1240 -120 L1240 -170 Q1270 -220 1300 -170 L1300 0";
+          b.cityFill = ctx.el("far", leather(CITY + " Z", C.red));
+          b.city = ctx.el("scene", path(CITY, C.gold, 2.4));
+          b.gate = ctx.el("scene", path("M1025 0 L1025 -80 Q1050 -112 1075 -80 L1075 0", C.gold, 2));
+          const L = [];
+          [[930, -230], [1050, -320], [1170, -240], [1270, -220], [900, -170], [960, -170], [1000, -240], [1100, -240], [1140, -190], [1200, -190], [1240, -170], [1300, -170]].forEach((p) => L.push(p));
+          for (let x = 910; x <= 1290; x += 32) L.push([x, -120]);
+          for (let x = 580; x <= 1480; x += 46) L.push([x, -6]);
+          b.lamps = flat(ctx.el("fills", L.map(([x, y]) => FL.lamp(x, y, .8)).join("")));
+          b.order = L.map((p, i) => i).sort((i, j) => (L[i][0] - L[j][0]));
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 15500);
+          ctx.show(true); ctx.size(5, 0);
+          op(B[1].ask, .2, 1200); op(FL.B[3].hub, .4, 1200);
+          await ctx.draw(b.road, 2.0, { glide: 900 });
+          await ctx.draw(b.moon, 1.2, { glide: 600 });
+          setBg("#6E5034"); op(B[1].screen, .1, 2000);
+          await ctx.draw(b.city, 3.2, { glide: 600 });
+          await ctx.draw(b.gate, .8, { glide: 200 });
+          on(b.cityFill);
+          // they walk; the people light the way, roof by roof, until it is all light
+          slide(ctx, B[1].gR, [RAMA_AT.lanka, 0], [RAMA_AT.home, 0], 9000);
+          slide(ctx, B[1].gS, [SITA_AT.back, 0], [SITA_AT.home, 0], 9000);
+          ctx.show(false);
+          b.order.forEach((i, k) => ctx.later(600 + k * 150, () => b.lamps[i].classList.add("on")));
+          ctx.later(2000, () => { setBg("#FFF2D8"); op(B[1].screen, .85, 6000); });
+          await ctx.wait(9400);
+        },
+        settle(ctx, b) {
+          op(B[1].ask, .2, 0); op(FL.B[3].hub, .4, 0); drawn([b.road, b.moon, b.city, b.gate]); on([b.cityFill, b.lamps]);
+          at(B[1].gR, RAMA_AT.home); at(B[1].gS, SITA_AT.home); setBg("#FFF2D8"); op(B[1].screen, .85, 0); ctx.show(false); ctx.at(1050, -330);
+        },
+      },
+      {
+        k: "V · His people", cam: WIDE, bg: "#FFF2D8", mood: "bright",
+        text: "The gods told him who he was. His people lit the way back.",
+        build(ctx) {
+          const b = {};
+          const P = [930, 975, 1105, 1150, 1195, 1240, 1285];
+          b.people = P.map((x) => ctx.el("scene", path(`${HEAD(x, -104, 13)} M${x - 6} -91 C${x - 9} -60 ${x - 9} -28 ${x - 7} 0 M${x + 6} -91 C${x + 9} -60 ${x + 9} -28 ${x + 7} 0 M${x} -78 C${x + 9} -74 ${x + 15} -70 ${x + 19} -66`, C.cream, 2.4)));
+          b.pl = flat(ctx.el("fills", P.map((x) => FL.lamp(x + 22, -62, .9)).join("")));
+          b.wall = FL.wall(ctx, { x0: 240, x1: 1380, y: -700, n: 5, sag: 30, color: "rgba(150,100,30,.6)" });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 4000);
+          ctx.at(1050, -330); ctx.size(5, 0); ctx.show(true);
+          ctx.cascade(b.people, 800, 120);
+          b.pl.forEach((l, i) => ctx.later(500 + i * 160, () => l.classList.add("on")));
+          op(FL.B[3].hub, 1, 1200);
+          await ctx.glide(500, -600, 1800, true);
+          await ctx.wait(400);
+          await FL.wallPlay(ctx, b.wall);
+        },
+        settle(ctx, b) { drawn(b.people); on(b.pl); op(FL.B[3].hub, 1, 0); FL.wallSettle(ctx, b.wall); },
+      },
+    ],
+  });
+})();
+</script>

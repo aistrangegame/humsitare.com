@@ -1,0 +1,211 @@
+<title>The Light That Was Already Inside</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mukta:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="engine.css">
+<style>
+/* Mahavira · a Kalpa Sutra folio: a gold border drawn first, a vermilion ground that blooms inside it, white figures,
+   ultramarine for the night. Two compartments, as on a manuscript page: the teacher, and the student far away. */
+:root{
+  --bg:#2A120C; --paper:#2A0C0C; --ember:#B8862E; --gold:#E3B04B; --heart:#FFD27A;
+  --cream:#F4EEE2; --muted:#C2B2A2; --line:rgba(227,176,75,.32);
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Mukta','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+</style>
+<script src="engine.js"></script>
+<script>
+/* Shot list (what the flame draws · what it becomes · what stays)
+   I    The folio's gold border; a vermilion ground blooms in the left compartment. The teacher seated on a low throne.
+        A crown, a necklace and a cloth are drawn beside him, then dissolve: nothing in the way. A deer and a bird come
+        close: no harm. Three listeners; a small light opens in each. The flame circles his head: the halo.
+   II   Night falls inside the page: a dark new-moon disc, a lotus pond under the seat. His lines fade. The flame rises
+        to the top of the page and becomes the dot above the crescent of the liberated (siddhashila). Freed.
+   III  Eighteen kings, crowned, nine on each side of the seat. The flame comes down to the first king's lamp; the light
+        passes king to king until all eighteen hold one.
+   IV   The right compartment blooms. A road; the student walking with a staff. The flame carries the news to him. He sits,
+        bowed. A thread runs from his chest back to the teacher's halo; it slackens and falls away. The flame goes into
+        his chest and a halo opens around him. The camera pulls back to the whole page and the wall's thread above it;
+        the third lamp lights.
+   Turn The flame comes down into the guest's lamp: "The light that stayed was the one inside the student all along." */
+(() => {
+  const { HEAD, path, rnd, flat, op, drawn, on, setBg, B } = FL;
+  const C = { white: "#F4EEE2", gold: "#E3B04B", red: "#7E1A12", blue: "#2E4DA7", heart: "#FFD27A", dimgold: "rgba(227,176,75,.6)" };
+  const WIDE = { cx: 0, w: 1420, top: -830 };
+
+  FL.story({
+    slug: "mahavira", code: "qrcode-3", title: "The Light That Was Already Inside",
+    kicker: "The third lamp on the wall · Mahavira",
+    lede: "We come into this life with a forgetting. Diwali is the night we help each other remember.",
+    question: "What's something you understand now that you couldn't see before?",
+    turn: "The lamps outside were lit for a teacher who had gone. The light that stayed was the one inside the student all along.",
+    turnCam: WIDE,
+    samples: [
+      "That my father was doing his best with what he had.",
+      "Rest is not the same as quitting.",
+      "That I didn't need to be the strongest person in the room.",
+      "Why my grandmother prayed every morning.",
+    ],
+    binduHue: 45,
+    chapters: [
+      {
+        k: "I · Clear seeing", cam: { cx: -270, w: 680, top: -545 }, bg: "#2A120C", mood: "warm",
+        text: "Mahavira spent his life learning to see with nothing in the way: no possessions, no harm to any living thing, no clinging. Through his teaching, many found their own way to that clear seeing.",
+        build(ctx) {
+          const b = {};
+          b.frame = ctx.el("scene", path("M-600 0 L-600 -520 L600 -520 L600 0 Z", C.gold, 2.4));
+          b.border = ctx.el("far", `<g class="fill"><path class="st" d="M-588 -8 L-588 -508 L588 -508 L588 -8 Z" fill="none" stroke="${C.gold}" style="--b:2.2" stroke-linecap="round" stroke-dasharray="0 9" opacity=".7"/></g>`);
+          b.leftBox = ctx.el("scene", path("M-576 -16 L-576 -496 L44 -496 L44 -16 Z", C.gold, 1.4));
+          b.leftFill = ctx.el("far", `<g class="fill"><rect x="-576" y="-496" width="620" height="480" fill="${C.red}" opacity=".62"/></g>`);
+          b.throne = ctx.el("scene", path("M-360 -170 L-180 -170 L-196 -150 L-344 -150 Z M-344 -150 L-344 -130 M-196 -150 L-196 -130", C.gold, 2));
+          b.him = [path(HEAD(-270, -332, 22), C.white, 3), path("M-288 -308 C-298 -272 -302 -242 -298 -212 M-252 -308 C-242 -272 -238 -242 -242 -212", C.white, 3),
+            path("M-340 -196 C-310 -174 -230 -174 -200 -196 C-230 -212 -310 -212 -340 -196", C.white, 3), path("M-294 -250 C-286 -222 -254 -222 -246 -250", C.white, 2.6)].map((d) => ctx.el("scene", d));
+          b.things = [ctx.el("scene", path("M-450 -246 L-446 -266 L-436 -254 L-428 -272 L-420 -254 L-410 -266 L-406 -246 Z", C.gold, 2.2)),
+            ctx.el("scene", path("M-140 -270 a22 22 0 1 0 0.1 0", C.gold, 2.2, "", `stroke-dasharray="0.04 0.03"`)),
+            ctx.el("scene", path("M-160 -196 C-130 -220 -100 -206 -92 -176 C-110 -186 -136 -184 -160 -196", C.white, 2))];
+          b.deer = ctx.el("scene", path("M-540 -60 C-520 -70 -480 -70 -460 -60 M-536 -58 L-540 -20 M-522 -60 L-520 -20 M-478 -60 L-480 -20 M-464 -60 L-460 -20 M-460 -60 C-454 -78 -448 -92 -438 -98 L-426 -94 L-436 -86 M-442 -98 C-446 -110 -454 -114 -458 -110 M-444 -104 C-438 -116 -430 -118 -426 -112", C.white, 2.2));
+          b.bird = ctx.el("scene", path("M-140 -410 C-130 -420 -116 -420 -108 -412 C-100 -414 -94 -420 -88 -424 M-124 -414 C-126 -404 -120 -398 -112 -400", C.white, 2.2));
+          b.listen = [-360, -270, -180].map((x) => ctx.el("scene", path(`${HEAD(x, -100, 10)} M${x - 14} -62 C${x - 10} -82 ${x + 10} -82 ${x + 14} -62 M${x - 24} -40 C${x - 8} -30 ${x + 8} -30 ${x + 24} -40`, C.white, 2.2)));
+          b.sparks = flat(ctx.el("hero", [-360, -270, -180].map((x) => `<g class="fill"><circle cx="${x}" cy="-70" r="14" fill="url(#warm)"/><circle cx="${x}" cy="-70" r="3" fill="${C.heart}"/></g>`).join("")));
+          b.halo = ctx.el("hero", path("M-270 -382 a50 50 0 1 0 0.1 0", C.heart, 2.4, "glow"));
+          return b;
+        },
+        async play(ctx, b, from) {
+          ctx.phrases(1400, 10000);
+          if (from) ctx.at(from.x, from.y); else ctx.at(-600, 100);
+          ctx.size(5, 0); ctx.show(true);
+          await ctx.glide(-600, 0, 1300, true);
+          await ctx.draw(b.frame, 2.4, { noGlide: true });
+          on(b.border);
+          await ctx.draw(b.leftBox, 1.4, { glide: 300 });
+          on(b.leftFill);
+          await ctx.draw(b.throne, .8, { glide: 300 });
+          for (const p of b.him) await ctx.draw(p, .55, { glide: 140 });
+          for (const p of b.things) await ctx.draw(p, .4, { glide: 200 });
+          // nothing in the way: the things dissolve
+          b.things.forEach((t, i) => ctx.later(i * 250, () => { op(t, 0, 1400); }));
+          ctx.sparks(-428, -258, 6, C.gold); ctx.sparks(-130, -230, 6, C.gold);
+          await ctx.draw(b.deer, 1.2, { glide: 400 });
+          await ctx.draw(b.bird, .6, { glide: 400 });
+          for (const l of b.listen) await ctx.draw(l, .6, { glide: 200 });
+          b.sparks.forEach((s, i) => ctx.later(300 + i * 400, () => s.classList.add("on")));
+          await ctx.draw(b.halo, 1.6, { glide: 500 });
+          ctx.chord([220, 277.18, 329.63, 440]); ctx.ripple(-270, -332, 90);
+          await ctx.glide(-270, -404, 700);
+        },
+        settle(ctx, b) { drawn([b.frame, b.leftBox, b.throne, b.him, b.things, b.deer, b.bird, b.listen, b.halo]); on([b.border, b.leftFill, b.sparks]); op(b.things, 0, 0); ctx.show(true); ctx.size(5, 0); ctx.at(-270, -404); },
+      },
+      {
+        k: "II · Pavapuri", cam: { cx: -270, w: 680, top: -560 }, bg: "#1E0E1A", mood: "held",
+        text: "On the new-moon night of Kartik, at Pavapuri, he left his body and was freed for good. Jains call it his nirvana.",
+        build(ctx) {
+          const b = {};
+          b.night = ctx.el("far", `<g class="fill"><rect x="-576" y="-496" width="620" height="300" fill="#0E0A2A" opacity=".75"/></g>`);
+          b.moon = ctx.el("scene", path("M-470 -440 a26 26 0 1 0 0.1 0", "rgba(120,140,220,.55)", 1.6));
+          b.pond = ctx.el("scene", path("M-520 -138 C-470 -128 -420 -148 -370 -138 M-170 -138 C-120 -128 -70 -148 -20 -138 M-500 -118 C-450 -108 -400 -128 -350 -118 M-190 -118 C-140 -108 -90 -128 -40 -118", "rgba(150,170,240,.8)", 1.6));
+          b.leaves = ctx.el("scene", path("M-450 -128 a14 6 0 1 0 0.1 0 M-100 -128 a14 6 0 1 0 0.1 0", "rgba(150,170,240,.8)", 1.6));
+          b.crescent = ctx.el("hero", path("M-330 -440 C-310 -416 -230 -416 -210 -440 C-236 -428 -304 -428 -330 -440", C.heart, 2.4, "glow"));
+          b.siddha = ctx.el("hero", `<g class="fill"><circle cx="-270" cy="-466" r="30" fill="url(#warm)"/><circle cx="-270" cy="-466" r="6" fill="#FFF1C8"/></g>`);
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 6500);
+          ctx.show(true); ctx.size(5, 0);
+          on(b.night); setBg("#1E0E1A");
+          await ctx.draw(b.moon, 1.4, { glide: 900 });
+          await ctx.draw(b.pond, 1.6, { glide: 400 });
+          await ctx.draw(b.leaves, .8, { glide: 200 });
+          // he left his body: his lines fade; the flame rises out of the halo
+          await ctx.glide(-270, -332, 900);
+          op(B[1].him.concat([B[1].throne]), .15, 2600);
+          await ctx.wait(800);
+          await ctx.draw(b.crescent, 1.4, { glide: 1600, slow: 1.3 });
+          await ctx.glide(-270, -466, 900);
+          on(b.siddha); ctx.chord([146.83, 220, 293.66, 440], 5.5); ctx.ripple(-270, -466, 120); ctx.sparks(-270, -466, 10, C.heart);
+          ctx.show(false);
+          await ctx.wait(1400);
+        },
+        settle(ctx, b) { on([b.night, b.siddha]); drawn([b.moon, b.pond, b.leaves, b.crescent]); op(B[1].him.concat([B[1].throne]), .15, 0); setBg("#1E0E1A"); ctx.show(false); ctx.at(-270, -466); },
+      },
+      {
+        k: "III · Eighteen kings", cam: { cx: -270, w: 720, top: -560 }, bg: "#2E160E", mood: "warm",
+        text: "Eighteen kings had gathered there. They understood that a great light had gone out of the world, so they lit lamps. If the light of knowing had left, they would hold small lights in its place.",
+        build(ctx) {
+          const b = {}, pos = [];
+          [[-540, -490, -440], [-100, -50, 0]].forEach((xs) => [-24, -112, -200].forEach((y) => xs.forEach((x) => pos.push([x, y]))));
+          b.kings = pos.map(([x, y]) => ctx.el("scene", path(`${HEAD(x, y - 54, 9)} M${x - 8} ${y - 68} L${x - 6} ${y - 76} L${x} ${y - 70} L${x + 6} ${y - 76} L${x + 8} ${y - 68} M${x - 4} ${y - 45} C${x - 6} ${y - 30} ${x - 6} ${y - 14} ${x - 5} ${y} M${x + 4} ${y - 45} C${x + 6} ${y - 30} ${x + 6} ${y - 14} ${x + 5} ${y} M${x} ${y - 38} C${x + 6} ${y - 34} ${x + 10} ${y - 32} ${x + 13} ${y - 30}`, C.white, 1.8)));
+          b.lamps = flat(ctx.el("hero", pos.map(([x, y]) => FL.lamp(x + 16, y - 26, .55)).join("")));
+          b.order = pos.map((p, i) => i).sort((i, j) => Math.hypot(pos[i][0] + 540, pos[i][1] + 24) - Math.hypot(pos[j][0] + 540, pos[j][1] + 24));
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 10500);
+          op([B[1].listen, B[1].sparks, B[1].deer], .12, 1600);
+          ctx.cascade(b.kings, 900, 110);
+          await ctx.wait(2400);
+          // the flame comes down to the first king's lamp; the light passes from lamp to lamp
+          ctx.at(-270, -466); ctx.size(4, 0); ctx.show(true);
+          await ctx.glide(-524, -50, 2200, true);
+          b.lamps[b.order[0]].classList.add("on"); ctx.ripple(-524, -50, 50);
+          ctx.show(false);
+          for (const [k, i] of b.order.slice(1).entries()) { ctx.later(k * 260, () => b.lamps[i].classList.add("on")); }
+          await ctx.wait(17 * 260 + 1400);
+        },
+        settle(ctx, b) { op([B[1].listen, B[1].sparks, B[1].deer], .12, 0); drawn(b.kings); on(b.lamps); ctx.show(false); ctx.at(-524, -50); },
+      },
+      {
+        k: "IV · Gautama", cam: { cx: 330, w: 620, top: -545 }, bg: "#3A1C10", mood: "bright",
+        text: "His closest disciple, Gautama, was not there; Mahavira had sent him away to teach. When the news reached him, he grieved. And in the grieving he saw it: he had been holding on to his teacher. He let go. Before that night was over, his own complete knowing opened.",
+        build(ctx) {
+          const b = {};
+          b.rightBox = ctx.el("scene", path("M76 -16 L76 -496 L576 -496 L576 -16 Z", C.gold, 1.4));
+          b.rightFill = ctx.el("far", `<g class="fill"><rect x="76" y="-496" width="500" height="480" fill="${C.red}" opacity=".62"/></g>`);
+          b.road = ctx.el("scene", path("M560 -24 C490 -50 440 -60 400 -96 C360 -132 280 -150 200 -200", C.dimgold, 2));
+          b.walker = ctx.el("scene", `<g>${path(HEAD(470, -206, 13), C.white, 2.6)}${path("M466 -193 C462 -156 458 -116 452 -66 M474 -193 C480 -156 488 -116 492 -66", C.white, 2.6)}${path("M470 -176 C482 -174 492 -176 498 -182 M502 -226 L496 -62", C.white, 2.2)}</g>`);
+          b.walkerParts = [...b.walker.querySelectorAll(".ln")];
+          b.sat = [path(HEAD(300, -158, 15), C.white, 2.8), path("M292 -144 C280 -116 276 -90 280 -62 M308 -144 C318 -118 322 -92 320 -62", C.white, 2.8), path("M262 -54 C284 -42 312 -42 336 -56", C.white, 2.6), path("M296 -128 C288 -138 286 -150 292 -160", C.white, 2.2)].map((d) => ctx.el("scene", d));
+          b.hold = ctx.el("hero", `<g>${path("M300 -112 C190 -210 -60 -390 -228 -350", C.heart, 1.6, "", `opacity=".85"`)}</g>`);
+          b.holdLine = b.hold.querySelector(".ln");
+          b.halo = ctx.el("hero", path("M300 -206 a48 48 0 1 0 0.1 0", C.heart, 2.6, "glow"));
+          b.rays = ctx.el("hero", `<g class="fill">${Array.from({ length: 12 }, (_, i) => { const a = i / 12 * Math.PI * 2; return `<path d="M${(300 + Math.cos(a) * 58).toFixed(1)} ${(-158 + Math.sin(a) * 58).toFixed(1)} L${(300 + Math.cos(a) * 84).toFixed(1)} ${(-158 + Math.sin(a) * 84).toFixed(1)}" stroke="${C.heart}" stroke-width="2" stroke-linecap="round"/>`; }).join("")}<circle cx="300" cy="-120" r="26" fill="url(#warm)"/></g>`);
+          b.wall = FL.wall(ctx, { x0: -640, x1: 640, y: -760, n: 3, color: "rgba(227,176,75,.55)" });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 14500);
+          await ctx.draw(b.rightBox, 1.2, { glide: 1400 });
+          on(b.rightFill);
+          await ctx.draw(b.road, 1.2, { glide: 300 });
+          for (const p of b.walkerParts) await ctx.draw(p, .45, { glide: 140 });
+          // the news reaches him
+          ctx.at(-270, -466); ctx.dim(1); ctx.size(4, 0);
+          await ctx.glide(470, -230, 2000, true);
+          ctx.ripple(470, -230, 70);
+          // he grieves: he sits, bowed
+          op(b.walker, 0, 1400);
+          for (const p of b.sat) await ctx.draw(p, .6, { glide: 160, slow: 1.3 });
+          // holding on: a thread back to his teacher; then he lets go
+          await ctx.draw(b.holdLine, 2.0, { glide: 300 });
+          await ctx.wait(900);
+          b.hold.animate([{ transform: "translate(0,0)", opacity: 1 }, { transform: "translate(0px,60px)", opacity: 0 }], { duration: 2200, easing: "ease-in", fill: "forwards" });
+          await ctx.wait(1600);
+          // his own knowing opens
+          await ctx.glide(300, -120, 1200, true);
+          await ctx.draw(b.halo, 1.4, { glide: 500 });
+          on(b.rays); ctx.chord([293.66, 369.99, 440, 587.33], 5); ctx.sparks(300, -158, 14, C.heart, true);
+          await ctx.wait(800);
+          // the whole page, and the wall's thread above it
+          await ctx.camera(WIDE, 2200);
+          await FL.wallPlay(ctx, b.wall);
+        },
+        settle(ctx, b) {
+          drawn([b.rightBox, b.road, b.walkerParts, b.sat, b.holdLine, b.halo]); on([b.rightFill, b.rays]);
+          op(b.walker, 0, 0); b.hold.getAnimations().forEach((a) => a.cancel()); b.hold.style.opacity = 0;
+          FL.wallSettle(ctx, b.wall);
+        },
+      },
+    ],
+  });
+})();
+</script>

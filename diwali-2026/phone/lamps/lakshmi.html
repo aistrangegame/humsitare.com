@@ -1,0 +1,295 @@
+<title>What the Ocean Was Keeping</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mukta:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="engine.css">
+<style>
+/* Lakshmi · kolam: rice-flour lines that loop around a grid of dots without lifting, on a night sea; the colour
+   powder (pink, gold) comes last, when she rises. */
+:root{
+  --bg:#08101F; --paper:#0A1424; --ember:#7FA6CF; --gold:#E2B85A; --heart:#FFD27A;
+  --cream:#F2EEE6; --muted:#A9B3C2; --line:rgba(190,205,225,.3);
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Mukta','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+</style>
+<script src="engine.js"></script>
+<script>
+/* Shot list (what the flame draws · what it becomes · what stays)
+   I    The gods on a cloud, a garland in one god's hand; the sage with his staff; she sits on a small lotus beside them.
+        The garland falls; the sage's curse crackles across; she slips down into the sea. The flame follows her under
+        and leaves a small light below the waves. Stays: the waves, the gods, the sage, the light below.
+   II   The mountain stands in the sea; Vasuki coils around it; gods lean back on the tail, asuras (horned) on the hood.
+        The mountain turns. Stays: all of it.
+   III  Dark poison rises; both sides step back. Shiva, by his trident and crescent, stands forward; the flame carries the
+        poison into his throat and turns blue there; a blue light stays at his throat.
+   IV   The churning again. The wish-giving cow, the wish-giving tree, the moon come up. She rises on a lotus; the flame
+        becomes its centre; a great kolam lotus blooms and the pink powder fills it. A garland runs from her to Vishnu
+        (discus, conch, tall crown).
+   V    The light that waited below rises out of the sea. Small footprints walk up to a doorway with a kolam at its step;
+        lamps line the door; the flame rises to the wall's thread and lights the second lamp.
+   Turn The flame comes down into the guest's lamp: "light the way in, so she can find us again." */
+(() => {
+  const { HEAD, path, rnd, flat, op, drawn, on, setBg, B } = FL;
+  const C = { chalk: "#F2EEE6", dot: "rgba(160,180,210,.55)", sea: "#9CC3E6", gold: "#E2B85A", pink: "#F08FB0", poison: "#7a3fa0", blue: "#4FA3E0", heart: "#FFD27A" };
+  // kolam helpers: a wave that loops along the sea; a grid of pulli dots; a single-line rosette
+  const wave = (x0, x1, y, s = 40, a = 22) => { let d = `M${x0} ${y}`, up = 1; for (let x = x0; x < x1; x += s) { d += ` c${s * .25} ${-a * up} ${s * .75} ${-a * up} ${s} 0`; up = -up; } return d; };
+  const dots = (x0, x1, y0, y1, s, r = 2.2) => { let o = ""; for (let x = x0; x <= x1; x += s) for (let y = y0; y <= y1; y += s) o += `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.dot}"/>`; return o; };
+  const rose = (cx, cy, R, k, sy = 1) => { let d = ""; for (let i = 0; i <= 720; i++) { const t = i / 720 * Math.PI * 2, r = R * Math.cos(k * t); d += (i ? " L" : "M") + (cx + r * Math.cos(t)).toFixed(1) + " " + (cy + r * Math.sin(t) * sy).toFixed(1); } return d; };
+  const epi = (cx, cy, R, r, dd, sx = 1, sy = 1) => { let d = ""; const k = (R + r) / r; for (let i = 0; i <= 900; i++) { const t = i / 900 * Math.PI * 2; const x = (R + r) * Math.cos(t) - dd * Math.cos(k * t), y = (R + r) * Math.sin(t) - dd * Math.sin(k * t); d += (i ? " L" : "M") + (cx + x * sx).toFixed(1) + " " + (cy + y * sy).toFixed(1); } return d; };
+  const figure = (x, top, opts = {}) => {  // a standing figure: head, two long body lines, arms given
+    const h = opts.r || 14, y = top + h;
+    return { head: HEAD(x, y, h), body: `M${x - 5} ${y + h} C${x - 9} ${y + 60} ${x - 10} ${-top * .35} ${x - 8} 0 M${x + 5} ${y + h} C${x + 9} ${y + 60} ${x + 10} ${-top * .35} ${x + 8} 0` };
+  };
+
+  FL.story({
+    slug: "lakshmi", code: "qrcode-2", title: "What the Ocean Was Keeping",
+    kicker: "The second lamp on the wall · Lakshmi",
+    lede: "We come into this life with a forgetting. Diwali is the night we help each other remember.",
+    question: "What came up for you after a hard stretch that you didn't expect?",
+    turn: "On Diwali night we clean our homes, open our doors and light the way in, so she can find us again.",
+    samples: [
+      "After the layoff I found out how many people would show up for me.",
+      "Patience. I didn't know I had any until my mother was ill.",
+      "My own voice. I started saying no.",
+      "A friendship I thought I had lost came back.",
+    ],
+    binduHue: 330,
+    turnCam: { cx: 60, w: 1500, top: -720 },
+    chapters: [
+      {
+        k: "I · The blessing slips away", cam: { cx: 0, w: 720, top: -470 }, bg: "#08101F", mood: "held",
+        text: "Once, the gods grew careless with a blessing. The sage Durvasa cursed them for it, and Lakshmi (fortune, beauty, everything that makes a life full) slipped away from them and sank into the ocean of milk.",
+        build(ctx) {
+          const b = {}, r = rnd(5);
+          b.grid = ctx.el("far", `<g class="fill">${dots(-560, 560, -460, -60, 40)}</g>`);
+          b.stars = flat(ctx.el("sky", Array.from({ length: 50 }, () => `<circle class="star" cx="${(-1100 + r() * 1900).toFixed(0)}" cy="${(-1100 + r() * 600).toFixed(0)}" r="${(1 + r() * 1.8).toFixed(1)}" fill="#F2EEE6" style="animation-delay:${(r() * 6).toFixed(2)}s"/>`).join("")));
+          b.sea = ctx.el("scene", path(wave(-1100, 1100, 0), C.sea, 2));
+          b.sea2 = ctx.el("scene", path(wave(-1080, 1100, 22, 40, 14), C.sea, 1.4, "", `opacity=".5"`));
+          b.cloud = ctx.el("scene", path("M-330 -200 c12 -26 38 -26 50 0 c12 -26 38 -26 50 0 c12 -26 38 -26 50 0 c12 -26 38 -26 50 0", C.chalk, 2));
+          b.gods = [-300, -255, -210].map((x, i) => {
+            const f = figure(x, -330, { r: 12 });
+            return [ctx.el("scene", path(f.head, C.chalk, 2.6)), ctx.el("scene", path(`M${x - 9} -340 L${x - 6} -352 L${x} -344 L${x + 6} -352 L${x + 9} -340`, C.gold, 2)),
+              ctx.el("scene", path(`M${x - 5} -306 C${x - 8} -270 ${x - 8} -230 ${x - 6} -204 M${x + 5} -306 C${x + 8} -270 ${x + 8} -230 ${x + 6} -204`, C.chalk, 2.6))];
+          });
+          b.handArm = ctx.el("scene", path("M-255 -290 C-236 -282 -222 -276 -210 -268", C.chalk, 2.4));
+          b.garland = ctx.el("hero", `<g style="transform-box:fill-box;transform-origin:center">${path("M-208 -268 C-200 -236 -176 -228 -166 -256", C.pink, 2.2)}</g>`);
+          b.sage = [ctx.el("scene", path(HEAD(300, -300, 14), C.chalk, 2.6)), ctx.el("scene", path("M296 -286 C292 -240 290 -160 292 -100 C292 -60 294 -30 296 0 M306 -286 C312 -240 316 -160 314 -100 C314 -60 312 -30 310 0", C.chalk, 2.6)),
+            ctx.el("scene", path("M300 -286 C304 -268 302 -252 296 -240", C.chalk, 1.8)), ctx.el("scene", path("M340 -330 L330 0", C.chalk, 2.2)), ctx.el("scene", path("M300 -270 C316 -266 326 -262 334 -258", C.chalk, 2.4)),
+            ctx.el("scene", path("M300 -268 C282 -282 270 -296 262 -312", C.chalk, 2.4))];
+          b.curse = ctx.el("hero", path("M258 -318 L222 -300 L232 -290 L180 -276 L192 -266 L120 -256 L134 -246 L60 -236", C.poison, 2.2, "glow"));
+          b.her = ctx.el("hero", `<g class="her">${path(HEAD(-80, -296, 12), C.chalk, 2.4)}${path("M-82 -284 C-88 -268 -90 -256 -86 -244 C-76 -240 -64 -240 -54 -244 M-80 -276 C-70 -270 -62 -268 -56 -270", C.chalk, 2.4)}${path("M-110 -242 Q-98 -230 -80 -234 Q-62 -230 -50 -242 M-102 -242 Q-90 -256 -80 -238 Q-70 -256 -58 -242", C.pink, 2)}</g>`);
+          b.herParts = [...b.her.querySelectorAll(".ln")];
+          b.below = ctx.el("hero", `<g style="opacity:0"><circle cx="150" cy="16" r="34" fill="url(#warm)"/><circle cx="150" cy="16" r="4" fill="#FFE6B0"/></g>`);
+          return b;
+        },
+        async play(ctx, b, from) {
+          ctx.phrases(1400, 10500);
+          if (from) ctx.at(from.x, from.y); else ctx.at(-560, 120);
+          ctx.size(5, 0); ctx.show(true);
+          await ctx.glide(-560, 0, 1300, true);
+          on([b.stars, b.grid]);
+          await ctx.draw(b.sea, 2.6, { noGlide: true });
+          ctx.cascade(b.sea2, 1800);
+          await ctx.draw(b.cloud, 1.2, { glide: 400 });
+          for (const g of b.gods) for (const p of g) await ctx.draw(p, .32, { glide: 120 });
+          await ctx.draw(b.handArm, .4, { glide: 120 });
+          await ctx.draw(b.garland.querySelector(".ln"), .6, { glide: 100 });
+          for (const p of b.herParts) await ctx.draw(p, .4, { glide: 140 });
+          for (const p of b.sage) await ctx.draw(p, .35, { glide: 140 });
+          // careless: the garland falls into the sea
+          b.garland.animate([{ transform: "translate(0,0) rotate(0)" }, { transform: "translate(40px,250px) rotate(40deg)", opacity: .3 }], { duration: 1600, easing: "cubic-bezier(.55,0,.8,.4)", fill: "forwards" });
+          await ctx.draw(b.curse, .9, { glide: 300 });
+          await ctx.wait(500);
+          // she slips away and sinks
+          b.her.animate([{ transform: "translate(0,0)", opacity: 1 }, { transform: "translate(150px,-40px)", opacity: 1, offset: .35 }, { transform: "translate(230px,200px)", opacity: 0 }], { duration: 3200, easing: "ease-in", fill: "forwards" });
+          await ctx.tween(3200, (e) => { const f = e < .35 ? e / .35 : 1, g = e < .35 ? 0 : (e - .35) / .65; FL.place(-80 + 150 * f + 80 * g, -260 - 40 * f + 240 * g); });
+          op(b.below, 1, 1400);
+          ctx.ripple(150, 0, 90, "rgba(160,200,240,.7)");
+          await ctx.glide(150, -60, 1200);
+        },
+        settle(ctx, b) {
+          drawn([b.sea, b.sea2, b.cloud, b.gods, b.handArm, b.garland.querySelector(".ln"), b.herParts, b.sage, b.curse]); on([b.stars, b.grid]);
+          b.garland.getAnimations().forEach((a) => a.cancel()); b.garland.style.transform = "translate(40px,250px) rotate(40deg)"; b.garland.style.opacity = .3;
+          b.her.getAnimations().forEach((a) => a.cancel()); b.her.style.opacity = 0;
+          op(b.below, 1, 0); ctx.show(true); ctx.size(5, 0); ctx.at(150, -60);
+        },
+      },
+      {
+        k: "II · The churning", cam: { cx: 0, w: 1120, top: -540 }, bg: "#0A1324", mood: "held",
+        text: "To bring her back they had to work with the very ones they feared. Gods on one end, asuras on the other. A mountain for a churning rod, the great serpent Vasuki for a rope, and the whole ocean between them.",
+        build(ctx) {
+          const b = {};
+          b.rig = ctx.el("scene", `<g class="rig"></g>`);
+          const add = (d, c, w) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "g"); t.innerHTML = path(d, c, w); const el = t.firstChild; b.rig.append(el); return el; };
+          b.mtnFill = ctx.el("fills", `<g class="fill"><path d="M-80 0 C-66 -130 -44 -330 0 -500 C44 -330 66 -130 80 0 Z" fill="#0A1424"/>${dots(-60, 60, -440, -20, 26, 1.8)}</g>`);
+          b.mtn = add("M-80 0 C-66 -130 -44 -330 0 -500 C44 -330 66 -130 80 0", C.chalk, 2.8);
+          b.snake = add("M-470 -176 C-330 -186 -190 -160 -70 -176 C30 -190 70 -226 -30 -246 C-90 -258 -70 -300 30 -298 C120 -296 300 -196 470 -186", C.gold, 3.4);
+          b.hood = add("M470 -186 c4 -34 30 -52 56 -40 c22 10 24 40 4 50 c-18 8 -42 6 -60 -10 M500 -196 a3 3 0 1 0 0.1 0", C.gold, 3);
+          b.scales = add("M-430 -184 l8 -8 l8 8 M-340 -182 l8 -8 l8 8 M-250 -170 l8 -8 l8 8 M-160 -168 l8 -8 l8 8 M100 -282 l8 -8 l8 8 M200 -246 l8 -8 l8 8 M300 -210 l8 -8 l8 8 M390 -194 l8 -8 l8 8", C.gold, 1.6);
+          b.godsL = [-520, -470, -420].map((x) => [add(HEAD(x - 14, -258, 12), C.chalk, 2.6), add(`M${x - 23} -268 L${x - 20} -280 L${x - 14} -272 L${x - 8} -280 L${x - 5} -268`, C.gold, 2),
+            add(`M${x - 12} -246 C${x - 8} -180 ${x + 2} -90 ${x + 18} 0 M${x - 2} -246 C${x + 4} -180 ${x + 14} -90 ${x + 30} 0`, C.chalk, 2.6), add(`M${x - 8} -220 C${x + 10} -196 ${x + 26} -182 ${x + 40} -178`, C.chalk, 2.4)]);
+          b.asuras = [420, 470, 520].map((x) => [add(HEAD(x + 14, -262, 13), C.chalk, 2.6), add(`M${x + 6} -272 C${x} -286 ${x - 8} -290 ${x - 12} -282 M${x + 22} -272 C${x + 28} -286 ${x + 36} -290 ${x + 40} -282`, C.chalk, 2.2),
+            add(`M${x + 12} -249 C${x + 8} -180 ${x - 2} -90 ${x - 18} 0 M${x + 2} -249 C${x - 4} -180 ${x - 14} -90 ${x - 30} 0`, C.chalk, 2.6), add(`M${x + 8} -222 C${x - 10} -200 ${x - 26} -190 ${x - 40} -186`, C.chalk, 2.4)]);
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 10500);
+          ctx.show(true); ctx.size(5, 0);
+          op([B[1].cloud, B[1].gods, B[1].handArm, B[1].sage, B[1].curse], .05, 2000);
+          await ctx.draw(b.mtn, 2.0, { glide: 900 });
+          on(b.mtnFill);
+          await ctx.draw(b.snake, 3.0, { glide: 500 });
+          await ctx.draw(b.hood, .7, { glide: 80 });
+          ctx.cascade(b.scales, 900);
+          for (const g of b.godsL) for (const p of g) await ctx.draw(p, .3, { glide: 110 });
+          for (const g of b.asuras) for (const p of g) await ctx.draw(p, .3, { glide: 110 });
+          // the mountain turns: back and forth
+          await ctx.glide(0, -530, 700);
+          await ctx.tween(4200, (e, f) => { const a = Math.sin(f * Math.PI * 4) * 3.2 * (1 - f * .3); b.rig.setAttribute("transform", `rotate(${a.toFixed(2)} 0 0)`); b.mtnFill.setAttribute("transform", `rotate(${a.toFixed(2)} 0 0)`); if (Math.random() < .05) ctx.ripple(0, 0, 160, "rgba(160,200,240,.6)"); }, (f) => f);
+          b.rig.setAttribute("transform", ""); b.mtnFill.setAttribute("transform", "");
+        },
+        settle(ctx, b) { op([B[1].cloud, B[1].gods, B[1].handArm, B[1].sage, B[1].curse], .05, 0); drawn([b.mtn, b.snake, b.hood, b.scales, b.godsL, b.asuras]); on(b.mtnFill); b.rig.removeAttribute("transform"); b.mtnFill.removeAttribute("transform"); ctx.show(true); ctx.size(5, 0); ctx.at(0, -530); },
+      },
+      {
+        k: "III · The poison", cam: { cx: -60, w: 900, top: -560 }, bg: "#0A0A1C", mood: "held",
+        text: "The first thing to rise was poison, dark enough to end the world. Shiva drank it and held it in his throat. That is why his throat is blue.",
+        build(ctx) {
+          const b = {};
+          b.plume = ctx.el("fills", `<g class="plume" style="opacity:0"><path d="M-70 -10 C-120 -120 -60 -200 -110 -300 C-60 -380 60 -360 40 -280 C100 -220 60 -120 70 -10 Z" fill="#20112C"/>${path("M-40 -40 C-90 -120 -30 -170 -70 -250 C-30 -310 30 -300 10 -250", C.poison, 2.2)}${path("M30 -60 C70 -130 20 -180 50 -240", C.poison, 2)}</g>`);
+          b.swirls = [...b.plume.querySelectorAll(".ln")];
+          b.shiva = [
+            ctx.el("scene", path(HEAD(-170, -360, 16), C.chalk, 2.8)),
+            ctx.el("scene", path("M -178 -376 C -188 -400 -162 -410 -158 -388 C -152 -404 -136 -396 -144 -380", C.chalk, 2.2)),
+            ctx.el("scene", path("M -150 -398 a 10 10 0 1 0 10 12 a 7 7 0 1 1 -10 -12", C.gold, 2)),
+            ctx.el("scene", path("M -176 -344 C -182 -260 -184 -160 -180 -80 C -179 -50 -178 -24 -180 0 M -164 -344 C -158 -260 -156 -160 -160 -80 C -161 -50 -162 -24 -160 0", C.chalk, 2.8)),
+            ctx.el("scene", path("M -170 -326 C -152 -322 -138 -320 -126 -320", C.chalk, 2.6)),
+            ctx.el("scene", path("M -126 -440 L -126 0 M -144 -462 C -144 -440 -134 -436 -126 -436 C -118 -436 -108 -440 -108 -462 M -126 -470 L -126 -436", C.chalk, 2.4)),
+          ];
+          b.throat = ctx.el("hero", `<g class="fill"><circle cx="-170" cy="-338" r="26" fill="rgba(79,163,224,.25)"/><circle cx="-170" cy="-338" r="7" fill="${C.blue}" style="filter:drop-shadow(0 0 6px ${C.blue})"/></g>`);
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 8500);
+          ctx.show(true); ctx.tint(); ctx.size(5, 0);
+          // the dark rises, and both sides step back
+          b.plume.style.transformOrigin = "0px 0px";
+          b.plume.animate([{ opacity: 0, transform: "scale(.2)" }, { opacity: 1, transform: "scale(1)" }], { duration: 2600, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" });
+          ctx.cascade(b.swirls, 2000, 400);
+          op(B[2].godsL.flat().concat(B[2].asuras.flat()), .3, 2400);
+          setBg("#06061A");
+          await ctx.glide(-20, -320, 1800, true);
+          // one steps forward
+          for (const [i, p] of b.shiva.entries()) await ctx.draw(p, [.5, .5, .4, .9, .4, 1.0][i], { glide: 160 });
+          // the flame carries the poison into his throat, and is held there, blue
+          await ctx.glide(-10, -260, 700);
+          ctx.tint("#4FA3E0");
+          op(b.plume, .12, 2600);
+          await ctx.glide(-170, -338, 2400, true);
+          on(b.throat); ctx.size(3, 900);
+          ctx.chord([146.83, 220, 293.66], 5);
+          await ctx.wait(1600);
+        },
+        settle(ctx, b) { b.plume.getAnimations().forEach((a) => a.cancel()); b.plume.style.opacity = .12; b.plume.style.transform = "scale(1)"; drawn([b.swirls, b.shiva]); on(b.throat); op(B[2].godsL.flat().concat(B[2].asuras.flat()), .3, 0); setBg("#06061A"); ctx.show(true); ctx.tint("#4FA3E0"); ctx.size(3, 0); ctx.at(-170, -338); },
+      },
+      {
+        k: "IV · She rose", cam: { cx: 0, w: 960, top: -560 }, bg: "#141C38", mood: "bright",
+        text: ["They kept churning.", "Treasures began to surface: a cow that grants wishes, a tree that grants wishes, the moon. And at last, seated on a lotus, Lakshmi rose. She looked past both ends of the rope and chose Vishnu."],
+        build(ctx) {
+          const b = {};
+          b.cow = ctx.el("scene", `<g class="cow" style="opacity:0">${["M-320 -80 C-300 -96 -240 -96 -210 -84", "M-316 -50 C-290 -42 -240 -42 -216 -52", "M-306 -48 L-308 0 M-288 -46 L-284 0 M-236 -46 L-238 0 M-220 -50 L-214 0",
+            "M-210 -84 C-196 -96 -186 -100 -174 -96 L-166 -80 C-176 -74 -188 -74 -196 -78 L-216 -52", "M-190 -100 C-192 -112 -184 -118 -176 -116 M-180 -98 C-174 -108 -166 -110 -160 -106", "M-320 -80 C-336 -70 -340 -50 -334 -30"].map((d) => path(d, C.chalk, 2.4)).join("")}</g>`);
+          b.tree = ctx.el("scene", `<g class="tree" style="opacity:0">${["M-420 0 C-424 -60 -416 -130 -420 -200", "M-420 -120 c-34 -10 -46 -44 -22 -54 c16 -6 26 8 16 18", "M-420 -160 c34 -10 46 -44 22 -54 c-16 -6 -26 8 -16 18", "M-420 -200 c-24 -14 -28 -44 -6 -50 c14 -2 20 10 12 18 M-420 -200 c24 -14 28 -44 6 -50"].map((d) => path(d, C.chalk, 2.4)).join("")}${[[-460, -168], [-382, -206], [-448, -246], [-396, -250], [-420, -268]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="${C.gold}"/>`).join("")}</g>`);
+          b.moon = ctx.el("scene", `<g class="moon" style="opacity:0">${path("M170 -380 a30 30 0 1 0 24 48 a24 24 0 1 1 -24 -48", C.chalk, 2.4, "glow")}</g>`);
+          b.bigLotusFill = ctx.el("fills", `<g class="fill"><path d="${rose(0, -150, 210, 4, .72)}" fill="rgba(240,143,176,.16)" fill-rule="evenodd"/></g>`);
+          b.bigLotus = ctx.el("fills", path(rose(0, -150, 210, 4, .72), C.pink, 1.8));
+          b.lotus = ctx.el("hero", path("M-70 -100 Q-46 -76 0 -84 Q46 -76 70 -100 M-58 -100 Q-36 -140 0 -92 Q36 -140 58 -100 M-24 -100 Q0 -150 24 -100", C.pink, 2.6));
+          b.lotusFill = ctx.el("fills", `<g class="fill"><path d="M-70 -100 Q-46 -76 0 -84 Q46 -76 70 -100 Q36 -140 0 -92 Q-36 -140 -70 -100 Z" fill="rgba(240,143,176,.55)"/></g>`);
+          b.her = [path(HEAD(0, -262, 16), C.chalk, 2.8), path("M-12 -282 L-8 -296 L0 -288 L8 -296 L12 -282", C.gold, 2.2), path("M-4 -246 C-10 -210 -12 -170 -6 -130 M4 -246 C10 -210 12 -170 6 -130", C.chalk, 2.8),
+            path("M-42 -110 C-20 -100 20 -100 42 -112", C.chalk, 2.6), path("M0 -226 C18 -220 28 -208 30 -192", C.chalk, 2.4), path("M0 -226 C-18 -220 -28 -208 -30 -192", C.chalk, 2.4)].map((d) => ctx.el("hero", d));
+          b.vishnu = [path(HEAD(330, -300, 16), C.chalk, 2.8), path("M316 -318 L320 -356 L330 -344 L340 -356 L344 -318", C.gold, 2.4), path("M324 -284 C320 -220 318 -120 320 0 M336 -284 C340 -220 342 -120 340 0", C.chalk, 2.8),
+            path("M330 -266 C350 -280 362 -300 368 -322", C.chalk, 2.4), path("M368 -356 a18 18 0 1 0 0.1 0 M368 -356 L368 -320 M350 -338 L386 -338 M356 -350 L380 -326 M380 -350 L356 -326", C.gold, 2), path("M330 -266 C310 -254 300 -240 296 -226 m-6 2 c-10 -4 -12 -16 -2 -20 c8 -2 12 6 8 12", C.chalk, 2.2)].map((d) => ctx.el("scene", d));
+          b.garland = ctx.el("hero", path("M30 -196 C110 -300 220 -300 300 -250", C.pink, 2.2, "glow"));
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 12000);
+          ctx.tint(); ctx.size(5, 600); ctx.show(true);
+          // they kept churning: the mountain turns again
+          const rig = B[2].rig, mf = B[2].mtnFill;
+          await ctx.glide(0, -520, 1000, true);
+          await ctx.tween(2400, (e, f) => { const a = Math.sin(f * Math.PI * 3) * 3; rig.setAttribute("transform", `rotate(${a.toFixed(2)} 0 0)`); mf.setAttribute("transform", `rotate(${a.toFixed(2)} 0 0)`); }, (f) => f);
+          rig.removeAttribute("transform"); mf.removeAttribute("transform");
+          op(B[3].plume, 0, 1500);
+          // the treasures come up out of the sea
+          const rise = (el, dy, ms) => { ctx.cascade([...el.querySelectorAll(".ln")], ms * .8, 120); return el.animate([{ opacity: 0, transform: `translate(0px,${dy}px)` }, { opacity: 1, transform: "translate(0,0)" }], { duration: ms, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" }); };
+          await ctx.glide(-250, -110, 900); rise(b.cow, 120, 1600); ctx.ripple(-250, 0, 110, "rgba(160,200,240,.7)"); await ctx.wait(1100);
+          await ctx.glide(-420, -200, 800); rise(b.tree, 160, 1600); ctx.ripple(-420, 0, 110, "rgba(160,200,240,.7)"); await ctx.wait(1100);
+          await ctx.glide(170, -360, 900); rise(b.moon, 340, 2000); await ctx.wait(1200);
+          // she rises: the mountain stands back, the flame becomes the heart of the lotus
+          op([B[2].mtn, B[2].mtnFill, B[2].snake, B[2].hood], .25, 1800);
+          await ctx.draw(b.lotus, 1.4, { glide: 600 });
+          on(b.lotusFill);
+          for (const p of b.her) await ctx.draw(p, .45, { glide: 120 });
+          await ctx.glide(0, -150, 700);
+          await ctx.draw(b.bigLotus, 3.0, { glide: 300 });
+          on(b.bigLotusFill);
+          ctx.chord([293.66, 369.99, 440, 587.33], 5); ctx.sparks(0, -150, 16, C.pink, true); ctx.ripple(0, -150, 220, "rgba(240,143,176,.7)");
+          // she chooses
+          for (const p of b.vishnu) await ctx.draw(p, .4, { glide: 140 });
+          await ctx.draw(b.garland, 1.8, { glide: 500 });
+          await ctx.glide(300, -330, 700);
+        },
+        settle(ctx, b) {
+          [b.cow, b.tree, b.moon].forEach((el) => { el.getAnimations().forEach((a) => a.cancel()); el.style.opacity = 1; el.style.transform = "none"; drawn([...el.querySelectorAll(".ln")]); });
+          B[2].rig.removeAttribute("transform"); B[2].mtnFill.removeAttribute("transform");
+          op(B[3].plume, 0, 0); op([B[2].mtn, B[2].mtnFill, B[2].snake, B[2].hood], .25, 0);
+          drawn([b.lotus, b.her, b.bigLotus, b.vishnu, b.garland]); on([b.lotusFill, b.bigLotusFill]);
+          ctx.tint(); ctx.show(true); ctx.size(5, 0); ctx.at(300, -330);
+        },
+      },
+      {
+        k: "V · Never gone", cam: { cx: 330, w: 760, top: -420 }, bg: "#1E2A4C", mood: "bright",
+        text: "What they had lost was never gone. It was waiting below, for whoever kept going past the poison.",
+        build(ctx) {
+          const b = {};
+          b.house = ctx.el("scene", path("M440 0 L440 -200 L540 -280 L640 -200 L640 0", C.chalk, 2.6));
+          b.door = ctx.el("scene", path("M515 0 L515 -110 Q540 -138 565 -110 L565 0", C.gold, 2.4));
+          b.kolam = ctx.el("scene", path(epi(540, -10, 40, 10, 22, 1, .28), C.chalk, 1.6));
+          const feet = []; for (let i = 0; i < 6; i++) { const x = 220 + i * 46, y = -6 - (i % 2) * 10; feet.push(`<g class="fill"><ellipse cx="${x}" cy="${y}" rx="9" ry="5" fill="${C.chalk}" opacity=".85"/>${[0, 1, 2, 3, 4].map((k) => `<circle cx="${x + 9 + k * .6}" cy="${y - 5 + k * 2.4}" r="1.6" fill="${C.chalk}"/>`).join("")}</g>`); }
+          b.feet = flat(ctx.el("fills", feet.join("")));
+          b.doorLamps = flat(ctx.el("fills", [480, 500, 580, 600, 540].map((x, i) => FL.lamp(x, i === 4 ? -230 : -2, 1)).join("")));
+          b.wall = FL.wall(ctx, { x0: -640, x1: 760, y: -640, n: 2, sag: 40, color: "rgba(226,184,90,.55)" });
+          return b;
+        },
+        async play(ctx, b) {
+          ctx.phrases(900, 6400);
+          ctx.show(true); ctx.size(5, 0);
+          // what waited below comes up
+          const below = B[1].below;
+          await ctx.glide(150, 16, 1400, true);
+          ctx.ripple(150, 0, 140, "rgba(160,200,240,.8)");
+          below.animate([{ transform: "translate(0,0)" }, { transform: "translate(0px,-60px)" }], { duration: 2000, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
+          await ctx.glide(150, -44, 2000);
+          setBg("#1E2A4C");
+          // up the shore, small footprints walk to a door with a kolam at its step
+          b.feet.forEach((f, i) => ctx.later(i * 260, () => f.classList.add("on")));
+          await ctx.glide(500, -40, 1800, true);
+          await ctx.draw(b.house, 1.4, { glide: 300 });
+          await ctx.draw(b.door, .8, { glide: 200 });
+          await ctx.draw(b.kolam, 2.2, { glide: 300 });
+          b.doorLamps.forEach((l, i) => ctx.later(i * 220, () => l.classList.add("on")));
+          await ctx.wait(1400);
+          await ctx.camera({ cx: 60, w: 1500, top: -720 }, 2200);
+          await FL.wallPlay(ctx, b.wall);
+        },
+        settle(ctx, b) {
+          const below = B[1].below; below.getAnimations().forEach((a) => a.cancel()); below.setAttribute("transform", "translate(0 -60)");
+          on([b.feet, b.doorLamps]); drawn([b.house, b.door, b.kolam]); setBg("#1E2A4C"); FL.wallSettle(ctx, b.wall);
+        },
+      },
+    ],
+  });
+})();
+</script>
