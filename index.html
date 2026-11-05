@@ -453,6 +453,14 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
   font:500 var(--fs-lg)/1 var(--font-ui);color:var(--fg);
   background:rgba(255,255,255,.06);border:1.5px solid rgba(255,217,138,.32);border-radius:var(--radius)}
 .whoami input::placeholder{color:rgba(214,204,186,.62);font-weight:400}
+.whoami label + input + label{margin-top:var(--s-2)}
+.gate-say{min-height:1.3em;margin:0;font-size:var(--fs-ui);color:var(--fg-2)}
+.gate-say.bad{color:#FFB4A0}
+.closed-note{text-align:center;padding:var(--s-5) 0}
+.closed-note[hidden]{display:none}
+.closed-h{font-family:var(--font-display);font-size:var(--fs-xl,1.6rem);color:var(--fg);margin:0 0 var(--s-2)}
+.closed-s{font-size:var(--fs-lg);color:var(--fg-2);margin:0}
+.is-closed .whoami,.is-closed .lightbtn,.is-closed .hold-say{display:none}
 .whoami input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.1)}
 .lightbtn{
  max-width:100%;box-sizing:border-box;min-height:68px;padding:var(--s-2) clamp(var(--s-5),7vw,var(--s-8));border-radius:var(--radius-pill);border:2px solid var(--gold);
@@ -1197,10 +1205,18 @@ body.has-replied .rsvp-fab{display:none}
       <div class="whoami">
         <label for="whoName">Who is lighting it?</label>
         <input id="whoName" type="text" autocomplete="name" placeholder="Your name"
-               enterkeyhint="go" autocapitalize="words" spellcheck="false">
+               enterkeyhint="next" autocapitalize="words" spellcheck="false">
+        <label for="whoPhone">and your phone number</label>
+        <input id="whoPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555"
+               enterkeyhint="go">
+        <p class="gate-say" id="gateSay" role="status" aria-live="polite"></p>
       </div>
       <button class="lightbtn" id="lightBtn" type="button">Tap to light the lamp</button>
       <p class="hold-say">then the evening opens</p>
+      <div class="closed-note" id="closedNote" hidden tabindex="-1">
+        <p class="closed-h">This invitation is closed.</p>
+        <p class="closed-s">Thank you for stopping by.</p>
+      </div>
     </div></div>
 
     <div class="hero-on"><div class="hero-on-in">
@@ -2529,10 +2545,54 @@ function initHero(){
     setTimeout(settle, 3400);
   }
 
+  /* the door. A name and a phone number; the Worker says open or closed. Closed is remembered
+     on this phone so a refresh does not show the invitation again; the Worker enforces it
+     whatever the phone remembers. If the Worker cannot be reached the door stays open. */
+  const CLOSED_KEY='rk:sitarey-closed:v1';
+  const wasClosed=()=>{ try{ if(localStorage.getItem(CLOSED_KEY)) return true; }catch(_){}
+                        return /(?:^|;\s*)rk_closed=1/.test(document.cookie||''); };
+  const markClosed=()=>{ try{ localStorage.setItem(CLOSED_KEY,'1'); }catch(_){}
+                         try{ document.cookie='rk_closed=1; max-age=31536000; path=/; SameSite=Lax'; }catch(_){} };
+  function showClosed(){
+    markClosed();
+    hero.classList.add('is-closed');
+    const note=$('#closedNote'); if(note){ note.hidden=false; }
+    const lb=$('#lightBtn'); if(lb) lb.disabled=true;
+    ['whoName','whoPhone'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.value=''; el.blur(); } });
+    // nothing the guest typed stays on this phone
+    try{ localStorage.removeItem(GUEST_KEY); localStorage.removeItem(GUEST_PHONE_KEY); localStorage.removeItem(REPLY_KEY); }catch(_){}
+  }
+  async function tryOpen(){
+    if(hero.classList.contains('lit') || hero.classList.contains('is-closed')) return;
+    const nameEl=document.getElementById('whoName'), phoneEl=document.getElementById('whoPhone');
+    const say=document.getElementById('gateSay'), btn=$('#lightBtn');
+    const name=tidyName(nameEl?nameEl.value:''), digitsOnly=String(phoneEl?phoneEl.value:'').replace(/\D/g,'');
+    const bad=t=>{ if(say){ say.textContent=t; say.classList.add('bad'); } };
+    if(say){ say.textContent=''; say.classList.remove('bad'); }
+    if(!name){ bad('Your name, please.'); nameEl&&nameEl.focus(); return; }
+    if(digitsOnly.length<7){ bad('A full phone number, please.'); phoneEl&&phoneEl.focus(); return; }
+    btn.disabled=true; const label=btn.textContent; btn.textContent='One moment';
+    let verdict='open';
+    try{
+      const r=await post('/gate',{ name, phone:phoneEl.value, event:EVENT.eventName });
+      if(r && r.closed) verdict='closed';
+    }catch(e){
+      if(e && e.closed) verdict='closed';
+      else if(e && e.status===429){ verdict='wait'; bad('Too many tries. Please wait a minute.'); }
+      /* any other failure (no network, Worker down): let them in rather than lock out a guest */
+    }
+    btn.textContent=label;
+    if(verdict==='closed'){ showClosed(); return; }
+    btn.disabled=false;
+    if(verdict==='wait') return;
+    open();
+  }
+
   function open(){
     if(hero.classList.contains('lit')) return;
-    const who=document.getElementById('whoName');
+    const who=document.getElementById('whoName'), whoPhone=document.getElementById('whoPhone');
     if(who){ setGuest(who.value); who.blur(); }
+    if(whoPhone){ setGuestPhone(whoPhone.value); whoPhone.blur(); }
     paintGuest();
     document.body.classList.remove('held');
     if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }
@@ -2579,7 +2639,10 @@ function initHero(){
       );
     }, 2550);
   }
-  $('#lightBtn').addEventListener('click',open);
+  $('#lightBtn').addEventListener('click',tryOpen);
+  const ph=document.getElementById('whoPhone');
+  if(ph) ph.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); tryOpen(); } });
+  if(wasClosed()) showClosed();
   onWidthChange(()=>{ if(hero.classList.contains('lit')) stageReveal(); });
 
   // motes
@@ -3623,6 +3686,8 @@ function initRsvp(){
     // carry the name from the top into the first person if that one is empty
     const top=$('#r-name').value.trim(), p0=$('#p0-name');
     if(p0 && !p0.value && top) p0.value=top;
+    const gp=getGuestPhone(), p0p=$('#p0-phone');
+    if(p0p && !p0p.value && gp) p0p.value=prettyPhone(gp);
   }
   function paintAnswer(){
     const isYes=yes.checked;
@@ -4618,6 +4683,11 @@ function tidyName(raw){
 }
 function getGuest(){ try{ return tidyName(store.get(GUEST_KEY)||''); }catch(_){ return ''; } }
 function setGuest(n){ const t=tidyName(n); if(t) store.set(GUEST_KEY,t); return t; }
+/* the phone given at the door is the same one the reply asks for: remembered, then offered */
+const GUEST_PHONE_KEY='rk:sitarey-guest-phone:v1';
+function getGuestPhone(){ try{ return store.get(GUEST_PHONE_KEY)||''; }catch(_){ return ''; } }
+function setGuestPhone(p){ const d=String(p||'').replace(/\D/g,'').replace(/^1(?=\d{10}$)/,''); if(d.length>=7) store.set(GUEST_PHONE_KEY,d); return d; }
+function prettyPhone(p){ const d=String(p||'').replace(/\D/g,''); return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : d; }
 
 function paintGuest(){
   const n=getGuest();
@@ -4630,6 +4700,11 @@ function paintGuest(){
   if(r && !r.value && n) r.value=n;
   const w=document.getElementById('whoName');
   if(w && !w.value && n) w.value=n;
+  const ph=getGuestPhone();
+  if(ph){
+    [['whoPhone'],['lk-phone'],['n-phone'],['p0-phone']].forEach(([id])=>{
+      const el=document.getElementById(id); if(el && !el.value) el.value=prettyPhone(ph); });
+  }
 }
 
 /* --- once they have said yes, their fireworks can be lit again, any time --- */
@@ -4661,7 +4736,7 @@ function post(path, payload){
     method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
   }).then(async r=>{
     const d=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(d.error||'Could not save');
+    if(!r.ok){ const e=new Error(d.error||'Could not save'); e.status=r.status; e.closed=!!d.closed; throw e; }
     return d;
   });
 }
@@ -4732,6 +4807,7 @@ function initLookup(){
     st.textContent='';
     try{
       const r=await post('/lookup',{ phone:inp.value, event:EVENT.eventName });
+      if(r.closed){ st.textContent='This invitation is closed.'; st.classList.add('bad'); go.disabled=false; go.textContent=label; return; }
       if(r.found) showFound(r);
       else { st.textContent='Nothing on that number yet — fill it in below.'; box.hidden=false;
              $('#r-name').focus({preventScroll:true}); }
@@ -4809,6 +4885,10 @@ function initForms(){
       if(yes) setTimeout(()=>celebrate({count:headcount, family:famName}), 500);
       else setTimeout(quietLamp, 400);
     }catch(err){
+      if(err && err.closed){ btn.disabled=false; btn.textContent=label;
+        status.textContent='This invitation is closed.'; status.classList.add('bad');
+        try{ localStorage.setItem('rk:sitarey-closed:v1','1'); document.cookie='rk_closed=1; max-age=31536000; path=/; SameSite=Lax'; }catch(_){}
+        return; }
       btn.disabled=false; btn.textContent=label;
       status.textContent = EVENT.endpoint
         ? 'That did not go through. Please try once more.'

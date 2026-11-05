@@ -85,3 +85,37 @@ Leave **Sitaron Ka Saavan 2024** alone. The other five tables are defaults with 
 
 ## Check it worked
 Create one row by hand in Replies linking a Family and the Diwali 2026 Event. If the links take and the back-links appear in Families and Events, the Worker will behave.
+
+---
+
+## Added 5 Nov 2026 — the door
+Two tables the Worker reads and writes. Created by hand-off, names must match exactly.
+
+### Table: Blocked
+*Who the invitation door is closed to. Retire a row by unticking Active; never delete.*
+
+| Field | Type | Notes |
+|---|---|---|
+| Label | Single line text | **primary** — anything that helps you recognise the row |
+| Name | Single line text | blocks the full name AND the first name alone (spelling nearby, any case) |
+| Phone | Phone number | any format; last ten digits compared |
+| Email | Email | |
+| IP | Single line text | filled by the Worker on a closed attempt |
+| Active | Checkbox | ticked = closed to them |
+| Expires | Date | empty = no end; auto IP rows end the day after the event (`IP_BLOCK_UNTIL`, default 2026-11-22) |
+| Note | Long text | |
+
+### Table: Gate log
+*Every closed attempt, with the address it came from. Ordinary guests are not logged.*
+
+| Field | Type |
+|---|---|
+| Label | Single line text — primary |
+| Reason | Single line text — phone · full name · first name · email · ip |
+| Where | Single line text — gate (entrance) or rsvp (the reply form) |
+| Name | Single line text |
+| Phone | Single line text |
+| IP | Single line text |
+| Time | Date with time |
+
+If the Blocked table cannot be read the door stays open: a hiccup must never lock out a guest. The RSVP form runs the same check again on everyone named on a reply.

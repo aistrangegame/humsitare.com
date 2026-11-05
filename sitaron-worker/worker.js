@@ -5,10 +5,13 @@
             GET /carriers  GET /carry-photo/:id   (the public wall of confirmed co-sponsors)
             POST /dash-sponsor (token → change a co-sponsor's status)
             POST /dash (passcode → everything, for the hosts)    GET /dash-photo/:id?t=…
+            POST /gate (name + phone at the door → ok, or closed)
    ============================================================ */
 
-// the same five tables the page has always written to
-const TABLES = { people:'People', families:'Families', events:'Events', replies:'Replies', sponsors:'Sponsors' };
+// the five tables the page has always written to, and two for the door:
+// Blocked (who may not enter) and Gate log (every closed attempt, with its IP)
+const TABLES = { people:'People', families:'Families', events:'Events', replies:'Replies', sponsors:'Sponsors',
+                 blocked:'Blocked', gatelog:'Gate log' };
 const ALLOWED = ['https://humsitare.com','https://www.humsitare.com','http://localhost:8788','http://127.0.0.1:5500'];
 
 export default {
@@ -110,13 +113,20 @@ export default {
     // a field no human sees; only a bot fills it
     if (body.website) return json({ ok: true }, 200, cors);
 
+    const ip = request.headers.get('CF-Connecting-IP') || 'anon';
     try {
-      if (url.pathname === '/rsvp')    return json(await handleRsvp(body, env), 200, cors);
+      if (url.pathname === '/gate') {
+        if (throttled(ip)) return json({ error: 'Too many tries. Try again in a minute.' }, 429, cors);
+        const g = await handleGate(body, env, ip);
+        return json(g, g.error ? 400 : 200, { ...cors, 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/rsvp')    return json(await handleRsvp(body, env, ip), 200, cors);
       if (url.pathname === '/sponsor') return json(await handleSponsor(body, env), 200, cors);
       return json({ error: 'Not found' }, 404, cors);
     } catch (err) {
-      console.error(err && err.stack || err);
+      if (!(err && err.message === 'closed')) console.error(err && err.stack || err);
       const msg = String(err && err.message || '');
+      if (msg === 'closed') return json({ closed: true, error: 'closed' }, 403, cors);
       if (msg.includes('phone missing')) return json({ error: url.pathname === '/sponsor' ? 'A phone number, so we can reach you.' : 'A phone number, so you can change this later.' }, 400, cors);
       if (msg.includes('email missing')) return json({ error: 'An email address, for your acknowledgment letter.' }, 400, cors);
       if (msg.includes('amount missing')) return json({ error: 'The amount you would like to give.' }, 400, cors);
@@ -205,7 +215,7 @@ const date = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim()) ? String(v)
 const num  = (v, lo, hi) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : null; };
 
 /* ---------- RSVP ---------- */
-async function handleRsvp(b, env) {
+async function handleRsvp(b, env, ip) {
   const submitter = str(b.name, 120);
   if (!submitter) throw new Error('name missing');
   const coming = b.attending === 'yes' ? 'Yes' : 'No';
@@ -216,6 +226,14 @@ async function handleRsvp(b, env) {
   const withPhone = people.find(p => digits(p.phone).length >= 7);
   const keyPhone = digits(b.phone) || (withPhone ? digits(withPhone.phone) : '');
   if (!keyPhone || keyPhone.length < 7) throw new Error('phone missing');
+
+  // the door again: the same check as the gate, on everyone named on this reply, so a
+  // blocked person cannot be slipped in as a "family member" by someone who passed
+  const why = await checkBlocked(env, {
+    names: [submitter, ...people.map(p => str(p.name, 120))],
+    phones: [keyPhone, ...people.map(p => digits(p.phone))],
+    ip });
+  if (why) { await closeAttempt(env, why, { name: submitter, phone: keyPhone, ip, where: 'rsvp' }); throw new Error('closed'); }
   // the person who owns that number is the one a future change is matched against
 
   const event = await findOrCreate(env, TABLES.events, 'Event name', str(b.event, 120) || 'Diwali 2026');
@@ -263,7 +281,6 @@ async function handleRsvp(b, env) {
   await Promise.all(photos);
 
   const reply = {
-    'Reply': `${familyName} — ${event.fields['Event name']}`,
     'Event': [event.id],
     'Family': [family.id],
     'Coming': coming,
@@ -309,6 +326,7 @@ function throttled(ip) {
 async function handleLookup(b, env, ip) {
   const phone = digits(b.phone);
   if (!phone || phone.length < 7) return { found: false, reason: 'short' };
+  if (await checkBlocked(env, { names: [], phones: [phone], ip })) return { closed: true };
   const person = await findByPhone(env, phone);
   if (!person) return { found: false };
   const eventName = str(b.event, 120) || 'Diwali 2026';
@@ -507,4 +525,93 @@ async function handleSponsor(b, env) {
   // a photo is only kept if they chose to be recognised by name
   const photo = !anonymous && b.photo ? await putPhoto(env, TABLES.sponsors, saved.id, 'Photo', b.photo, false) : false;
   return { ok: true, id: saved.id, photo };
+}
+
+/* ---------- The door ----------
+   Who may not come in, kept in the Airtable table "Blocked" (one row per person or
+   address; Active unchecked = retired, never deleted). A row can carry any of:
+   Name · Phone · Email · IP · Expires. A Name blocks the full name AND the first name
+   alone, however it is capitalised or spelled nearby. A Phone blocks that number in any
+   format. An IP blocks that address until it expires. Every closed attempt is written
+   to "Gate log" with the address it came from, and the address of a closed attempt is
+   itself blocked until the event is over (IP_BLOCK_UNTIL, default 2026-11-22).
+   If the table cannot be read the door stays open: a hiccup must never lock out guests. */
+const fold = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  .replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const sound = w => w.replace(/(.)\1+/g, '$1');                 // shreesh → shresh
+function lev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+const near = (a, b) => { a = sound(a); b = sound(b); return a === b || (Math.min(a.length, b.length) >= 5 && lev(a, b) <= 1); };
+function nameHit(blockedName, given) {
+  const bt = fold(blockedName).split(' ').filter(Boolean), gt = fold(given).split(' ').filter(Boolean);
+  if (!bt.length || !gt.length) return null;
+  const first = bt[0], last = bt.length > 1 ? bt[bt.length - 1] : '';
+  if (last && gt.some(t => near(t, first)) && gt.some(t => near(t, last))) return 'full name';
+  if (gt.some(t => near(t, first))) return 'first name';
+  const squashed = sound(gt.join(''));                            // "NamrataTiwari", "Shreesh.T"
+  if (sound(first).length >= 5 && squashed.includes(sound(first))) return 'first name';
+  return null;
+}
+
+let blockCache = { at: 0, rows: [] };
+async function loadBlocked(env) {
+  if (Date.now() - blockCache.at < 30000) return blockCache.rows;
+  const rows = await listAll(env, TABLES.blocked);
+  blockCache = { at: Date.now(), rows };
+  return rows;
+}
+const tail10 = v => digits(v).slice(-10);
+
+// returns why the door is closed to this person ('phone', 'full name', 'first name', 'email', 'ip'), or null
+async function checkBlocked(env, who) {
+  let rows;
+  try { rows = await loadBlocked(env); } catch (err) { console.error('blocklist unreadable', err); return null; }
+  const today = new Date().toISOString().slice(0, 10);
+  const names = (who.names || []).filter(Boolean);
+  const phones = (who.phones || []).map(tail10).filter(p => p.length >= 7);
+  const emails = (who.emails || []).map(e => String(e || '').trim().toLowerCase()).filter(Boolean);
+  for (const r of rows) {
+    const f = r.fields || {};
+    if (!f.Active) continue;
+    if (f.Expires && f.Expires < today) continue;
+    if (f.IP && who.ip && f.IP === who.ip) return 'ip';
+    const bp = tail10(f.Phone);
+    if (bp.length >= 7 && phones.includes(bp)) return 'phone';
+    if (f.Email && emails.includes(String(f.Email).trim().toLowerCase())) return 'email';
+    if (f.Name) for (const n of names) { const h = nameHit(f.Name, n); if (h) return h; }
+  }
+  return null;
+}
+
+// a closed attempt: write it down, and close the address it came from
+async function closeAttempt(env, why, who) {
+  try {
+    await createOne(env, TABLES.gatelog, {
+      'Label': `${why} — ${who.name || ''}`.slice(0, 120), 'Reason': why, 'Where': who.where || 'gate',
+      'Name': who.name || '', 'Phone': who.phone || '', 'IP': who.ip || '', 'Time': new Date().toISOString() });
+  } catch (err) { console.error('gate log', err); }
+  try {
+    if (who.ip && who.ip !== 'anon' && why !== 'ip') {
+      const rows = await loadBlocked(env).catch(() => []);
+      if (!rows.some(r => r.fields && r.fields.Active && r.fields.IP === who.ip)) {
+        const rec = await createOne(env, TABLES.blocked, {
+          'Label': `(auto) address of a closed attempt — ${who.name || ''}`.slice(0, 120), 'IP': who.ip, 'Active': true,
+          'Expires': env.IP_BLOCK_UNTIL || '2026-11-22', 'Note': `Seen with ${who.name || '?'} ${who.phone || ''} (${why})` });
+        blockCache.rows.push(rec);
+      }
+    }
+  } catch (err) { console.error('ip block', err); }
+}
+
+async function handleGate(b, env, ip) {
+  const name = str(b.name, 120), phone = digits(b.phone);
+  if (!name || phone.length < 7) return { error: 'Your name and phone number, please.' };
+  const why = await checkBlocked(env, { names: [name], phones: [phone], ip });
+  if (why) { await closeAttempt(env, why, { name, phone, ip, where: 'gate' }); return { ok: false, closed: true }; }
+  return { ok: true };
 }
