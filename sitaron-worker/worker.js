@@ -6,6 +6,7 @@
             POST /dash-sponsor (token → change a co-sponsor's status)
             POST /dash (passcode → everything, for the hosts)    GET /dash-photo/:id?t=…
             POST /gate (name + phone at the door → ok, or closed)
+            GET  /mode (is the event open to all, or the guest list only?)
    ============================================================ */
 
 // the five tables the page has always written to, and two for the door:
@@ -28,6 +29,12 @@ export default {
 
     const url = new URL(request.url);
     if (url.pathname === '/health') return json({ ok: true }, 200, cors);
+
+    // is this event open to anyone, or only to the people who replied Yes? (Events.Status)
+    if (url.pathname === '/mode' && request.method === 'GET') {
+      const info = await eventInfo(env, url.searchParams.get('event'));
+      return json({ mode: info.mode }, 200, { ...cors, 'Cache-Control': 'public, max-age=30' });
+    }
 
     // ---- the public wall of co-sponsors, and a photo only for a confirmed, named gift ----
     if (url.pathname === '/carriers' && request.method === 'GET') {
@@ -124,9 +131,10 @@ export default {
       if (url.pathname === '/sponsor') return json(await handleSponsor(body, env), 200, cors);
       return json({ error: 'Not found' }, 404, cors);
     } catch (err) {
-      if (!(err && err.message === 'closed')) console.error(err && err.stack || err);
+      if (!(err && (err.message === 'closed' || err.message === 'over'))) console.error(err && err.stack || err);
       const msg = String(err && err.message || '');
       if (msg === 'closed') return json({ closed: true, error: 'closed' }, 403, cors);
+      if (msg === 'over') return json({ error: 'The evening is full, so we cannot add places. You are welcome to lower the number.' }, 409, cors);
       if (msg.includes('phone missing')) return json({ error: url.pathname === '/sponsor' ? 'A phone number, so we can reach you.' : 'A phone number, so you can change this later.' }, 400, cors);
       if (msg.includes('email missing')) return json({ error: 'An email address, for your acknowledgment letter.' }, 400, cors);
       if (msg.includes('amount missing')) return json({ error: 'The amount you would like to give.' }, 400, cors);
@@ -234,6 +242,18 @@ async function handleRsvp(b, env, ip) {
     phones: [keyPhone, ...people.map(p => digits(p.phone))],
     ip });
   if (why) { await closeAttempt(env, why, { name: submitter, phone: keyPhone, ip, where: 'rsvp' }); throw new Error('closed'); }
+
+  // a full evening: only a household that already said Yes may change its reply, and it may
+  // swap or remove people but not add places. Enforced here, whatever the page shows.
+  const li = await listCheck(env, str(b.event, 120), submitter, keyPhone);
+  if (li.listMode && !li.unreadable) {
+    if (!li.house) { await closeAttempt(env, 'not on list', { name: submitter, phone: keyPhone, ip, where: 'rsvp' }); throw new Error('closed'); }
+    if (coming === 'Yes') {
+      const named = people.filter(p => str(p.name, 120)).length;
+      const hc = num(b.count, 1, 20);
+      if ((hc && hc > li.house.headcount) || named > Math.max(li.house.headcount, li.house.memberCount)) throw new Error('over');
+    }
+  }
   // the person who owns that number is the one a future change is matched against
 
   const event = await findOrCreate(env, TABLES.events, 'Event name', str(b.event, 120) || 'Diwali 2026');
@@ -327,6 +347,8 @@ async function handleLookup(b, env, ip) {
   const phone = digits(b.phone);
   if (!phone || phone.length < 7) return { found: false, reason: 'short' };
   if (await checkBlocked(env, { names: [], phones: [phone], ip })) return { closed: true };
+  const li = await listCheck(env, str(b.event, 120), '', phone);
+  if (li.listMode && !li.unreadable && !li.house) return { found: false };
   const person = await findByPhone(env, phone);
   if (!person) return { found: false };
   const eventName = str(b.event, 120) || 'Diwali 2026';
@@ -579,7 +601,7 @@ async function checkBlocked(env, who) {
     const f = r.fields || {};
     if (!f.Active) continue;
     if (f.Expires && f.Expires < today) continue;
-    if (f.IP && who.ip && f.IP === who.ip) return 'ip';
+    if (f.IP && who.ip && ipKey(f.IP) === ipKey(who.ip)) return 'ip';
     const bp = tail10(f.Phone);
     if (bp.length >= 7 && phones.includes(bp)) return 'phone';
     if (f.Email && emails.includes(String(f.Email).trim().toLowerCase())) return 'email';
@@ -596,9 +618,9 @@ async function closeAttempt(env, why, who) {
       'Name': who.name || '', 'Phone': who.phone || '', 'IP': who.ip || '', 'Time': new Date().toISOString() });
   } catch (err) { console.error('gate log', err); }
   try {
-    if (who.ip && who.ip !== 'anon' && why !== 'ip') {
+    if (who.ip && who.ip !== 'anon' && why !== 'ip' && why !== 'not on list') {
       const rows = await loadBlocked(env).catch(() => []);
-      if (!rows.some(r => r.fields && r.fields.Active && r.fields.IP === who.ip)) {
+      if (!rows.some(r => r.fields && r.fields.Active && r.fields.IP && ipKey(r.fields.IP) === ipKey(who.ip))) {
         const rec = await createOne(env, TABLES.blocked, {
           'Label': `(auto) address of a closed attempt — ${who.name || ''}`.slice(0, 120), 'IP': who.ip, 'Active': true,
           'Expires': env.IP_BLOCK_UNTIL || '2026-11-22', 'Note': `Seen with ${who.name || '?'} ${who.phone || ''} (${why})` });
@@ -613,5 +635,83 @@ async function handleGate(b, env, ip) {
   if (!name || phone.length < 7) return { error: 'Your name and phone number, please.' };
   const why = await checkBlocked(env, { names: [name], phones: [phone], ip });
   if (why) { await closeAttempt(env, why, { name, phone, ip, where: 'gate' }); return { ok: false, closed: true }; }
+  // a full evening: the door opens only for a phone on a Yes reply, with a name from that household.
+  // Someone who is merely not on the list is written down but their address is NOT closed: a
+  // guest who mistyped must be able to try again from home.
+  const li = await listCheck(env, str(b.event, 120), name, phone);
+  if (li.listMode && !li.unreadable && !li.house) {
+    await closeAttempt(env, 'not on list', { name, phone, ip, where: 'gate' });
+    return { ok: false, closed: true };
+  }
   return { ok: true };
+}
+
+/* ---------- A full evening: the guest list ----------
+   Events.Status = "Guest list only" turns an event from open to list mode. In list mode the
+   list is every household with a Yes reply for that event; a Maybe, a No, a silence or a block
+   is not on it. The phone is the key; the name need only match someone in that household.
+   If the list cannot be read the door stays open (a hiccup must never lock out a guest). */
+const LIST_STATUS = 'Guest list only';
+const eventInfos = new Map();       // event name -> { at, mode, id }
+async function eventInfo(env, eventName) {
+  const name = str(eventName, 120) || 'Diwali 2026';
+  const c = eventInfos.get(name);
+  if (c && Date.now() - c.at < 30000) return c;
+  try {
+    const ev = await findOne(env, TABLES.events, 'Event name', name);
+    const info = { at: Date.now(), mode: ev && ev.fields.Status === LIST_STATUS ? 'list' : 'open', id: ev ? ev.id : null };
+    eventInfos.set(name, info);
+    return info;
+  } catch (err) { console.error('event status unreadable', err); return c || { mode: 'open', id: null }; }
+}
+
+const lists = new Map();            // event id -> { at, households }
+async function guestList(env, eventId) {
+  const c = lists.get(eventId);
+  if (c && Date.now() - c.at < 30000) return c.households;
+  try {
+    const [replies, people] = await Promise.all([listAll(env, TABLES.replies), listAll(env, TABLES.people)]);
+    const byId = new Map(people.map(p => [p.id, p]));
+    const households = [];
+    for (const r of replies) {
+      const f = r.fields || {};
+      if (f.Coming !== 'Yes' || !(f.Event || []).includes(eventId)) continue;
+      const members = (f.People || []).map(id => byId.get(id)).filter(Boolean);
+      households.push({
+        headcount: f.Headcount || members.length || 1, memberCount: members.length,
+        names: members.map(m => m.fields['Full name'] || '').filter(Boolean),
+        phones: members.map(m => tail10(m.fields.Phone)).filter(p => p.length >= 7) });
+    }
+    lists.set(eventId, { at: Date.now(), households });
+    return households;
+  } catch (err) { if (c) return c.households; throw err; }
+}
+
+const tokens = s => fold(s).split(' ').filter(t => t.length >= 2);
+const alike = (a, b) => near(a, b) || (Math.min(a.length, b.length) >= 3 && (a.startsWith(b) || b.startsWith(a)));
+// the household whose phone this is; with a name, someone in it must also sound like what was typed
+function householdFor(list, phone, name) {
+  const p = tail10(phone); if (p.length < 7) return null;
+  const gt = tokens(name);
+  for (const h of list) {
+    if (!h.phones.includes(p)) continue;
+    if (!name || h.names.some(n => tokens(n).some(t => gt.some(g => alike(g, t))))) return h;
+  }
+  return null;
+}
+async function listCheck(env, eventName, name, phone) {
+  const info = await eventInfo(env, eventName);
+  if (info.mode !== 'list' || !info.id) return { listMode: false };
+  try { return { listMode: true, house: householdFor(await guestList(env, info.id), phone, name) }; }
+  catch (err) { console.error('guest list unreadable', err); return { listMode: true, unreadable: true }; }
+}
+
+// an IPv6 address changes its last 64 bits all the time; the first 64 identify the home or the phone
+function ipKey(ip) {
+  const s = String(ip || '').toLowerCase();
+  if (!s.includes(':')) return s;
+  const [a, b] = s.split('::');
+  const left = a ? a.split(':') : [], right = b ? b.split(':') : [];
+  const groups = b === undefined ? left : [...left, ...Array(Math.max(0, 8 - left.length - right.length)).fill('0'), ...right];
+  return groups.slice(0, 4).map(g => g.replace(/^0+(?=.)/, '')).join(':');
 }

@@ -119,3 +119,24 @@ Two tables the Worker reads and writes. Created by hand-off, names must match ex
 | Time | Date with time |
 
 If the Blocked table cannot be read the door stays open: a hiccup must never lock out a guest. The RSVP form runs the same check again on everyone named on a reply.
+
+## Added 12 Nov 2026 — the guest list (a full evening)
+
+An event can be **open** (anyone gets in, the door only keeps out the Blocked list) or **guest list only**.
+The switch is `Events.Status`. Set it to **Guest list only** and:
+
+- `GET /mode?event=` tells the page which it is (cached 30 s; if it cannot be read the page acts as open).
+- `/gate` opens only for a phone that is on a household with **Coming = Yes** for that event, and a name
+  that matches someone in that household (first name, spelling slips and a three-letter start are fine).
+  The Blocked list is checked first and still wins. Maybe, No, silence and a block are all "not on the list".
+- `/rsvp` takes changes only from such a household, and only downwards: it may lower the number or swap a
+  name, never add a place (HTTP 409). `/lookup` finds nothing for a phone that is not on the list.
+- A guest who is merely not on the list is written to Gate log (`not on list`) but their address is **not**
+  blocked, so a mistyped number can be retried from home. A Blocked hit still closes its address.
+- Everyone not on the list, blocked or just late, sees the same words. Nothing is remembered as "closed" on the
+  phone in this mode; the Worker is the lock. An old closed marker on a phone is cleared.
+- IPv6 addresses are compared by their first 64 bits (a phone rotates the rest), for the Blocked IP rows.
+- The page puts the reply first after the entrance and shows the guest their own reply.
+
+To close a later event: set its `Events.Status` to **Guest list only**. To reopen: set it back.
+A guest who changes a Yes to a No leaves the list, by design.

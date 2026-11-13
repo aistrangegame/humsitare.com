@@ -461,6 +461,12 @@ details.acc>:not(summary){padding-bottom:var(--s-5);color:var(--t-body)}
 .closed-h{font-family:var(--font-display);font-size:var(--fs-xl,1.6rem);color:var(--fg);margin:0 0 var(--s-2)}
 .closed-s{font-size:var(--fs-lg);color:var(--fg-2);margin:0}
 .is-closed .whoami,.is-closed .lightbtn,.is-closed .hold-say{display:none}
+.full-note{text-align:center;padding:0 0 var(--s-4)}
+.full-note[hidden]{display:none}
+.full-h{font-family:var(--font-display);font-size:var(--fs-xl,1.6rem);color:var(--fg);margin:0 0 var(--s-2)}
+.full-s{font-size:var(--fs-lg);color:var(--fg-2);margin:0 0 var(--s-3)}
+.full-ask{font-size:var(--fs-md,1rem);color:var(--fg-2);margin:0}
+body.rsvp-here .rsvp-fab{display:none}
 .whoami input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.1)}
 .lightbtn{
  max-width:100%;box-sizing:border-box;min-height:68px;padding:var(--s-2) clamp(var(--s-5),7vw,var(--s-8));border-radius:var(--radius-pill);border:2px solid var(--gold);
@@ -1202,6 +1208,11 @@ body.has-replied .rsvp-fab{display:none}
     </div>
 
     <div class="hold-slot"><div class="hold-wrap">
+      <div class="full-note" id="fullNote" hidden>
+        <p class="full-h">The evening is full.</p>
+        <p class="full-s">Our home holds only so many, and every place is now taken. Thank you for the warmth you&rsquo;ve sent toward it.</p>
+        <p class="full-ask">Already replied Yes? Enter your name and number to open your invitation.</p>
+      </div>
       <div class="whoami">
         <label for="whoName">Who is lighting it?</label>
         <input id="whoName" type="text" autocomplete="name" placeholder="Your name"
@@ -2562,8 +2573,49 @@ function initHero(){
     // nothing the guest typed stays on this phone
     try{ localStorage.removeItem(GUEST_KEY); localStorage.removeItem(GUEST_PHONE_KEY); localStorage.removeItem(REPLY_KEY); }catch(_){}
   }
+  /* a full evening (Events.Status = "Guest list only"): the door is a login for the households that
+     said Yes. Nothing is remembered as closed on the phone, because a guest who mistyped must be
+     able to try again; the Worker is the lock. If /mode cannot be read the page behaves as before. */
+  let listMode=false;
+  function clearClosed(){
+    hero.classList.remove('is-closed');
+    const note=$('#closedNote'); if(note) note.hidden=true;
+    const lb=$('#lightBtn'); if(lb) lb.disabled=false;
+    try{ localStorage.removeItem(CLOSED_KEY); }catch(_){}
+    try{ document.cookie='rk_closed=; max-age=0; path=/; SameSite=Lax'; }catch(_){}
+  }
+  function applyList(){
+    listMode=true; document.body.dataset.mode='list';
+    clearClosed(); paintGuest();
+    const n=$('#fullNote'); if(n) n.hidden=false;
+  }
+  const modeReady=(EVENT.endpoint
+    ? Promise.race([
+        fetch(EVENT.endpoint.replace(/\/$/,'')+'/mode?event='+encodeURIComponent(EVENT.eventName)).then(r=>r.json()).then(d=>d&&d.mode==='list'?'list':'open'),
+        new Promise(res=>setTimeout(()=>res('open'),2500)) ])
+    : Promise.resolve('open')).catch(()=>'open');
+  modeReady.then(m=>{ if(m==='list') applyList(); else if(wasClosed()) showClosed(); });
+
+  // once they are in, a Yes household's reply comes first on the page
+  function placeRsvp(){
+    if(!listMode) return;
+    const r=document.getElementById('rsvp'); if(!r) return;
+    if(gate.firstElementChild!==r){
+      gate.insertBefore(r, gate.firstElementChild);
+      $$('[data-petal]').forEach((m,i)=>{ m.dataset.petal=String(i); });
+      const eb=$('.eyebrow',r), tt=$('.title',r), ld=$('.lede',r);
+      if(eb) eb.textContent='Your RSVP';
+      if(tt) tt.textContent='You are on the list.';
+      if(ld) ld.textContent='Change anything below. Every place is taken, so the number can go down but not up.';
+      new IntersectionObserver(([e])=>document.body.classList.toggle('rsvp-here',e.isIntersecting),{threshold:.15}).observe(r);
+    }
+    // show them their own reply without taking them anywhere
+    setTimeout(()=>document.dispatchEvent(new CustomEvent('sitarey:autolook')), 700);
+  }
+
   async function tryOpen(){
     if(hero.classList.contains('lit') || hero.classList.contains('is-closed')) return;
+    await modeReady;
     const nameEl=document.getElementById('whoName'), phoneEl=document.getElementById('whoPhone');
     const say=document.getElementById('gateSay'), btn=$('#lightBtn');
     const name=tidyName(nameEl?nameEl.value:''), digitsOnly=String(phoneEl?phoneEl.value:'').replace(/\D/g,'');
@@ -2582,6 +2634,11 @@ function initHero(){
       /* any other failure (no network, Worker down): let them in rather than lock out a guest */
     }
     btn.textContent=label;
+    if(verdict==='closed' && listMode){
+      btn.disabled=false;
+      bad('That name and number are not on our list for the evening. If you replied Yes, try the number you used on your reply.');
+      return;
+    }
     if(verdict==='closed'){ showClosed(); return; }
     btn.disabled=false;
     if(verdict==='wait') return;
@@ -2602,7 +2659,7 @@ function initHero(){
       requestAnimationFrame(()=>requestAnimationFrame(stageReveal));
       hero.classList.add('assembled','daybreak','inked','dawned');
       $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
-      gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw'));
+      placeRsvp(); gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw'));
       document.dispatchEvent(new CustomEvent('sitarey:lit'));
       return;
     }
@@ -2632,7 +2689,7 @@ function initHero(){
           SND.moment('swell',{gain:0.7});
           inkTitle();
           $$('.yantra',hero).forEach(y=>y.classList.add('on','draw'));
-          setTimeout(()=>{ gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw')); }, 900);
+          setTimeout(()=>{ placeRsvp(); gate.hidden=false; $$('.yantra').forEach(y=>y.classList.add('on','draw')); }, 900);
           document.dispatchEvent(new CustomEvent('sitarey:lit'));
         },
         ()=>hero.classList.add('assembled')   // they arrive as the points land
@@ -2642,7 +2699,6 @@ function initHero(){
   $('#lightBtn').addEventListener('click',tryOpen);
   const ph=document.getElementById('whoPhone');
   if(ph) ph.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); tryOpen(); } });
-  if(wasClosed()) showClosed();
   onWidthChange(()=>{ if(hero.classList.contains('lit')) stageReveal(); });
 
   // motes
@@ -4796,8 +4852,14 @@ function initLookup(){
     box.hidden=true; body.hidden=true; found.hidden=false;
     try{ remember({name:r.name, family:r.family, coming:r.coming, count:r.count, when:r.submitted?Date.parse(r.submitted):Date.now()}); }catch(_){}
     const sr=$('#sendRow'); if(sr) sr.hidden=true;
-    found.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
+    if(quiet) quiet=false; else found.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
   }
+
+  let quiet=false;
+  document.addEventListener('sitarey:autolook',()=>{
+    if(String(inp.value||'').replace(/\D/g,'').length<7) return;
+    quiet=true; look();
+  });
 
   async function look(){
     const d=String(inp.value||'').replace(/\D/g,'');
@@ -4809,6 +4871,7 @@ function initLookup(){
       const r=await post('/lookup',{ phone:inp.value, event:EVENT.eventName });
       if(r.closed){ st.textContent='This invitation is closed.'; st.classList.add('bad'); go.disabled=false; go.textContent=label; return; }
       if(r.found) showFound(r);
+      else if(document.body.dataset.mode==='list'){ quiet=false; st.textContent='We could not find a Yes reply under that number.'; st.classList.add('bad'); }
       else { st.textContent='Nothing on that number yet — fill it in below.'; box.hidden=false;
              $('#r-name').focus({preventScroll:true}); }
     }catch(e){
@@ -4886,9 +4949,11 @@ function initForms(){
       else setTimeout(quietLamp, 400);
     }catch(err){
       if(err && err.closed){ btn.disabled=false; btn.textContent=label;
+        if(document.body.dataset.mode==='list'){ status.textContent='That name and number are not on our list for the evening.'; status.classList.add('bad'); return; }
         status.textContent='This invitation is closed.'; status.classList.add('bad');
         try{ localStorage.setItem('rk:sitarey-closed:v1','1'); document.cookie='rk_closed=1; max-age=31536000; path=/; SameSite=Lax'; }catch(_){}
         return; }
+      if(err && err.status===409){ btn.disabled=false; btn.textContent=label; status.textContent=err.message; status.classList.add('bad'); return; }
       btn.disabled=false; btn.textContent=label;
       status.textContent = EVENT.endpoint
         ? 'That did not go through. Please try once more.'
