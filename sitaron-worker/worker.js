@@ -28,7 +28,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
 
     const url = new URL(request.url);
-    if (url.pathname === '/health') return json({ ok: true }, 200, cors);
+    if (url.pathname === '/health') return json({ ok: true, door: 2 }, 200, cors);   // door 2: a closed address never closes the guest list
 
     // is this event open to anyone, or only to the people who replied Yes? (Events.Status)
     if (url.pathname === '/mode' && request.method === 'GET') {
@@ -237,10 +237,10 @@ async function handleRsvp(b, env, ip) {
 
   // the door again: the same check as the gate, on everyone named on this reply, so a
   // blocked person cannot be slipped in as a "family member" by someone who passed
-  const why = await checkBlocked(env, {
+  const why = await addressOnly(env, await checkBlocked(env, {
     names: [submitter, ...people.map(p => str(p.name, 120))],
     phones: [keyPhone, ...people.map(p => digits(p.phone))],
-    ip });
+    ip }), str(b.event, 120), submitter, keyPhone);
   if (why) { await closeAttempt(env, why, { name: submitter, phone: keyPhone, ip, where: 'rsvp' }); throw new Error('closed'); }
 
   // a full evening: only a household that already said Yes may change its reply, and it may
@@ -346,7 +346,7 @@ function throttled(ip) {
 async function handleLookup(b, env, ip) {
   const phone = digits(b.phone);
   if (!phone || phone.length < 7) return { found: false, reason: 'short' };
-  if (await checkBlocked(env, { names: [], phones: [phone], ip })) return { closed: true };
+  if (await addressOnly(env, await checkBlocked(env, { names: [], phones: [phone], ip }), str(b.event, 120), '', phone)) return { closed: true };
   const li = await listCheck(env, str(b.event, 120), '', phone);
   if (li.listMode && !li.unreadable && !li.house) return { found: false };
   const person = await findByPhone(env, phone);
@@ -556,7 +556,8 @@ async function handleSponsor(b, env) {
    alone, however it is capitalised or spelled nearby. A Phone blocks that number in any
    format. An IP blocks that address until it expires. Every closed attempt is written
    to "Gate log" with the address it came from, and the address of a closed attempt is
-   itself blocked until the event is over (IP_BLOCK_UNTIL, default 2026-11-22).
+   itself blocked until the event is over (IP_BLOCK_UNTIL, default 2026-11-22). A closed
+   address never closes a household on the guest list (see addressOnly).
    If the table cannot be read the door stays open: a hiccup must never lock out guests. */
 const fold = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
   .replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -597,17 +598,27 @@ async function checkBlocked(env, who) {
   const names = (who.names || []).filter(Boolean);
   const phones = (who.phones || []).map(tail10).filter(p => p.length >= 7);
   const emails = (who.emails || []).map(e => String(e || '').trim().toLowerCase()).filter(Boolean);
+  let ipHit = false;
   for (const r of rows) {
     const f = r.fields || {};
     if (!f.Active) continue;
     if (f.Expires && f.Expires < today) continue;
-    if (f.IP && who.ip && ipKey(f.IP) === ipKey(who.ip)) return 'ip';
+    if (f.IP && who.ip && ipKey(f.IP) === ipKey(who.ip)) ipHit = true;
     const bp = tail10(f.Phone);
     if (bp.length >= 7 && phones.includes(bp)) return 'phone';
     if (f.Email && emails.includes(String(f.Email).trim().toLowerCase())) return 'email';
     if (f.Name) for (const n of names) { const h = nameHit(f.Name, n); if (h) return h; }
   }
-  return null;
+  return ipHit ? 'ip' : null;
+}
+
+// A closed address is shared: a hall's Wi-Fi, a family's home. In list mode it never closes
+// a household that said Yes (their phone, and a name from that household). Without this, one
+// closed attempt at the hall would shut the door on every guest in the room (17 Nov 2026).
+async function addressOnly(env, why, eventName, name, phone) {
+  if (why !== 'ip') return why;
+  const li = await listCheck(env, eventName, name, phone);
+  return li.listMode && !li.unreadable && li.house ? null : why;
 }
 
 // a closed attempt: write it down, and close the address it came from
@@ -633,7 +644,7 @@ async function closeAttempt(env, why, who) {
 async function handleGate(b, env, ip) {
   const name = str(b.name, 120), phone = digits(b.phone);
   if (!name || phone.length < 7) return { error: 'Your name and phone number, please.' };
-  const why = await checkBlocked(env, { names: [name], phones: [phone], ip });
+  const why = await addressOnly(env, await checkBlocked(env, { names: [name], phones: [phone], ip }), str(b.event, 120), name, phone);
   if (why) { await closeAttempt(env, why, { name, phone, ip, where: 'gate' }); return { ok: false, closed: true }; }
   // a full evening: the door opens only for a phone on a Yes reply, with a name from that household.
   // Someone who is merely not on the list is written down but their address is NOT closed: a
