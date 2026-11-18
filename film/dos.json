@@ -1,0 +1,56 @@
+{
+ "muladhara": {
+  "do_title": "Thank the one who holds the room up.",
+  "do_body": "Someone has been carrying this evening: cooking, setting up, driving people here. Find them. Thank them for one specific thing.",
+  "hi_title": "जो इस शाम को थामे हुए है, उसे धन्यवाद दीजिए।",
+  "hi_body": "कोई आज की शाम को संभाल रहा है: खाना बना रहा है, तैयारी कर रहा है, लोगों को यहाँ ला रहा है। उन्हें ढूँढिए, और किसी एक ख़ास बात के लिए धन्यवाद दीजिए।"
+ },
+ "svadhisthana": {
+  "do_title": "Follow someone's excitement.",
+  "do_body": "Ask someone: what are you excited about right now? Then ask \"what's the best part?\" twice. Follow wherever their voice lifts.",
+  "hi_title": "किसी के उत्साह के पीछे चलिए।",
+  "hi_body": "किसी से पूछिए: अभी आप किस बात को लेकर उत्साहित हैं? फिर दो बार पूछिए, \"इसमें सबसे अच्छा क्या है?\" जहाँ उनकी आवाज़ खिल उठे, वहीं तक चलते जाइए।"
+ },
+ "manipura": {
+  "do_title": "Build one piece for someone.",
+  "do_body": "Ask someone what they are building right now: a project, a home, a habit. Name one piece you could add: an idea, a name, an introduction. Offer it.",
+  "hi_title": "किसी के लिए एक टुकड़ा जोड़िए।",
+  "hi_body": "किसी से पूछिए कि वे अभी क्या बना रहे हैं: कोई काम, कोई घर, कोई आदत। एक चीज़ बताइए जो आप उसमें जोड़ सकते हैं: एक विचार, एक नाम, एक परिचय। और उसे उन्हें दे दीजिए।"
+ },
+ "anahata": {
+  "do_title": "Receive, and only say thank you.",
+  "do_body": "Ask someone to tell you one thing they see in you. Say only \"thank you.\" No deflecting. Then offer to do the same for them.",
+  "hi_title": "स्वीकार कीजिए, और बस धन्यवाद कहिए।",
+  "hi_body": "किसी से कहिए कि वे आपके बारे में एक बात बताएँ जो उन्हें आप में दिखती है। जवाब में सिर्फ़ \"धन्यवाद\" कहिए, बात टालिए नहीं। फिर उनके लिए भी यही करने की पेशकश कीजिए।"
+ },
+ "vishuddha": {
+  "do_title": "Say the true thing to their face.",
+  "do_body": "Tell someone one true thing you have been meaning to say. \"I'm glad you came because…\" or \"I've always admired…\". One sentence, out loud, to them.",
+  "hi_title": "सच्ची बात सामने कह दीजिए।",
+  "hi_body": "किसी से वह एक सच्ची बात कहिए जो आप बहुत दिनों से कहना चाहते थे: \"मुझे ख़ुशी है कि आप आए, क्योंकि…\" या \"मुझे हमेशा आपकी यह बात अच्छी लगी…\"। एक वाक्य, ज़ोर से, उन्हीं से।"
+ },
+ "ajna": {
+  "do_title": "Ten still seconds.",
+  "do_body": "Ask someone: \"Ten quiet seconds?\" Face each other and say nothing, just see them. Then each says one thing you noticed. Side by side in silence is fine too.",
+  "hi_title": "दस शांत पल।",
+  "hi_body": "किसी से पूछिए: \"दस पल चुप रहें?\" आमने-सामने खड़े होइए, कुछ मत कहिए, बस उन्हें देखिए। फिर दोनों एक-एक बात बताइए जो आपने देखी। चाहें तो साथ बैठकर चुप रहना भी ठीक है।"
+ },
+ "sahasrara": {
+  "do_title": "Make sure nobody is alone.",
+  "do_body": "Find someone standing alone or new to the room. Bring them to one person you know and say one good thing about each of them.",
+  "hi_title": "कोई अकेला न रहे।",
+  "hi_body": "किसी ऐसे व्यक्ति को ढूँढिए जो अकेला खड़ा है या यहाँ नया है। उन्हें किसी ऐसे व्यक्ति से मिलवाइए जिसे आप जानते हैं, और दोनों के बारे में एक-एक अच्छी बात कहिए।"
+ },
+ "aatma": {
+  "do_title": "Hold someone's story.",
+  "do_body": "Ask someone for a Diwali memory. Listen without adding your own. When they finish, say back one line of it.",
+  "hi_title": "किसी की कहानी थामिए।",
+  "hi_body": "किसी से उनकी कोई दिवाली की याद पूछिए। अपनी बात जोड़े बिना सुनिए। जब वे बता चुकें, तो उसकी एक पंक्ति उन्हें दोहराकर सुनाइए।"
+ },
+ "maya": {
+  "do_title": "Introduce yourself without the costume.",
+  "do_body": "Introduce yourself to someone without your job, your role, or whose son or daughter you are. Let them try it back. You will both laugh at how hard it is. Then go play.",
+  "hi_title": "बिना पहचान के अपना परिचय दीजिए।",
+  "hi_body": "किसी को अपना परिचय दीजिए, बिना अपने काम के, बिना अपनी भूमिका के, बिना यह बताए कि आप किसके बेटे या बेटी हैं। फिर उन्हें भी ऐसा करने दीजिए। दोनों हँसेंगे कि यह कितना मुश्किल है। फिर जाइए, खेलिए।"
+ }
+}
